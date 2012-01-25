@@ -40,12 +40,17 @@ SET( QT_USE_QTSQL TRUE )
 SET( QT_USE_QTNETWORK TRUE )
 SET( QT_USE_XML TRUE )
 
+ADD_SUBDIRECTORY( qtsingleapplication )
+
+SET( QtSingleApp_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/qtsingleapplication )
+SET( QT_SINGLEAPP_LIBRARY qtsingleapplication )
+
 ADD_SUBDIRECTORY( qtservice )
 
 SET( QtService_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/qtservice )
 SET( QT_SERVICE_LIBRARY qtservice )
 
-INCLUDE_DIRECTORIES(${QtService_INCLUDE_DIR} )
+INCLUDE_DIRECTORIES(${QtService_INCLUDE_DIR} ${QtSingleApp_INCLUDE_DIR} )
 
 SET( kueued_CPP main.cpp
                 kueued.cpp
@@ -63,6 +68,7 @@ TARGET_LINK_LIBRARIES( kueued ${QT_LIBRARIES}
                               ${QT_QTCORE_LIBRARY} 
                               ${QT_QTSQL_LIBRARIES} 
                               ${QT_QTNETWORK_LIBRARY} 
-			      ${QT_QTXML_LIBRARY} 
+			      ${QT_QTXML_LIBRARY}
+			      ${QT_SINGLEAPP_LIBRARY} 
                               ${QT_SERVICE_LIBRARY} )
 

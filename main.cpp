@@ -24,16 +24,22 @@
 */
 #include "kueued.h"
 #include <QDebug>
-#include <QApplication>
+#include <QtSingleCoreApplication>
+#include <iostream>
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication app( argc, argv );
-    
-    QApplication::setOrganizationName( "nts" );
-    QApplication::setApplicationName( "kueued" );
-    QApplication::setApplicationVersion( "git" );
-    QApplication::setQuitOnLastWindowClosed( false );
+    QtSingleCoreApplication app( argc, argv );
+
+    if ( app.isRunning() )
+    {
+        std::cout <<  "kueued is already running, exiting";
+    	return 0;
+    }
+        
+    QCoreApplication::setOrganizationName( "nts" );
+    QCoreApplication::setApplicationName( "kueued" );
+    QCoreApplication::setApplicationVersion( "git" );
 
      Kueued k;
      return app.exec();
