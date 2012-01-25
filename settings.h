@@ -35,13 +35,7 @@ class Settings
         /* General Group */
         
         static QString dBServer();
-        static void setdBServer( const QString& );
-        
-        static QString outputFile();
-        static void setOutputFile( const QString& );
-        
         static int refreshSeconds();
-        static void setRefreshSeconds( const int& );
 };    
 
 #endif

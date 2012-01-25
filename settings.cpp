@@ -27,39 +27,13 @@
 
 QString Settings::dBServer()
 {
-    QSettings settings( "/etc/kueued/kueued.conf" );
+    QSettings settings( "/etc/kueued/kueued.conf", QSettings::NativeFormat);
     return settings.value( "DBServer" ).toString();
-}
-
-void Settings::setdBServer( const QString& s )
-{
-    QSettings settings( "/etc/kueued/kueued.conf" );;
-    settings.setValue( "DBServer", s );
-    settings.sync();
 }
 
 int Settings::refreshSeconds()
 {
-    QSettings settings( "/etc/kueued/kueued.conf" );;
+    QSettings settings( "/etc/kueued/kueued.conf",QSettings::NativeFormat);
     return settings.value( "refreshSeconds", 60 ).toInt();
 }
 
-void Settings::setRefreshSeconds( const int& i )
-{
-    QSettings settings( "/etc/kueued/kueued.conf" );;
-    settings.setValue( "refreshSeconds", i );
-    settings.sync();
-}
-
-QString Settings::outputFile()
-{
-    QSettings settings( "/etc/kueued/kueued.conf" );;
-    return settings.value( "outputFile" ).toString();
-}
-
-void Settings::setOutputFile( const QString& s )
-{
-    QSettings settings( "/etc/kueued/kueued.conf" );;
-    settings.setValue( "outputFile", s );
-    settings.sync();
-}
