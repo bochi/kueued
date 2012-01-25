@@ -35,6 +35,6 @@ int main(int argc, char *argv[])
     QApplication::setApplicationVersion( "git" );
     QApplication::setQuitOnLastWindowClosed( false );
 
-     KueuedService service( argc, argv );
-     return service.exec();
+     Kueued k;
+     return app.exec();
 }

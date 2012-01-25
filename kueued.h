@@ -36,6 +36,8 @@
 #include <QtNetwork>
 #include <QNetworkAccessManager>
 
+class Database;
+
 class Kueued : public QObject
  {
      Q_OBJECT

@@ -100,13 +100,8 @@ Database::~Database()
 void Database::insertSiebelItemIntoDB( SiebelItem* item )
 {
     qDebug() << "[DATABASE] Inserting SiebelItem for " << item->id << item->queue;
-<<<<<<< HEAD
 
     QSqlQuery query( "INSERT INTO qmon_siebel( ID, QUEUE, SEVERITY, HOURS, SOURCE, CONTACTVIA, ODATE, ADATE, QDATE, "
-=======
-      
-    QSqlQuery query( "INSERT INTO qmon_siebel( ID, QUEUE, SEVERITY, HOURS, SOURCE, CONTACTVIA, ODATE, ADATE, QDATE "
->>>>>>> 10af9bbc1a82c8a5f681e9b00211268a09ca9dcc
                      "STATUS, CONTRACT, QUEUE1, PHONE, ONSITEPHONE, GEO, WTF, ROUTING, BDESC, SLA )"
                      "VALUES"
                      "( :id, :queue, :severity, :hours, :source, :contactvia, :odate, :adate, :qdate, :status, :contract, "
