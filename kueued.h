@@ -27,32 +27,32 @@
 #define KUEUED_H
 
 #include "database.h"
+#include "qtservice/qtservice.h"
 #include "server.h"
 
 #include <QObject>
 #include <QString>
 #include <QStringList>
 #include <QtNetwork>
-
-class Database;
+#include <QNetworkAccessManager>
 
 class Kueued : public QObject
-{
-    Q_OBJECT
+ {
+     Q_OBJECT
+     
+ public:
+     Kueued();
+     ~Kueued();
 
-    public: 
-        Kueued();
-        ~Kueued();
-        
     private:
-        Database* mDB;
-        HttpDaemon* mHttp;
+        HttpDaemon *mHttpServer;
         QStringList mNotifiedList;
         QStringList mQueueList;
         QNetworkReply* mBomgarReply;
         QNetworkReply* mSiebelReply;
         QTimer* mTimer;
-                
+        Database* mDB;
+        
     public slots:
         void update();
     
@@ -66,8 +66,8 @@ class Kueued : public QObject
         void initialUpdateProgress( int );
         void initialUpdateDone();
         void qmonDataChanged();
-};
 
+ };
 
-
+ 
 #endif

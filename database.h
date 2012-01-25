@@ -30,7 +30,6 @@
 
 #include <QtSql>
 
-
 class SiebelItem;
 class BomgarItem;
 class WhoIsInBomgarItem;

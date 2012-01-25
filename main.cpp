@@ -22,9 +22,7 @@
     Have a lot of fun :-)
 
 */
-
 #include "kueued.h"
-
 #include <QDebug>
 #include <QApplication>
 
@@ -37,7 +35,6 @@ int main(int argc, char *argv[])
     QApplication::setApplicationVersion( "git" );
     QApplication::setQuitOnLastWindowClosed( false );
 
-    Kueued kueued;
-    
-    return app.exec();
+     KueuedService service( argc, argv );
+     return service.exec();
 }

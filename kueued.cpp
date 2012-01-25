@@ -25,15 +25,23 @@
 
 #include "kueued.h"
 #include "settings.h"
+<<<<<<< HEAD
 #include "network.h"
+=======
+#include "database.h"
+#include "network.h"
+#include <QtServiceController>
+>>>>>>> 10af9bbc1a82c8a5f681e9b00211268a09ca9dcc
 
 #include <QApplication>
 #include <QWebElementCollection>
 
-Kueued::Kueued()
+KueuedService::KueuedService(int argc, char **argv)
+    : QtService<QCoreApplication>(argc, argv, "Qt HTTP Daemon")
 {
-    qDebug() << "[KUEUED] Constructing";
+    qDebug() << "[KUEUEDSERVICE] Constructing";
     
+<<<<<<< HEAD
     mDB = new Database;
     
     mHttp = new HttpDaemon( 8080, this );
@@ -48,6 +56,40 @@ Kueued::Kueued()
              this, SLOT( bomgarJobDone() ) );
     
     mTimer = new QTimer( this );
+=======
+    setServiceDescription("A dummy HTTP service implemented with Qt");
+    setServiceFlags(QtServiceBase::CanBeSuspended);
+}
+
+KueuedService::~KueuedService()
+{
+
+}
+
+
+void KueuedService::start()
+     {
+         mKueued = new Kueued();
+         mKueued->update();
+         
+     }
+          void KueuedService::pause()
+     {
+        // daemon->pause();
+     }
+
+     void KueuedService::resume()
+     {
+         //daemon->resume();
+     }
+
+Kueued::Kueued()
+{
+    mNAM = new QNetworkAccessManager;
+    mDB = new Database;
+    mHttpServer = new HttpDaemon( 8080, this );
+    mTimer = new QTimer(this);
+>>>>>>> 10af9bbc1a82c8a5f681e9b00211268a09ca9dcc
     
     connect( mTimer, SIGNAL( timeout() ),
              this, SLOT( update() ) );
@@ -55,6 +97,7 @@ Kueued::Kueued()
     mTimer->start( Settings::refreshSeconds() * 1000 );
 }
 
+     
 Kueued::~Kueued()
 {
     qDebug() << "[KUEUED] Destroying";
@@ -69,33 +112,50 @@ Kueued::~Kueued()
     }
 }
 
+     
 void Kueued::update()
 {
+<<<<<<< HEAD
     qDebug() << "[KUEUED] Starting update...";
     
     if ( !mSiebelReply->isRunning() ) 
     {
         Network::get(QUrl( Settings::dBServer() + "/stefan-siebel.asp" ));
+=======
+    qDebug() << Settings::dBServer();
+     //NetworkRequest bomgarRequest( QUrl( Settings::dBServer() + "/chat.asp" ) );
+    mSiebelReply = Network::get(QUrl( Settings::dBServer() + "/stefan-siebel.asp"));    
+    //siebelRequest.setRawHeader( "User-Agent", QString( "kueue" + QApplication::applicationVersion() ).toUtf8() );
+    //bomgarRequest.setRawHeader( "User-Agent", QString( "kueue" + QApplication::applicationVersion() ).toUtf8() );
+
+    /*//if ( !mSiebelReply->isRunning() ) 
+    {
+
+>>>>>>> 10af9bbc1a82c8a5f681e9b00211268a09ca9dcc
     }
-    else
+    //else
     {
         qDebug() << "[KUEUED] Siebel update still running - skipping";
     }
     
-    if ( !mBomgarReply->isRunning() ) 
+    //if ( !mBomgarReply->isRunning() ) 
     {
+<<<<<<< HEAD
         mBomgarReply = Network::get(QUrl( Settings::dBServer() + "/chat.asp" ));
+=======
+        //mBomgarReply = mNAM->get( bomgarRequest );
+>>>>>>> 10af9bbc1a82c8a5f681e9b00211268a09ca9dcc
     }
-    else
+    //else
     {
         qDebug() << "[KUEUED] Bomgar update still running - skipping";
     }
-    
+    */
     connect( mSiebelReply, SIGNAL( finished() ),
              this, SLOT( siebelJobDone() ) );
 
-    connect( mBomgarReply, SIGNAL( finished() ), 
-             this, SLOT( bomgarJobDone() ) );
+    //connect( mBomgarReply, SIGNAL( finished() ), 
+      //       this, SLOT( bomgarJobDone() ) );
 }
 
 void Kueued::siebelJobDone()
