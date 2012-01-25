@@ -34,14 +34,14 @@ Database::Database()
 {   
     qDebug() << "[DATABASE] Constructing";
     
-    QDir dir = QDir( QDesktopServices::storageLocation( QDesktopServices::DataLocation ) );
+    QDir dir = QDir( "/etc/kueued" );
 
     if ( !dir.exists() )
     {
         dir.mkpath( dir.path() );
     }
     
-    mDBfile = dir.path() + "/database.sqlite";
+    mDBfile = dir.path() + "/db.sqlite";
     
     mDb = QSqlDatabase::addDatabase( "QSQLITE" );
     mDb.setDatabaseName( mDBfile );
