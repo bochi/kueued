@@ -73,15 +73,16 @@ Database::Database()
     }
     
     if ( !query.exec( "CREATE TABLE IF NOT EXISTS qmon_siebel( ID INTEGER PRIMARY KEY UNIQUE, QUEUE TEXT, SEVERITY TEXT, HOURS TEXT, "
-                      "SOURCE TEXT, CONTACTVIA TEXT, ODATE TEXT, ADATE TEXT, STATUS TEXT, "
+                      "SOURCE TEXT, CONTACTVIA TEXT, ODATE TEXT, ADATE TEXT, QDATE TEXT, STATUS TEXT, "
                       "CONTRACT TEXT, QUEUE1 TEXT, PHONE TEXT, ONSITEPHONE TEXT, GEO TEXT, "
                       "WTF TEXT, ROUTING TEXT, BDESC TEXT, SLA TEXT, DISPLAY TEXT )" ) )
+
     {
         qDebug() << "[DATABASE] Error:" << query.lastError();
     }
     
     if ( !query.exec( "CREATE TABLE IF NOT EXISTS qmon_chat( ID TEXT PRIMARY KEY UNIQUE, SR INTEGER, REPTEAM TEXT, "
-                      "NAME TEXT, DATE TEXT, SOMENR INTEGER )" ) )
+                      "NAME TEXT, DATE TEXT, QDATE TEXT, SOMENR INTEGER )" ) )
         {
         qDebug() << "[DATABASE] Error:" << query.lastError();
     }
@@ -98,13 +99,13 @@ Database::~Database()
 void Database::insertSiebelItemIntoDB( SiebelItem* item )
 {
     qDebug() << "[DATABASE] Inserting SiebelItem for " << item->id << item->queue;
-      
-    QSqlQuery query( "INSERT INTO qmon_siebel( ID, QUEUE, SEVERITY, HOURS, SOURCE, CONTACTVIA, ODATE, ADATE, "
+
+    QSqlQuery query( "INSERT INTO qmon_siebel( ID, QUEUE, SEVERITY, HOURS, SOURCE, CONTACTVIA, ODATE, ADATE, QDATE, "
                      "STATUS, CONTRACT, QUEUE1, PHONE, ONSITEPHONE, GEO, WTF, ROUTING, BDESC, SLA )"
                      "VALUES"
-                     "( :id, :queue, :severity, :hours, :source, :contactvia, :odate, :adate, :status, :contract, "
+                     "( :id, :queue, :severity, :hours, :source, :contactvia, :odate, :adate, :qdate, :status, :contract, "
                      ":queue1, :phone, :onsitephone, :geo, :wtf, :routing, :bdesc, :sla )" );
-  
+
     query.bindValue( ":id", item->id );
     query.bindValue( ":queue", item->queue );
     query.bindValue( ":severity", item->severity );
@@ -113,6 +114,7 @@ void Database::insertSiebelItemIntoDB( SiebelItem* item )
     query.bindValue( ":contactvia", item->contactvia );
     query.bindValue( ":odate", convertTime( item->odate ) );
     query.bindValue( ":adate", convertTime( item->adate ) );
+    query.bindValue( ":qdate", QDateTime::currentDateTime().toString( "yyyy-MM-dd hh:mm:ss" ) );
     query.bindValue( ":status", item->status );
     query.bindValue( ":contract", item->contract );
     query.bindValue( ":queue1", item->queue1 );
@@ -296,15 +298,16 @@ void Database::updateBomgarItemInDB( BomgarItem* bi )
 {
     qDebug() << "[DATABASE] Inserting BomgarItem" << bi->id << bi->sr;
         
-    QSqlQuery query( "INSERT INTO qmon_chat( ID, SR, REPTEAM, NAME, DATE, SOMENR )"
+    QSqlQuery query( "INSERT INTO qmon_chat( ID, SR, REPTEAM, NAME, DATE, QDATE, SOMENR )"
                      "VALUES"
-                     "( :id, :sr, :repteam, :name, :date, :somenr )" );
+                     "( :id, :sr, :repteam, :name, :date, :qdate, :somenr )" );
                      
     query.bindValue( ":id", bi->id );
     query.bindValue( ":sr", bi->sr );
     query.bindValue( ":repteam", bi->repteam );
     query.bindValue( ":name", bi->name );
     query.bindValue( ":date", bi->date );
+    query.bindValue( ":qdate", QDateTime::currentDateTime().toString( "yyyy-MM-dd hh:mm:ss" ) );
     query.bindValue( ":somenr", bi->someNumber );
     query.exec();
 }
@@ -324,7 +327,7 @@ QList< SiebelItem* > Database::getSrsForQueue( const QString& queue )
     QSqlQuery query;
     QList< SiebelItem* > list;
     
-    query.prepare( "SELECT ID, SEVERITY, HOURS, SOURCE, CONTACTVIA, ODATE, ADATE, STATUS, CONTRACT, GEO, BDESC, SLA, DISPLAY "
+    query.prepare( "SELECT ID, SEVERITY, HOURS, SOURCE, CONTACTVIA, ODATE, ADATE, QDATE, STATUS, CONTRACT, GEO, BDESC, SLA, DISPLAY "
                    "FROM qmon_siebel WHERE ( QUEUE = :queue )" );
     query.bindValue( ":queue", queue );
     query.exec();
@@ -340,12 +343,13 @@ QList< SiebelItem* > Database::getSrsForQueue( const QString& queue )
         si->contactvia = query.value( 4 ).toString();
         si->adate = query.value( 5 ).toString();
         si->odate = query.value( 6 ).toString();
-        si->status = query.value( 7 ).toString();
-        si->contract = query.value( 8 ).toString();
-        si->geo = query.value( 9 ).toString();
-        si->bdesc = query.value( 10 ).toString();
-        si->sla = query.value( 11 ).toString();
-        si->display = query.value( 12 ).toString();
+        si->qdate = query.value( 7 ).toString();
+        si->status = query.value( 8 ).toString();
+        si->contract = query.value( 9 ).toString();
+        si->geo = query.value( 10 ).toString();
+        si->bdesc = query.value( 11 ).toString();
+        si->sla = query.value( 12 ).toString();
+        si->display = query.value( 13 ).toString();
         si->isChat = isChat( query.value( 0 ).toString() );
         si->bomgarQ = getBomgarQueue( query.value( 0 ).toString() );
         

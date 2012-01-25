@@ -30,6 +30,11 @@
 
 #include <QtSql>
 
+
+class SiebelItem;
+class BomgarItem;
+class WhoIsInBomgarItem;
+
 class Database : public QObject
 {
     Q_OBJECT
@@ -64,6 +69,55 @@ class Database : public QObject
     private:
         QSqlDatabase mDb;
         QString mDBfile;        
+};
+
+
+class SiebelItem 
+{
+    public:
+        QString id;
+        QString queue;
+        QString severity;
+        QString hours;
+        QString source;
+        QString contactvia;
+        QString odate;
+        QString adate;
+        QString qdate;
+        QString status;
+        QString contract;
+        QString queue1; 
+        QString phone;
+        QString onsitephone;
+        QString geo; 
+        QString wtf;
+        QString routing;
+        QString bdesc;
+        QString sla;
+        QString display;
+        QString bomgarQ;
+        bool isChat;
+};
+
+class BomgarItem 
+{
+    public:
+        QString id;
+        QString sr;
+        QString repteam;
+        QString name;
+        QString date;
+        QString qdate;
+        QString someNumber;
+};
+
+class WhoIsInBomgarItem
+{
+    public:
+        QString name;
+        QString sr;
+        QString timeInQueue;
+        QString timeInSystem;
 };
 
 #endif

@@ -23,51 +23,6 @@
 
 */
 
-#ifndef KUEUED_H
-#define KUEUED_H
 
-#include "database.h"
 #include "server.h"
-
-#include <QObject>
-#include <QString>
-#include <QStringList>
-#include <QtNetwork>
-
-class Database;
-
-class Kueued : public QObject
-{
-    Q_OBJECT
-
-    public: 
-        Kueued();
-        ~Kueued();
-        
-    private:
-        Database* mDB;
-        HttpDaemon* mHttp;
-        QStringList mNotifiedList;
-        QStringList mQueueList;
-        QNetworkReply* mBomgarReply;
-        QNetworkReply* mSiebelReply;
-        QTimer* mTimer;
-                
-    public slots:
-        void update();
-    
-    private slots:
-        void siebelJobDone();
-        void bomgarJobDone();
-        void whoIsInBomgarJobDone( QNetworkReply* );
-        
-    signals:
-        void initialUpdate( int, int );
-        void initialUpdateProgress( int );
-        void initialUpdateDone();
-        void qmonDataChanged();
-};
-
-
-
-#endif
+#include "server.moc"

@@ -26,16 +26,9 @@ CMAKE_MINIMUM_REQUIRED( VERSION 2.6 )
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR} )
 
 SET( QtService_CPP      qtservice.cpp  
-                        qtservice_unix.cpp  
                         qtunixserversocket.cpp  
                         qtunixsocket.cpp )
 
-
-IF( WIN32 )
-    SET( QtService_CPP ${QtService_CPP} qtservice_win.cpp )
-ELSE( WIN32 )
-    SET( QtService_CPP ${QtService_CPP} qtservice_unix.cpp )
-ENDIF( WIN32 )
 
 QT4_AUTOMOC( ${QtService_CPP} )
 

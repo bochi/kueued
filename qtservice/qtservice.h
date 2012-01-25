@@ -40,7 +40,11 @@
 #ifndef QTSERVICE_H
 #define QTSERVICE_H
 
+#include "qtunixsocket.h"
+#include "qtunixserversocket.h"
+
 #include <QtCore/QCoreApplication>
+#include <QStringList>
 
 #if defined(Q_WS_WIN)
 #  if !defined(QT_QTSERVICE_EXPORT) && !defined(QT_QTSERVICE_IMPORT)
@@ -60,6 +64,8 @@
 
 class QStringList;
 class QtServiceControllerPrivate;
+class QtServiceBasePrivate;
+class QtServiceSysPrivate;
 
 class QT_QTSERVICE_EXPORT QtServiceController
 {
@@ -186,6 +192,84 @@ private:
     Application *app;
 };
 
+class QtServiceControllerPrivate
+{
+    Q_DECLARE_PUBLIC(QtServiceController)
+public:
+    QString serviceName;
+    QtServiceController *q_ptr;
+};
+
+class QtServiceBasePrivate
+{
+    Q_DECLARE_PUBLIC(QtServiceBase)
+public:
+
+    QtServiceBasePrivate(const QString &name);
+    ~QtServiceBasePrivate();
+
+    QtServiceBase *q_ptr;
+
+    QString serviceDescription;
+    QtServiceController::StartupType startupType;
+    QtServiceBase::ServiceFlags serviceFlags;
+    QStringList args;
+
+    static class QtServiceBase *instance;
+
+    QtServiceController controller;
+
+    void startService();
+    int run(bool asService, const QStringList &argList);
+    bool install(const QString &account, const QString &password);
+
+    bool start();
+
+    QString filePath() const;
+    bool sysInit();
+    void sysSetPath();
+    void sysCleanup();
+    class QtServiceSysPrivate *sysd;
+};
+
 Q_DECLARE_OPERATORS_FOR_FLAGS(QtServiceBase::ServiceFlags)
+
+class QtServiceSysPrivate : public QtUnixServerSocket
+{
+    Q_OBJECT
+public:
+    QtServiceSysPrivate();
+    ~QtServiceSysPrivate();
+
+    char *ident;
+
+    QtServiceBase::ServiceFlags serviceFlags;
+
+protected:
+    void incomingConnection(int socketDescriptor);
+
+private slots:
+    void slotReady();
+    void slotClosed();
+
+private:
+    QString getCommand(const QTcpSocket *socket);
+    QMap<const QTcpSocket *, QString> cache;
+};
+
+class QtServiceStarter : public QObject
+{
+    Q_OBJECT
+public:
+    QtServiceStarter(QtServiceBasePrivate *service)
+        : QObject(), d_ptr(service) {}
+public slots:
+    void slotStart()
+    {
+        d_ptr->startService();
+    }
+private:
+    QtServiceBasePrivate *d_ptr;
+};
 
 #endif // QTSERVICE_H

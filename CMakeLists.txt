@@ -50,7 +50,9 @@ INCLUDE_DIRECTORIES(${QtService_INCLUDE_DIR} )
 SET( kueued_CPP main.cpp
                 kueued.cpp
 		database.cpp
-                settings.cpp)
+                server.cpp
+		network.cpp
+		settings.cpp)
 
 QT4_AUTOMOC( ${kueued_CPP} )
 
