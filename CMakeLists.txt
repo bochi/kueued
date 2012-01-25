@@ -63,6 +63,10 @@ QT4_AUTOMOC( ${kueued_CPP} )
 
 ADD_EXECUTABLE( kueued ${kueued_CPP} )
 INSTALL( TARGETS kueued DESTINATION bin )
+INSTALL( PROGRAMS scripts/kueued DESTINATION /etc/init.d )
+INSTALL( FILES kueued.conf DESTINATION /etc/kueued )
+INSTALL( FILES kueued.log DESTINATION /var/log )
+INSTALL( SCRIPT scripts/kueued_post.cmake )
 
 TARGET_LINK_LIBRARIES( kueued ${QT_LIBRARIES} 
                               ${QT_QTCORE_LIBRARY} 
@@ -71,4 +75,5 @@ TARGET_LINK_LIBRARIES( kueued ${QT_LIBRARIES}
 			      ${QT_QTXML_LIBRARY}
 			      ${QT_SINGLEAPP_LIBRARY} 
                               ${QT_SERVICE_LIBRARY} )
+
 
