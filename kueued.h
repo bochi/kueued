@@ -26,31 +26,37 @@
 #ifndef KUEUED_H
 #define KUEUED_H
 
+#include "database.h"
+#include "qtservice/qtservice.h"
+#include "server.h"
+
 #include <QObject>
 #include <QString>
 #include <QStringList>
 #include <QtNetwork>
+#include <QNetworkAccessManager>
 
-class SiebelItem;
-class BomgarItem;
 class WhoIsInBomgarItem;
+class Database;
 
 class Kueued : public QObject
-{
-    Q_OBJECT
+ {
+     Q_OBJECT
+     
+ public:
+     Kueued();
+     ~Kueued();
 
-    public: 
-        Kueued();
-        ~Kueued();
-        
-    private:
+ private:
+        HttpDaemon *mHttpServer;
         QNetworkAccessManager* mNAM;
         QStringList mNotifiedList;
         QStringList mQueueList;
         QNetworkReply* mBomgarReply;
         QNetworkReply* mSiebelReply;
         QTimer* mTimer;
-                
+        Database* mDB;
+        
     public slots:
         void update();
     
@@ -64,8 +70,27 @@ class Kueued : public QObject
         void initialUpdateProgress( int );
         void initialUpdateDone();
         void qmonDataChanged();
-};
 
+ };
+
+ 
+class KueuedService : public QtService<QCoreApplication>
+ {
+          
+ public:
+     KueuedService(int argc, char **argv);
+     ~KueuedService();
+
+  protected:
+     void start();
+     void pause();
+     void resume();
+
+ private:
+     Kueued* mKueued;
+ };
+
+ 
 class SiebelItem 
 {
     public:

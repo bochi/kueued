@@ -1,6 +1,6 @@
 /*
-              kueued - create xml data for kueue's qmon 
-              (C) 2012 Stefan Bogner <sbogner@suse.com>
+                kueue - keep track of your SR queue
+             (C) 2011 Stefan Bogner <sbogner@suse.com>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,19 +22,34 @@
     Have a lot of fun :-)
 
 */
-#include "kueued.h"
-#include <QDebug>
-#include <QApplication>
 
-int main(int argc, char *argv[])
+#ifndef NETWORK_H
+#define NETWORK_H
+
+#include <QtNetwork>
+
+class Network : public QObject
 {
-    QApplication app( argc, argv );
+    Q_OBJECT
     
-    QApplication::setOrganizationName( "nts" );
-    QApplication::setApplicationName( "kueued" );
-    QApplication::setApplicationVersion( "git" );
-    QApplication::setQuitOnLastWindowClosed( false );
+    private:
+        static Network* instance;
+        Network();
+        ~Network();
+        
+        QNetworkAccessManager* mNAM;
+        QNetworkReply* getImpl( const QUrl& );
+ 
+    public:
+        static Network& net();
+        static void destroy();
+        static QNetworkReply* get( const QUrl& url )
+        {
+            return Network::net().getImpl( url );
+        }
 
-     KueuedService service( argc, argv );
-     return service.exec();
-}
+    private slots:
+        void error( QNetworkReply::NetworkError );
+};
+
+#endif

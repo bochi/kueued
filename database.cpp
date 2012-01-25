@@ -28,6 +28,7 @@
 #include <QFile>
 #include <QDebug>
 #include <QDesktopServices>
+#include <QDateTime>
 
 Database::Database()
 {   
@@ -73,7 +74,7 @@ Database::Database()
     }
     
     if ( !query.exec( "CREATE TABLE IF NOT EXISTS qmon_siebel( ID INTEGER PRIMARY KEY UNIQUE, QUEUE TEXT, SEVERITY TEXT, HOURS TEXT, "
-                      "SOURCE TEXT, CONTACTVIA TEXT, ODATE TEXT, ADATE TEXT, STATUS TEXT, "
+                      "SOURCE TEXT, CONTACTVIA TEXT, ODATE TEXT, ADATE TEXT, QDATE TEXT, STATUS TEXT, "
                       "CONTRACT TEXT, QUEUE1 TEXT, PHONE TEXT, ONSITEPHONE TEXT, GEO TEXT, "
                       "WTF TEXT, ROUTING TEXT, BDESC TEXT, SLA TEXT, DISPLAY TEXT )" ) )
     {
@@ -99,10 +100,10 @@ void Database::insertSiebelItemIntoDB( SiebelItem* item )
 {
     qDebug() << "[DATABASE] Inserting SiebelItem for " << item->id << item->queue;
       
-    QSqlQuery query( "INSERT INTO qmon_siebel( ID, QUEUE, SEVERITY, HOURS, SOURCE, CONTACTVIA, ODATE, ADATE, "
+    QSqlQuery query( "INSERT INTO qmon_siebel( ID, QUEUE, SEVERITY, HOURS, SOURCE, CONTACTVIA, ODATE, ADATE, QDATE "
                      "STATUS, CONTRACT, QUEUE1, PHONE, ONSITEPHONE, GEO, WTF, ROUTING, BDESC, SLA )"
                      "VALUES"
-                     "( :id, :queue, :severity, :hours, :source, :contactvia, :odate, :adate, :status, :contract, "
+                     "( :id, :queue, :severity, :hours, :source, :contactvia, :odate, :adate, :qdate, :status, :contract, "
                      ":queue1, :phone, :onsitephone, :geo, :wtf, :routing, :bdesc, :sla )" );
   
     query.bindValue( ":id", item->id );
@@ -113,6 +114,7 @@ void Database::insertSiebelItemIntoDB( SiebelItem* item )
     query.bindValue( ":contactvia", item->contactvia );
     query.bindValue( ":odate", convertTime( item->odate ) );
     query.bindValue( ":adate", convertTime( item->adate ) );
+    query.bindValue( ":qdate", QDateTime::currentDateTime().toString( "yyyy-MM-dd hh:mm:ss" ) );
     query.bindValue( ":status", item->status );
     query.bindValue( ":contract", item->contract );
     query.bindValue( ":queue1", item->queue1 );

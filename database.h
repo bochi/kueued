@@ -30,6 +30,9 @@
 
 #include <QtSql>
 
+class SiebelItem;
+class BomgarItem;
+
 class Database : public QObject
 {
     Q_OBJECT
