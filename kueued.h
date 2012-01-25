@@ -44,6 +44,7 @@ class Kueued : public QObject
         ~Kueued();
         
     private:
+        QNetworkAccessManager* mNAM;
         QStringList mNotifiedList;
         QStringList mQueueList;
         QNetworkReply* mBomgarReply;

@@ -26,6 +26,8 @@
 #ifndef DATABASE_H_
 #define DATABASE_H_
 
+#include "kueued.h"
+
 #include <QtSql>
 
 class Database : public QObject
@@ -57,6 +59,8 @@ class Database : public QObject
         static QString getBomgarQueueById( const QString& );
         static void updateBomgarQueue( BomgarItem* );
         
+        static QString convertTime( const QString& );
+
     private:
         QSqlDatabase mDb;
         QString mDBfile;        

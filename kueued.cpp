@@ -27,36 +27,21 @@
 #include "settings.h"
 #include "database.h"
 
+#include <QApplication>
 #include <QWebElementCollection>
 
 Kueued::Kueued()
 {
     qDebug() << "[KUEUED] Constructing";
     
+    mNAM = new QNetworkAccessManager( this );
     mTimer = new QTimer( this );
     
     connect( mTimer, SIGNAL( timeout() ),
              this, SLOT( update() ) );
 
-    if ( Settings::monitorEnabled() )
-    {
-        mBomgarReply = Kueue::download( QUrl( Settings::dBServer() + "/chat.asp" ) );
-        mSiebelReply = Kueue::download( QUrl( Settings::dBServer() + "/stefan-siebel.asp" ) );
-        
-        connect( mSiebelReply, SIGNAL( finished() ),
-                 this, SLOT( siebelJobDone() ) );
-        connect( mBomgarReply, SIGNAL( finished() ), 
-                 this, SLOT( bomgarJobDone() ) );
-        
-        mTimer->start( Settings::monitorMinutes() * 60000 );
-    }
     
-    QStringList queueList = Settings::queuesToMonitor();
-    
-    for ( int i = 0; i < queueList.size(); ++i ) 
-    {
-        mQueueList.append( queueList.at( i ).split( "|" ).at( 1 ) );
-    }
+    mTimer->start( Settings::refreshSeconds() * 6000 );
 }
 
 Kueued::~Kueued()
@@ -75,29 +60,35 @@ Kueued::~Kueued()
 
 void Kueued::update()
 {
-    if ( !mBomgarReply->isRunning() ) 
-    {
-        mBomgarReply = Kueue::download( QUrl( Settings::dBServer() + "/chat.asp" ) );
-        
-        connect( mBomgarReply, SIGNAL( finished() ), 
-                 this, SLOT( bomgarJobDone() ) );
-    }
-    else
-    {
-        qDebug() << "[KUEUED] Bomgar update still running - skipping";
-    }
+    QNetworkRequest siebelRequest( QUrl( Settings::dBServer() + "/stefan-siebel.asp" ) );
+    QNetworkRequest bomgarRequest( QUrl( Settings::dBServer() + "/chat.asp" ) );
+    
+    siebelRequest.setRawHeader( "User-Agent", QString( "kueue" + QApplication::applicationVersion() ).toUtf8() );
+    bomgarRequest.setRawHeader( "User-Agent", QString( "kueue" + QApplication::applicationVersion() ).toUtf8() );
 
     if ( !mSiebelReply->isRunning() ) 
     {
-        mSiebelReply = Kueue::download( QUrl( Settings::dBServer() + "/stefan-siebel.asp" ) );
-        
-        connect( mSiebelReply, SIGNAL( finished() ), 
-                 this, SLOT( siebelJobDone() ) );
+        mSiebelReply = mNAM->get( siebelRequest );
     }
     else
     {
         qDebug() << "[KUEUED] Siebel update still running - skipping";
     }
+    
+    if ( !mBomgarReply->isRunning() ) 
+    {
+        mBomgarReply = mNAM->get( bomgarRequest );
+    }
+    else
+    {
+        qDebug() << "[KUEUED] Bomgar update still running - skipping";
+    }
+    
+    connect( mSiebelReply, SIGNAL( finished() ),
+             this, SLOT( siebelJobDone() ) );
+
+    connect( mBomgarReply, SIGNAL( finished() ), 
+             this, SLOT( bomgarJobDone() ) );
 }
 
 void Kueued::siebelJobDone()
@@ -109,7 +100,7 @@ void Kueued::siebelJobDone()
     
     QStringList list = replydata.split( "<br>" );
     QStringList newList;
-    QStringList existList = Database::getKueuedSiebelList();
+    QStringList existList = Database::getQmonSiebelList();
     
     if ( existList.isEmpty() )
     {
@@ -150,35 +141,6 @@ void Kueued::siebelJobDone()
                 if ( !Database::siebelExistsInDB( si->id ) )
                 {                    
                     Database::insertSiebelItemIntoDB( si );
-                    
-                    if ( !initial && mQueueList.contains( si->queue ) )
-                    {
-                        if ( si->severity == "Low" )
-                        {               
-                            Kueue::notify( "kueue-monitor-low", "New SR in " + QString( si->queue ), 
-                                               "<b>SR#" + si->id + "</b><br>" + si->bdesc, si->id );
-                        }
-                        else if ( si->severity == "Medium" )
-                        {
-                            Kueue::notify( "kueue-monitor-medium", "New SR in " + QString( si->queue ), 
-                                               "<b>SR#" + si->id + "</b><br>" + si->bdesc, si->id );
-                        }
-                        else if ( si->severity == "Urgent" )
-                        {
-                            Kueue::notify( "kueue-monitor-urgent", "New SR in " + QString( si->queue ), 
-                                               "<b>SR#" + si->id + "</b><br>" + si->bdesc, si->id );
-                        }
-                        else if ( si->severity == "High" )
-                        {
-                            Kueue::notify( "kueue-monitor-high", "New SR in " + QString( si->queue ), 
-                                               "<b>SR#" + si->id + "</b><br>" + si->bdesc, si->id );
-                        }
-
-                        if ( Settings::animateKueued() ) 
-                        {
-			    Kueue::attention( true );
-			}
-                    }
                 }
                 else
                 {
@@ -197,12 +159,8 @@ void Kueued::siebelJobDone()
                 
                 delete si;
             }
-            
-            emit initialUpdateProgress( i );
         }
         
-        emit initialUpdateDone();
-    
         for ( int i = 0; i < existList.size(); ++i ) 
         {
             if ( !newList.contains( existList.at( i ) ) )
@@ -223,7 +181,7 @@ void Kueued::bomgarJobDone()
 {
     QString replydata = mBomgarReply->readAll();
     QStringList list;
-    QStringList existList( Database::getKueuedBomgarList() );
+    QStringList existList( Database::getQmonBomgarList() );
     bool changed = false;
     
     if ( !mBomgarReply->error() )
@@ -262,15 +220,6 @@ void Kueued::bomgarJobDone()
                     changed = true;
                 }
                 
-                if ( ( Settings::monitorPersonalBomgar() ) && 
-                     ( bi->name == Settings::bomgarName() ) && 
-                     ( !mNotifiedList.contains( bi->sr ) ) )
-                {
-                    mNotifiedList.append( bi->sr );
-                    Kueue::notify( "kueue-personal-bomgar", "Customer in Bomgar", "<b>SR#" + bi->sr + "</b>", "<br>" );
-                    if ( Settings::animateKueued() ) Kueue::attention( true );
-                }
-                
                 delete bi;
             }
         }
@@ -286,13 +235,7 @@ void Kueued::bomgarJobDone()
     }
     else
     {
-        Kueue::notify( "kueue-general", "Error", "<b>Updating Bomgar Data failed.</b><br>No VPN connection or networking issues?", "" );
         qDebug() << "[KUEUED] Bomgar Error:" << mBomgarReply->errorString();
-    }
-    
-    if ( changed )
-    {
-        emit qmonDataChanged();
     }
 }
 
