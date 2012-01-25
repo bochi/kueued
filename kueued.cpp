@@ -1,6 +1,6 @@
 /*
-                kueue - keep track of your SR queue
-             (C) 2011 Stefan Bogner <sbogner@suse.com>
+              kueued - create xml data for kueue's qmon 
+              (C) 2012 Stefan Bogner <sbogner@suse.com>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,26 +23,15 @@
 
 */
 
-#include "qmon.h"
-#include "data/database.h"
+#include "kueued.h"
 #include "settings.h"
-#include "network.h"
-#include "kueue.h"
-#include "ui/html.h"
+#include "database.h"
 
-#include <QMessageBox>
-#include <QMenu>
-#include <QWebFrame>
-#include <QWidgetAction>
-#include <QWebInspector>
-#include <QShortcut>
-#include <QGridLayout>
-#include <QToolButton>
 #include <QWebElementCollection>
 
-Qmon::Qmon()
+Kueued::Kueued()
 {
-    qDebug() << "[MONITOR] Constructing";
+    qDebug() << "[KUEUED] Constructing";
     
     mTimer = new QTimer( this );
     
@@ -70,9 +59,9 @@ Qmon::Qmon()
     }
 }
 
-Qmon::~Qmon()
+Kueued::~Kueued()
 {
-    qDebug() << "[MONITOR] Destroying";
+    qDebug() << "[KUEUED] Destroying";
     
     mQueueList.clear();
     
@@ -84,7 +73,7 @@ Qmon::~Qmon()
     }
 }
 
-void Qmon::update()
+void Kueued::update()
 {
     if ( !mBomgarReply->isRunning() ) 
     {
@@ -95,7 +84,7 @@ void Qmon::update()
     }
     else
     {
-        qDebug() << "[MONITOR] Bomgar update still running - skipping";
+        qDebug() << "[KUEUED] Bomgar update still running - skipping";
     }
 
     if ( !mSiebelReply->isRunning() ) 
@@ -107,11 +96,11 @@ void Qmon::update()
     }
     else
     {
-        qDebug() << "[MONITOR] Siebel update still running - skipping";
+        qDebug() << "[KUEUED] Siebel update still running - skipping";
     }
 }
 
-void Qmon::siebelJobDone()
+void Kueued::siebelJobDone()
 {
     QString replydata = mSiebelReply->readAll();
     bool initial = false;
@@ -120,7 +109,7 @@ void Qmon::siebelJobDone()
     
     QStringList list = replydata.split( "<br>" );
     QStringList newList;
-    QStringList existList = Database::getQmonSiebelList();
+    QStringList existList = Database::getKueuedSiebelList();
     
     if ( existList.isEmpty() )
     {
@@ -185,7 +174,7 @@ void Qmon::siebelJobDone()
                                                "<b>SR#" + si->id + "</b><br>" + si->bdesc, si->id );
                         }
 
-                        if ( Settings::animateQmon() ) 
+                        if ( Settings::animateKueued() ) 
                         {
 			    Kueue::attention( true );
 			}
@@ -195,13 +184,13 @@ void Qmon::siebelJobDone()
                 {
                     if ( Database::siebelQueueChanged( si ) )
                     {
-                        qDebug() << "[MONITOR] Siebel Queue Changed for SR" << list.at( i ).split( "|" ).at( 1 ).trimmed();
+                        qDebug() << "[KUEUED] Siebel Queue Changed for SR" << list.at( i ).split( "|" ).at( 1 ).trimmed();
                         Database::updateSiebelQueue( si );
                     }
                     
                     if ( Database::siebelSeverityChanged( si ) )
                     {
-                        qDebug() << "[MONITOR] Siebel Severity Changed for SR" << list.at( i ).split( "|" ).at( 1 ).trimmed();
+                        qDebug() << "[KUEUED] Siebel Severity Changed for SR" << list.at( i ).split( "|" ).at( 1 ).trimmed();
                         Database::updateSiebelSeverity( si );
                     }
                 }
@@ -224,17 +213,17 @@ void Qmon::siebelJobDone()
     }
     else
     {
-        qDebug() << "[MONITOR] Siebel Error:" << mSiebelReply->errorString();
+        qDebug() << "[KUEUED] Siebel Error:" << mSiebelReply->errorString();
     }
     
     emit qmonDataChanged();
 }
 
-void Qmon::bomgarJobDone()
+void Kueued::bomgarJobDone()
 {
     QString replydata = mBomgarReply->readAll();
     QStringList list;
-    QStringList existList( Database::getQmonBomgarList() );
+    QStringList existList( Database::getKueuedBomgarList() );
     bool changed = false;
     
     if ( !mBomgarReply->error() )
@@ -279,7 +268,7 @@ void Qmon::bomgarJobDone()
                 {
                     mNotifiedList.append( bi->sr );
                     Kueue::notify( "kueue-personal-bomgar", "Customer in Bomgar", "<b>SR#" + bi->sr + "</b>", "<br>" );
-                    if ( Settings::animateQmon() ) Kueue::attention( true );
+                    if ( Settings::animateKueued() ) Kueue::attention( true );
                 }
                 
                 delete bi;
@@ -298,7 +287,7 @@ void Qmon::bomgarJobDone()
     else
     {
         Kueue::notify( "kueue-general", "Error", "<b>Updating Bomgar Data failed.</b><br>No VPN connection or networking issues?", "" );
-        qDebug() << "[MONITOR] Bomgar Error:" << mBomgarReply->errorString();
+        qDebug() << "[KUEUED] Bomgar Error:" << mBomgarReply->errorString();
     }
     
     if ( changed )
@@ -308,7 +297,7 @@ void Qmon::bomgarJobDone()
 }
 
 
-void Qmon::whoIsInBomgarJobDone( QNetworkReply* reply )
+void Kueued::whoIsInBomgarJobDone( QNetworkReply* reply )
 {
     QString replydata = reply->readAll();
     QString who;
@@ -331,13 +320,12 @@ void Qmon::whoIsInBomgarJobDone( QNetworkReply* reply )
            w->timeInQueue = whoItem.split( "<td><td>" ).at( 2 );
            w->timeInSystem = whoItem.split( "<td><td>" ).at( 3 );
            
-           qDebug() << "[MONITOR] New WhoIsInBomgarItem" << w->name << w->sr << w->timeInQueue << w->timeInSystem;
+           qDebug() << "[KUEUED] New WhoIsInBomgarItem" << w->name << w->sr << w->timeInQueue << w->timeInSystem;
            
            delete w;
         }        
     }
 }
 
-
-#include "qmon.moc"
+#include "kueued.moc"
 
