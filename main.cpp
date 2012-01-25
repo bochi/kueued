@@ -28,7 +28,7 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication app( argc, argv );
+    QCoreApplication app( argc, argv );
     
     QApplication::setOrganizationName( "nts" );
     QApplication::setApplicationName( "kueued" );
