@@ -24,6 +24,7 @@
 */
 
 #include "database.h"
+#include "debug.h"
 
 #include <QFile>
 #include <QDebug>
@@ -32,7 +33,7 @@
 
 Database::Database()
 {   
-    qDebug() << "[" + QDateTime::currentDateTime().toString( "MM-dd hh:mm:ss" ) + "DATABASE] Constructing";
+    Debug::print( "database", "Constructing" );
     
     QDir dir = QDir( "/etc/kueued" );
 
@@ -48,29 +49,29 @@ Database::Database()
     
     if ( !mDb.open() )
     {
-        qDebug() << "[" + QDateTime::currentDateTime().toString( "MM-dd hh:mm:ss" ) + "DATABASE] Failed to open the database.";
+        Debug::print( "database", "Failed to open the database." );
     }
                          
     QSqlQuery query( mDb );
     
     if ( !query.exec("PRAGMA temp_store = MEMORY") )
     {
-        qDebug() << "[" + QDateTime::currentDateTime().toString( "MM-dd hh:mm:ss" ) + "DATABASE] Error:" << query.lastError();
+        Debug::print( "database", "Error: " + query.lastError().text() );
     }
     
     if ( !query.exec("PRAGMA synchronous = OFF") )
     {
-        qDebug() << "[" + QDateTime::currentDateTime().toString( "MM-dd hh:mm:ss" ) + "DATABASE] Error:" << query.lastError();
+        Debug::print( "database", "Error: " + query.lastError().text() );
     }
     
     if ( !query.exec("PRAGMA journal_mode = MEMORY") )
     {
-        qDebug() << "[" + QDateTime::currentDateTime().toString( "MM-dd hh:mm:ss" ) + "DATABASE] Error:" << query.lastError();
+        Debug::print( "database", "Error: " + query.lastError().text() );
     }
     
     if ( !query.exec("PRAGMA locking_mode = EXCLUSIVE") )
     {
-        qDebug() << "[" + QDateTime::currentDateTime().toString( "MM-dd hh:mm:ss" ) + "DATABASE] Error:" << query.lastError();
+        Debug::print( "database", "Error: " + query.lastError().text() );
     }
     
     if ( !query.exec( "CREATE TABLE IF NOT EXISTS qmon_siebel( ID INTEGER PRIMARY KEY UNIQUE, QUEUE TEXT, SEVERITY TEXT, HOURS TEXT, "
@@ -79,19 +80,19 @@ Database::Database()
                       "WTF TEXT, ROUTING TEXT, BDESC TEXT, SLA TEXT, DISPLAY TEXT )" ) )
 
     {
-        qDebug() << "[" + QDateTime::currentDateTime().toString( "MM-dd hh:mm:ss" ) + "DATABASE] Error:" << query.lastError();
+        Debug::print( "database", "Error: " + query.lastError().text() );
     }
     
     if ( !query.exec( "CREATE TABLE IF NOT EXISTS qmon_chat( ID TEXT PRIMARY KEY UNIQUE, SR INTEGER, REPTEAM TEXT, "
                       "NAME TEXT, DATE TEXT, QDATE TEXT, SOMENR INTEGER )" ) )
         {
-        qDebug() << "[" + QDateTime::currentDateTime().toString( "MM-dd hh:mm:ss" ) + "DATABASE] Error:" << query.lastError();
+        Debug::print( "database", "Error: " + query.lastError().text() );
     }
 }
 
 Database::~Database()
 {   
-    qDebug() << "[" + QDateTime::currentDateTime().toString( "MM-dd hh:mm:ss" ) + "DATABASE] Destroying";
+    Debug::print( "database", "Destroying" );
 
     mDb.close();    
     QSqlDatabase::removeDatabase( mDb.connectionName() );
@@ -99,7 +100,7 @@ Database::~Database()
 
 void Database::insertSiebelItemIntoDB( SiebelItem* item )
 {
-    qDebug() << "[" + QDateTime::currentDateTime().toString( "MM-dd hh:mm:ss" ) + "DATABASE] Inserting SiebelItem for " << item->id << item->queue;
+    Debug::print( "database", "Inserting SiebelItem for " + item->id + " " + item->queue );
 
     QSqlQuery query( "INSERT INTO qmon_siebel( ID, QUEUE, SEVERITY, HOURS, SOURCE, CONTACTVIA, ODATE, ADATE, QDATE, "
                      "STATUS, CONTRACT, QUEUE1, PHONE, ONSITEPHONE, GEO, WTF, ROUTING, BDESC, SLA )"
@@ -143,7 +144,7 @@ void Database::updateSiebelQueue( SiebelItem* si )
 
 void Database::updateSiebelSeverity( SiebelItem* si )
 {
-    qDebug() << "[" + QDateTime::currentDateTime().toString( "MM-dd hh:mm:ss" ) + "DATABASE] Updating Siebel Severity" << si->id << si->severity;
+    Debug::print( "database", "Updating Siebel Severity for " + si->id + " to " + si->severity );
     QSqlQuery query( "UPDATE qmon_siebel SET SEVERITY = :severity WHERE id = :id" );
                 
     query.bindValue( ":severity", si->severity );
@@ -164,7 +165,7 @@ void Database::updateSiebelDisplay( const QString& display )
 
 void Database::deleteSiebelItemFromDB( const QString& id )
 {
-    qDebug() << "[" + QDateTime::currentDateTime().toString( "MM-dd hh:mm:ss" ) + "DATABASE] Deleting SiebelItem" << id;
+    Debug::print( "database", "Deleting SiebelItem " + id );
     
     QSqlQuery query;
     query.prepare( "DELETE FROM qmon_siebel WHERE ID = :id" );
@@ -297,7 +298,7 @@ QString Database::getQmonBdesc( const QString& id )
 
 void Database::updateBomgarItemInDB( BomgarItem* bi )
 {
-    qDebug() << "[" + QDateTime::currentDateTime().toString( "MM-dd hh:mm:ss" ) + "DATABASE] Inserting BomgarItem" << bi->id << bi->sr;
+    Debug::print( "database", "Inserting BomgarItem " + bi->id + " " + bi->sr );
         
     QSqlQuery query( "INSERT INTO qmon_chat( ID, SR, REPTEAM, NAME, DATE, QDATE, SOMENR )"
                      "VALUES"
@@ -315,7 +316,7 @@ void Database::updateBomgarItemInDB( BomgarItem* bi )
 
 void Database::deleteBomgarItemFromDB( const QString& id )
 {
-    qDebug() << "[" + QDateTime::currentDateTime().toString( "MM-dd hh:mm:ss" ) + "DATABASE] Deleting BomgarItem" << id;
+    Debug::print( "database", "Deleting BomgarItem " + id );
     
     QSqlQuery query;
     query.prepare( "DELETE FROM qmon_chat WHERE ID = :id" );
@@ -391,7 +392,7 @@ bool Database::bomgarExistsInDB( const QString& id )
 
 void Database::updateBomgarQueue( BomgarItem* bi )
 {
-    qDebug() << "[" + QDateTime::currentDateTime().toString( "MM-dd hh:mm:ss" ) + "DATABASE] Updating BomgarQueue for" << bi->id << bi->sr << " to " << bi->name;
+    Debug::print( "database", "Updating BomgarQueue for " + bi->id + " " + bi->sr + " to " + bi->name );
     
     QSqlQuery query;
     query.prepare( "UPDATE qmon_chat SET NAME = :name WHERE ID = :id" );

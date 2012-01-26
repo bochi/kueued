@@ -1,11 +1,7 @@
 /*
-<<<<<<< HEAD
+ 
               kueued - create xml data for kueue's qmon 
               (C) 2012 Stefan Bogner <sbogner@suse.com>
-=======
-                kueue - keep track of your SR queue
-             (C) 2011 Stefan Bogner <sbogner@suse.com>
->>>>>>> 10af9bbc1a82c8a5f681e9b00211268a09ca9dcc
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -30,6 +26,7 @@
 
 #include "network.h"
 #include "settings.h"
+#include "debug.h"
 
 #include <QtGui>
 #include <QDebug>
@@ -58,14 +55,14 @@ void Network::destroy()
 
 Network::Network()
 {
-    qDebug() << "[NETWORK] Constructing";   
+    Debug::print( "network", "Constructing" );
     
     mNAM = new QNetworkAccessManager( this );
 }
 
 Network::~Network()
 {
-    qDebug() << "[NETWORK] Destroying";
+    Debug::print( "network", "Destroying" );
 }
 
 QNetworkReply* Network::getImpl( const QUrl& url )
@@ -85,7 +82,7 @@ void Network::error( QNetworkReply::NetworkError error )
 {
     QNetworkReply* reply = qobject_cast<QNetworkReply*>( QObject::sender() );
     
-    qDebug() << "[NETWORK] Error getting" << reply->url();
+    Debug::print( "network", "Error getting " + reply->url().toString() );
 }
 
 #include "network.moc"
