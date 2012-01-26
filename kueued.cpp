@@ -28,12 +28,15 @@
 #include "network.h"
 #include "database.h"
 #include "network.h"
+#include "debug.h"
 
 #include <QApplication>
 #include <QWebElementCollection>
 
 Kueued::Kueued()
 {
+    Debug::print( "kueued", "Constructing" );
+    
     mSiebelReply = Network::get(QUrl( Settings::dBServer() + "/stefan-siebel.asp" ));
     mBomgarReply = Network::get(QUrl( Settings::dBServer() + "/chat.asp" ));
 		        
@@ -56,7 +59,7 @@ Kueued::Kueued()
      
 Kueued::~Kueued()
 {
-    qDebug() << "[KUEUED] Destroying";
+    Debug::print( "kueued", "Destroying" );
     
     mQueueList.clear();
     
@@ -77,7 +80,7 @@ void Kueued::update()
     }
     else
     {
-        qDebug() << "[KUEUED] Siebel update still running - skipping";
+        Debug::print( "kueued", "Siebel update still running - skipping" );
     }
 
     if ( !mBomgarReply->isRunning() ) 
@@ -86,7 +89,7 @@ void Kueued::update()
     }
     else
     {
-        qDebug() << "[KUEUED] Bomgar update still running - skipping";
+        Debug::print( "kueued", "Bomgar update still running - skipping" );
     }
 
     connect( mSiebelReply, SIGNAL( finished() ),
@@ -151,13 +154,13 @@ void Kueued::siebelJobDone()
                 {
                     if ( Database::siebelQueueChanged( si ) )
                     {
-                        qDebug() << "[KUEUED] Siebel Queue Changed for SR" << list.at( i ).split( "|" ).at( 1 ).trimmed();
+                        Debug::print( "kueued", "Siebel Queue Changed for SR " + list.at( i ).split( "|" ).at( 1 ).trimmed() );
                         Database::updateSiebelQueue( si );
                     }
                     
                     if ( Database::siebelSeverityChanged( si ) )
                     {
-                        qDebug() << "[KUEUED] Siebel Severity Changed for SR" << list.at( i ).split( "|" ).at( 1 ).trimmed();
+                        Debug::print( "kueued", "Siebel Severity Changed for SR " + list.at( i ).split( "|" ).at( 1 ).trimmed() );
                         Database::updateSiebelSeverity( si );
                     }
                 }
@@ -176,7 +179,7 @@ void Kueued::siebelJobDone()
     }
     else
     {
-        qDebug() << "[KUEUED] Siebel Error:" << mSiebelReply->errorString();
+        Debug::print( "kueued", "Siebel Error: " + mSiebelReply->errorString() );
     }
     
     emit qmonDataChanged();
@@ -240,7 +243,7 @@ void Kueued::bomgarJobDone()
     }
     else
     {
-        qDebug() << "[KUEUED] Bomgar Error:" << mBomgarReply->errorString();
+        Debug::print( "kueued", "Bomgar Error: " + mBomgarReply->errorString() );
     }
 }
 
@@ -268,7 +271,7 @@ void Kueued::whoIsInBomgarJobDone( QNetworkReply* reply )
            w->timeInQueue = whoItem.split( "<td><td>" ).at( 2 );
            w->timeInSystem = whoItem.split( "<td><td>" ).at( 3 );
            
-           qDebug() << "[KUEUED] New WhoIsInBomgarItem" << w->name << w->sr << w->timeInQueue << w->timeInSystem;
+           Debug::print( "kueued", "New WhoIsInBomgarItem " + w->name + " " + w->sr + " " + w->timeInQueue + " " + w->timeInSystem );
            
            delete w;
         }        

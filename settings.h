@@ -36,6 +36,8 @@ class Settings
         
         static QString dBServer();
         static int refreshSeconds();
+        static QString oracleHost();
+        static int oraclePort();
 };    
 
 #endif

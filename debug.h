@@ -23,29 +23,21 @@
 
 */
 
-#include "settings.h"
+#ifndef DEBUG_H
+#define DEBUG_H
 
-QString Settings::dBServer()
+#include <QDebug>
+#include <QDateTime>
+#include <QString>
+#include <iostream>
+
+namespace Debug
 {
-    QSettings settings( "/etc/kueued/kueued.conf", QSettings::NativeFormat);
-    return settings.value( "DBServer" ).toString();
+    static void print( const QString& c, const QString& msg )
+    {
+        QString t = "[" + QDateTime::currentDateTime().toString( "MM/dd hh:mm:ss" ) + "] [" + c.toUpper() + "] ";
+        std::cout << t.toStdString() << msg.toStdString() << std::endl;
+    }
 }
 
-int Settings::refreshSeconds()
-{
-    QSettings settings( "/etc/kueued/kueued.conf",QSettings::NativeFormat);
-    return settings.value( "refreshSeconds", 60 ).toInt();
-}
-
-QString Settings::oracleHost()
-{
-    QSettings settings( "/etc/kueued/kueued.conf", QSettings::NativeFormat);
-    return settings.value( "oracleHost" ).toString();
-}
-
-int Settings::oraclePort()
-{
-    QSettings settings( "/etc/kueued/kueued.conf", QSettings::NativeFormat);
-    return settings.value( "oraclePort" ).toInt();
-}
-
+#endif
