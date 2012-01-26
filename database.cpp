@@ -27,7 +27,6 @@
 #include "debug.h"
 
 #include <QFile>
-#include <QDebug>
 #include <QDesktopServices>
 #include <QDateTime>
 
@@ -45,11 +44,10 @@ Database::Database()
     mDBfile = dir.path() + "/db.sqlite";
     
     mDb = QSqlDatabase::addDatabase( "QSQLITE" );
-    mDb.setDatabaseName( mDBfile );
     
     if ( !mDb.open() )
     {
-        Debug::print( "database", "Failed to open the database." );
+        Debug::print( "database", "Failed to open the database " + mDb.lastError().text() );
     }
                          
     QSqlQuery query( mDb );
@@ -133,7 +131,7 @@ void Database::insertSiebelItemIntoDB( SiebelItem* item )
 
 void Database::updateSiebelQueue( SiebelItem* si )
 {
-    qDebug() << "[" + QDateTime::currentDateTime().toString( "MM-dd hh:mm:ss" ) + "[" + QDateTime::currentDateTime().toString( "MM-dd hh:mm:ss" ) + "DATABASE] Updating Siebel Queue" << si->id << si->queue;
+    Debug::print( "database", "Updating Siebel queue for " + si->id + " to " + si->queue );
     QSqlQuery query( "UPDATE qmon_siebel SET QUEUE = :queue WHERE id = :id" );
                 
     query.bindValue( ":queue", si->queue );

@@ -37,8 +37,8 @@ Kueued::Kueued()
 {
     Debug::print( "kueued", "Constructing" );
     
-    mSiebelReply = Network::get(QUrl( Settings::dBServer() + "/stefan-siebel.asp" ));
-    mBomgarReply = Network::get(QUrl( Settings::dBServer() + "/chat.asp" ));
+    mSiebelReply = Network::get( QUrl( Settings::dBServer() + "/stefan-siebel.asp" ) );
+    mBomgarReply = Network::get( QUrl( Settings::dBServer() + "/chat.asp" ) );
 		        
     connect( mSiebelReply, SIGNAL( finished() ),
              this, SLOT( siebelJobDone() ) );
@@ -76,7 +76,8 @@ void Kueued::update()
 {
     if ( !mSiebelReply->isRunning() ) 
     {
-        Network::get(QUrl( Settings::dBServer() + "/stefan-siebel.asp" ));
+        Debug::print( "kueued", "Downloading Siebel data..." );
+        Network::get( QUrl( Settings::dBServer() + "/stefan-siebel.asp" ) );
     }
     else
     {
@@ -85,6 +86,7 @@ void Kueued::update()
 
     if ( !mBomgarReply->isRunning() ) 
     {
+        Debug::print( "kueued", "Downloading Bomgar data..." );
         mBomgarReply = Network::get(QUrl( Settings::dBServer() + "/chat.asp" ));
     }
     else
