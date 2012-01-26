@@ -76,8 +76,7 @@ void Kueued::update()
 {
     if ( !mSiebelReply->isRunning() ) 
     {
-        Debug::print( "kueued", "Downloading Siebel data..." );
-        Network::get( QUrl( Settings::dBServer() + "/stefan-siebel.asp" ) );
+        mSiebelReply = Network::get( QUrl( Settings::dBServer() + "/stefan-siebel.asp" ) );
     }
     else
     {
@@ -86,7 +85,6 @@ void Kueued::update()
 
     if ( !mBomgarReply->isRunning() ) 
     {
-        Debug::print( "kueued", "Downloading Bomgar data..." );
         mBomgarReply = Network::get(QUrl( Settings::dBServer() + "/chat.asp" ));
     }
     else
@@ -105,7 +103,6 @@ void Kueued::siebelJobDone()
 {
     QString replydata = mSiebelReply->readAll();
     bool initial = false;
-    
     replydata.remove( QRegExp( "<(?:div|span|tr|td|body|html|tt|a|strong|p)[^>]*>", Qt::CaseInsensitive ) );
     
     QStringList list = replydata.split( "<br>" );
@@ -119,8 +116,6 @@ void Kueued::siebelJobDone()
         
     if ( !mSiebelReply->error() )
     {
-        if ( initial ) emit initialUpdate( list.size(), 1u );
-        
         for ( int i = 0; i < list.size(); ++i ) 
         {
             if ( list.at( i ).split("|").count() == 19 )
@@ -156,13 +151,11 @@ void Kueued::siebelJobDone()
                 {
                     if ( Database::siebelQueueChanged( si ) )
                     {
-                        Debug::print( "kueued", "Siebel Queue Changed for SR " + list.at( i ).split( "|" ).at( 1 ).trimmed() );
                         Database::updateSiebelQueue( si );
                     }
                     
                     if ( Database::siebelSeverityChanged( si ) )
                     {
-                        Debug::print( "kueued", "Siebel Severity Changed for SR " + list.at( i ).split( "|" ).at( 1 ).trimmed() );
                         Database::updateSiebelSeverity( si );
                     }
                 }
