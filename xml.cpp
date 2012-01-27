@@ -34,7 +34,12 @@ QString XML::sr( SiebelItem* si )
     QDateTime sladate = QDateTime::fromString( si->sla, "yyyy-MM-dd hh:mm:ss" );
     QDateTime qdate = QDateTime::fromString( si->qdate, "yyyy-MM-dd hh:mm:ss" );
     QString xml;
-  
+    
+    double lu = ( adate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 ));
+    double age = ( odate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 ) );
+    double qt = ( qdate.secsTo( now ) );
+    double sla = ( now.secsTo( sladate ) );
+    
     xml += "  <sr>\n";
     xml += "    <id>" + si->id + "</id>\n";
     xml += "    <queue>" + si->queue + "</queue>\n";
@@ -56,15 +61,19 @@ QString XML::sr( SiebelItem* si )
     }    
     
        
-    xml += "    <age>" + QString::number( odate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 ) ) + "</age>\n";
+    xml += "    <age>" + QString::number( age ) + "</age>\n";
    
-    if ( now.secsTo( sladate ) > 0 )      
+    if ( sla > 0 )      
     {
-         xml += "    <sla>" + QString::number( now.secsTo( sladate ) ) + "</sla>\n";
+         xml += "    <sla>" + QString::number( sla ) + "</sla>\n";
     }
     
-    xml += "    <lastupdate>" + QString::number( adate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 )) + "</lastupdate>\n";
-    xml += "    <timeinqueue>" +  QString::number( qdate.secsTo( now ) ) + "</timeinqueue>\n"; 
+    if ( lu < age )
+    {
+        xml += "    <lastupdate>" + QString::number( lu ) + "</lastupdate>\n";
+    }
+    
+    xml += "    <timeinqueue>" +  QString::number( qt ) + "</timeinqueue>\n"; 
     xml += "    <description><![CDATA[" + si->bdesc + "]]></description>\n";
     xml += "    <status>" + si->status + "</status>\n";
     xml += "    <contract>" + si->contract + "</contract>\n";
