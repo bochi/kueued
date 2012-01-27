@@ -36,8 +36,8 @@ QString XML::sr( SiebelItem* si )
     QDateTime qdate = QDateTime::fromString( si->qdate, "yyyy-MM-dd hh:mm:ss" );
     QString xml;
     
-    qint64 lu = ( adate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 ));
     qint64 age = ( odate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 ) );
+    qint64 lu = ( adate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 ));
     qint64 qt = ( qdate.secsTo( now ) );
     qint64 sla = ( now.secsTo( sladate ) );
     
