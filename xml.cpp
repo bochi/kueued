@@ -64,7 +64,7 @@ QString XML::sr( SiebelItem* si )
     }
     
     xml += "    <lastupdate>" + QString::number( adate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 )) + "</lastupdate>\n";
-    xml += "    <timeinqueue>" +  QString::number( qdate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 ) ) + "</timeinqueue>\n"; 
+    xml += "    <timeinqueue>" +  QString::number( qdate.secsTo( now ) ) + "</timeinqueue>\n"; 
     xml += "    <description><![CDATA[" + si->bdesc + "]]></description>\n";
     xml += "    <status>" + si->status + "</status>\n";
     xml += "    <contract>" + si->contract + "</contract>\n";
