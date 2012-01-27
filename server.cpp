@@ -108,23 +108,23 @@ void Server::readClient()
             {
                 os << "Welcome to kueue.hwlab.suse.de!\n\n";
                 os << "Usage:\n\n";
-                os << "http://kueue.hwlab.suse.de:8080/qmon\nGet a list of all SRs in all pseudo queues\n\n";
-                os << "http://kueue.hwlab.suse.de:8080/qmon/$QUEUE-NAME\nGet a list of all SRs in $QUEUE-NAME\n\n";
+                os << "  http://kueue.hwlab.suse.de:8080/qmon\n  Get a list of all SRs in all pseudo queues\n\n";
+                os << "  http://kueue.hwlab.suse.de:8080/qmon/$QUEUE-NAME\n  Get a list of all SRs in $QUEUE-NAME\n\n";
                 os << "The output will contain the following xml elements:\n\n";
-                os << "id              SR Number\n";
-                os << "queue           Current Queue\n";
-                os << "severity        Severity\n";
-                os << "geo             GEO\n";
-                os << "type            Type (SR/CR)\n";
-                os << "bomgarQ         Current Bomgar Queue (only available if the customer is in chat)\n";
-                os << "age             SR age in seconds\n";
-                os << "timeinqueue     Time in queue in seconds\n";
-                os << "sla             SLA left in seconds (only available if there is SLA left)\n";
-                os << "lastupdate      Last activity in SR (only available if SR is not new)\n";
-                os << "description     Brief description\n";
-                os << "status          Status\n";
-                os << "contract        Customer's contract\n";
-                os << "contact         Preferred contact method\n\n";
+                os << "  id              SR Number\n";
+                os << "  queue           Current Queue\n";
+                os << "  severity        Severity\n";
+                os << "  geo             GEO\n";
+                os << "  type            Type (SR/CR)\n";
+                os << "  bomgarQ         Current Bomgar Queue (only available if the customer is in chat)\n";
+                os << "  age             SR age in seconds\n";
+                os << "  timeinqueue     Time in queue in seconds\n";
+                os << "  sla             SLA left in seconds (only available if there is SLA left)\n";
+                os << "  lastupdate      Last activity in SR (only available if SR is not new)\n";
+                os << "  description     Brief description\n";
+                os << "  status          Status\n";
+                os << "  contract        Customer's contract\n";
+                os << "  contact         Preferred contact method\n\n";
                 os << "Stay tuned for more features!";
             }
         }
