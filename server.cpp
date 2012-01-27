@@ -108,8 +108,8 @@ void Server::readClient()
             {
                 os << "Welcome to kueue.hwlab.suse.de!\n\n";
                 os << "Usage:\n\n";
-                os << "http://kueue.hwlab.suse.de:8080/qmon\nGet a list if all SRs in all pseudo queues\n\n";
-                os << "http://kueue.hwlab.suse.de:8080/qmon/$QUEUE-NAME\nGet a list if all SRs in $QUEUE-NAME\n\n";
+                os << "http://kueue.hwlab.suse.de:8080/qmon\nGet a list of all SRs in all pseudo queues\n\n";
+                os << "http://kueue.hwlab.suse.de:8080/qmon/$QUEUE-NAME\nGet a list of all SRs in $QUEUE-NAME\n\n";
                 os << "Stay tuned for more features!";
             }
         }
