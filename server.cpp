@@ -43,7 +43,7 @@ void Server::incomingConnection( int socket )
     }
 
     QTcpSocket* s = new QTcpSocket( this );
-    Debug::print( "server", "New connection from " + s->peerAddress().toString() );
+    Debug::print( "server", s->peerAddress().toString() + " connected" );
     
     connect( s, SIGNAL( readyRead() ), 
              this, SLOT( readClient() ) );
@@ -77,7 +77,7 @@ void Server::readClient()
 
     if ( socket->canReadLine() ) 
     {
-        Debug::print( "server", "Received " + socket->readLine() + " from " + socket->peerAddress().toString() );
+        Debug::print( "server", socket->peerAddress().toString() + " sent " + socket->readLine().remove( "\n" ) );
         QStringList tokens = QString(socket->readLine()).split(QRegExp("[ \r\n][ \r\n]*"));
         QTextStream os(socket);    
         os.setAutoDetectUnicode(true);
@@ -150,7 +150,7 @@ void Server::discardClient()
     QTcpSocket* socket = (QTcpSocket*)sender();
     socket->deleteLater();
 
-    Debug::print( "server", "Connection from " + socket->peerAddress().toString() + " terminated" );
+    Debug::print( "server", socket->peerAddress().toString() + " connection terminated" );
 }
 
 #include "server.moc"
