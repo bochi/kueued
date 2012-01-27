@@ -68,7 +68,7 @@ QString XML::sr( SiebelItem* si )
     {
          xml += "    <sla>" + QString::number( sla ) + "</sla>\n";
     }
-    Debug::print( "xml", "lu " + QString::number( lu ) + " age " + QString::number( age ) );
+
     if ( lu < age )
     {
         xml += "    <lastupdate>" + QString::number( lu ) + "</lastupdate>\n";
