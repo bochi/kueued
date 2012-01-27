@@ -26,37 +26,43 @@
 
 #include "server.h"
 #include "database.h"
+#include "debug.h"
 
 Server::Server( quint16 port, QObject* parent )
     : QTcpServer(parent), disabled(false)
 {
+    Debug::print( "server", "Constructing" );
     listen(QHostAddress::Any, port);
 }
 
-void Server::incomingConnection(int socket)
+void Server::incomingConnection( int socket )
 {
-    if (disabled)
+    if ( disabled )
+    {
         return;
+    }
 
-    // When a new client connects, the server constructs a QTcpSocket and all
-    // communication with the client is done over this QTcpSocket. QTcpSocket
-    // works asynchronously, this means that all the communication is done
-    // in the two slots readClient() and discardClient().
-    QTcpSocket* s = new QTcpSocket(this);
-    connect(s, SIGNAL(readyRead()), this, SLOT(readClient()));
-    connect(s, SIGNAL(disconnected()), this, SLOT(discardClient()));
-    s->setSocketDescriptor(socket);
-
-    qDebug() << "New Connection";
+    QTcpSocket* s = new QTcpSocket( this );
+    Debug::print( "server", "New connection from " + s->peerAddress().toString() );
+    
+    connect( s, SIGNAL( readyRead() ), 
+             this, SLOT( readClient() ) );
+    
+    connect( s, SIGNAL( disconnected() ), 
+             this, SLOT( discardClient() ) );
+    
+    s->setSocketDescriptor( socket );
 }
 
 void Server::pause()
 {
+    Debug::print( "server", "Paused" );
     disabled = true;
 }
 
 void Server::resume()
 {
+    Debug::print( "server", "Resumed" );
     disabled = false;
 }
 
@@ -67,10 +73,11 @@ void Server::readClient()
         return;
     }
 
-    QTcpSocket* socket = (QTcpSocket*)sender();
+    QTcpSocket* socket = ( QTcpSocket* )sender();
 
     if ( socket->canReadLine() ) 
     {
+        Debug::print( "server", "Received " + socket->readLine() + " from " + socket->peerAddress().toString() );
         QStringList tokens = QString(socket->readLine()).split(QRegExp("[ \r\n][ \r\n]*"));
         QTextStream os(socket);    
         os.setAutoDetectUnicode(true);
@@ -143,7 +150,7 @@ void Server::discardClient()
     QTcpSocket* socket = (QTcpSocket*)sender();
     socket->deleteLater();
 
-    qDebug() << "Connection closed";
+    Debug::print( "server", "Connection from " + socket->peerAddress().toString() + " terminated" );
 }
 
 #include "server.moc"
