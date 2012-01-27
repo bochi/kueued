@@ -35,10 +35,10 @@ QString XML::sr( SiebelItem* si )
     QDateTime qdate = QDateTime::fromString( si->qdate, "yyyy-MM-dd hh:mm:ss" );
     QString xml;
     
-    double lu = ( adate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 ));
-    double age = ( odate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 ) );
-    double qt = ( qdate.secsTo( now ) );
-    double sla = ( now.secsTo( sladate ) );
+    qint64 lu = ( adate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 ));
+    qint64 age = ( odate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 ) );
+    qint64 qt = ( qdate.secsTo( now ) );
+    qint64 sla = ( now.secsTo( sladate ) );
     
     xml += "  <sr>\n";
     xml += "    <id>" + si->id + "</id>\n";
