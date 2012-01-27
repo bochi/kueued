@@ -62,30 +62,27 @@ void Server::resume()
 
 void Server::readClient()
 {
-    if (disabled)
+    if ( disabled )
+    {
         return;
+    }
 
-    // This slot is called when the client sent data to the server. The
-    // server looks if it was a get request and sends a very simple HTML
-    // document back.
     QTcpSocket* socket = (QTcpSocket*)sender();
-    if (socket->canReadLine()) {
+
+    if ( socket->canReadLine() ) 
+    {
         QStringList tokens = QString(socket->readLine()).split(QRegExp("[ \r\n][ \r\n]*"));
-        if (tokens[0] == "GET") {
-            QTextStream os(socket);
-            
-            os.setAutoDetectUnicode(true);
-        //os << tokens[0] << "   " << tokens[1] << "    " << tokens[2];
-            QString req = tokens[0];
-            QString cmd = tokens[1];
-            
-        os << "<?xml version='1.0'?>\n\n<qmon>\n";
-        QList< SiebelItem* > l;
+        QTextStream os(socket);    
+        os.setAutoDetectUnicode(true);
+        
+        QString req = tokens[0];
+        QString cmd = tokens[1];
         
         if ( req == "GET" )
         {
             if ( cmd.startsWith( "/qmon" ) )
             {
+                QList< SiebelItem* > l;
                 QString q = cmd.remove( "/qmon" );
                 
                 if ( !q.remove( "/" ).isEmpty() )
@@ -96,23 +93,32 @@ void Server::readClient()
                 {
                     l = Database::getSrsForQueue();
                 }
+             
+                os << "<?xml version='1.0'?>\n\n<qmon>\n";
+                
+                for ( int i = 0; i < l.size(); ++i ) 
+                {
+                    os << XML::sr(l.at(i));
+                    delete l.at( i );
+                }
+                
+                os << "</qmon>";
+            }
+            else
+            {
+                os << "Welcome to kueue.hwlab.suse.de!\n\n";
+                os << "Usage:\n\n";
+                os << "http://kueue.hwlab.suse.de:8080/qmon\nGet a list if all SRs in all pseudo queues\n\n";
+                os << "http://kueue.hwlab.suse.de:8080/qmon/$QUEUE-NAME\nGet a list if all SRs in $QUEUE-NAME\n\n";
+                os << "Stay tuned for more features!";
             }
         }
 
-        for ( int i = 0; i < l.size(); ++i ) 
+        socket->close();
+        
+        if (socket->state() == QTcpSocket::UnconnectedState) 
         {
-            os << XML::sr(l.at(i));
-            delete l.at( i );
-        }
-            os << "</qmon>";
-            socket->close();
-
-            qDebug() << "Wrote to client";
-
-            if (socket->state() == QTcpSocket::UnconnectedState) {
-                delete socket;
-                qDebug() << "Connection closed";
-            }
+            delete socket;
         }
     }
 }

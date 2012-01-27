@@ -44,8 +44,8 @@ class SiebelItem;
  public:
      Server(quint16 port, QObject* parent = 0);
      void incomingConnection(int socket);
-void pause();
-void resume();
+    void pause();
+    void resume();
 
  private slots:
      void readClient();
