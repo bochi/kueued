@@ -43,7 +43,6 @@ void Server::incomingConnection( int socket )
     }
 
     QTcpSocket* s = new QTcpSocket( this );
-    Debug::print( "server", s->peerAddress().toString() + " connected" );
     
     connect( s, SIGNAL( readyRead() ), 
              this, SLOT( readClient() ) );
@@ -72,12 +71,14 @@ void Server::readClient()
     {
         return;
     }
-
+    
     QTcpSocket* socket = ( QTcpSocket* )sender();
+    Debug::print( "server", socket->peerAddress().toString() + " connected" );
 
     if ( socket->canReadLine() ) 
     {
-        Debug::print( "server", socket->peerAddress().toString() + " sent " + socket->readLine() );
+        QString r = socket->readLine();
+        Debug::print( "server", socket->peerAddress().toString() + " sent " + r.trimmed() );
         QStringList tokens = QString(socket->readLine()).split(QRegExp("[ \r\n][ \r\n]*"));
         QTextStream os(socket);    
         os.setAutoDetectUnicode(true);
