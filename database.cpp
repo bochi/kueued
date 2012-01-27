@@ -328,9 +328,19 @@ QList< SiebelItem* > Database::getSrsForQueue( const QString& queue )
     QSqlQuery query( QSqlDatabase::database("sqliteDB" ) );
     QList< SiebelItem* > list;
     
-    query.prepare( "SELECT ID, SEVERITY, HOURS, SOURCE, CONTACTVIA, ODATE, ADATE, QDATE, STATUS, CONTRACT, GEO, BDESC, SLA, DISPLAY "
+    if (  queue == "NONE" )
+    {
+        
+    query.prepare( "SELECT ID, QUEUE, SEVERITY, HOURS, SOURCE, CONTACTVIA, ODATE, ADATE, QDATE, STATUS, CONTRACT, GEO, BDESC, SLA, DISPLAY "
+                   "FROM qmon_siebel" );
+    }
+    else
+    {
+    query.prepare( "SELECT ID, QUEUE, SEVERITY, HOURS, SOURCE, CONTACTVIA, ODATE, ADATE, QDATE, STATUS, CONTRACT, GEO, BDESC, SLA, DISPLAY "
                    "FROM qmon_siebel WHERE ( QUEUE = :queue )" );
     query.bindValue( ":queue", queue );
+    }
+    
     query.exec();
     
     while ( query.next() ) 
@@ -338,19 +348,20 @@ QList< SiebelItem* > Database::getSrsForQueue( const QString& queue )
         SiebelItem* si = new SiebelItem;
         
         si->id = query.value( 0 ).toString();
-        si->severity = query.value( 1 ).toString();
-        si->hours = query.value( 2 ).toString();
-        si->source = query.value( 3 ).toString();
-        si->contactvia = query.value( 4 ).toString();
-        si->adate = query.value( 5 ).toString();
-        si->odate = query.value( 6 ).toString();
-        si->qdate = query.value( 7 ).toString();
-        si->status = query.value( 8 ).toString();
-        si->contract = query.value( 9 ).toString();
-        si->geo = query.value( 10 ).toString();
-        si->bdesc = query.value( 11 ).toString();
-        si->sla = query.value( 12 ).toString();
-        si->display = query.value( 13 ).toString();
+        si->queue = query.value( 1 ).toString();
+        si->severity = query.value( 2 ).toString();
+        si->hours = query.value( 3 ).toString();
+        si->source = query.value( 4 ).toString();
+        si->contactvia = query.value( 5 ).toString();
+        si->adate = query.value( 6 ).toString();
+        si->odate = query.value( 7 ).toString();
+        si->qdate = query.value( 8 ).toString();
+        si->status = query.value( 9 ).toString();
+        si->contract = query.value( 10 ).toString();
+        si->geo = query.value( 11 ).toString();
+        si->bdesc = query.value( 12 ).toString();
+        si->sla = query.value( 13 ).toString();
+        si->display = query.value( 14 ).toString();
         si->isChat = isChat( query.value( 0 ).toString() );
         si->bomgarQ = getBomgarQueue( query.value( 0 ).toString() );
         

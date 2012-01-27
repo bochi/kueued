@@ -49,3 +49,8 @@ int Settings::oraclePort()
     return settings.value( "oraclePort" ).toInt();
 }
 
+int Settings::timezoneCorrection()
+{
+    QSettings settings( "/etc/kueued/kueued.conf", QSettings::NativeFormat);
+    return settings.value( "timezoneCorrection" ).toInt();
+}

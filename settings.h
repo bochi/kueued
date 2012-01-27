@@ -38,6 +38,7 @@ class Settings
         static int refreshSeconds();
         static QString oracleHost();
         static int oraclePort();
+        static int timezoneCorrection();
 };    
 
 #endif

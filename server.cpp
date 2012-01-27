@@ -25,4 +25,104 @@
 
 
 #include "server.h"
+#include "database.h"
+
+Server::Server( quint16 port, QObject* parent )
+    : QTcpServer(parent), disabled(false)
+{
+    listen(QHostAddress::Any, port);
+}
+
+void Server::incomingConnection(int socket)
+{
+    if (disabled)
+        return;
+
+    // When a new client connects, the server constructs a QTcpSocket and all
+    // communication with the client is done over this QTcpSocket. QTcpSocket
+    // works asynchronously, this means that all the communication is done
+    // in the two slots readClient() and discardClient().
+    QTcpSocket* s = new QTcpSocket(this);
+    connect(s, SIGNAL(readyRead()), this, SLOT(readClient()));
+    connect(s, SIGNAL(disconnected()), this, SLOT(discardClient()));
+    s->setSocketDescriptor(socket);
+
+    qDebug() << "New Connection";
+}
+
+void Server::pause()
+{
+    disabled = true;
+}
+
+void Server::resume()
+{
+    disabled = false;
+}
+
+void Server::readClient()
+{
+    if (disabled)
+        return;
+
+    // This slot is called when the client sent data to the server. The
+    // server looks if it was a get request and sends a very simple HTML
+    // document back.
+    QTcpSocket* socket = (QTcpSocket*)sender();
+    if (socket->canReadLine()) {
+        QStringList tokens = QString(socket->readLine()).split(QRegExp("[ \r\n][ \r\n]*"));
+        if (tokens[0] == "GET") {
+            QTextStream os(socket);
+            
+            os.setAutoDetectUnicode(true);
+        //os << tokens[0] << "   " << tokens[1] << "    " << tokens[2];
+            QString req = tokens[0];
+            QString cmd = tokens[1];
+            
+        os << "<?xml version='1.0'?>\n\n<qmon>\n";
+        QList< SiebelItem* > l;
+        
+        if ( req == "GET" )
+        {
+            if ( cmd.startsWith( "/qmon" ) )
+            {
+                QString q = cmd.remove( "/qmon" );
+                
+                if ( !q.remove( "/" ).isEmpty() )
+                {
+                    l = Database::getSrsForQueue( q.remove( "/" ) );
+                }
+                else
+                {
+                    l = Database::getSrsForQueue();
+                }
+            }
+        }
+
+        for ( int i = 0; i < l.size(); ++i ) 
+        {
+            os << XML::sr(l.at(i));
+            delete l.at( i );
+        }
+            os << "</qmon>";
+            socket->close();
+
+            qDebug() << "Wrote to client";
+
+            if (socket->state() == QTcpSocket::UnconnectedState) {
+                delete socket;
+                qDebug() << "Connection closed";
+            }
+        }
+    }
+}
+
+void Server::discardClient()
+{
+    QTcpSocket* socket = (QTcpSocket*)sender();
+    socket->deleteLater();
+
+    qDebug() << "Connection closed";
+}
+
 #include "server.moc"

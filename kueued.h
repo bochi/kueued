@@ -37,6 +37,7 @@
 #include <QNetworkAccessManager>
 
 class Database;
+class Server;
 
 class Kueued : public QObject
  {
@@ -47,7 +48,7 @@ class Kueued : public QObject
      ~Kueued();
 
     private:
-        HttpDaemon *mHttpServer;
+        Server *mServer;
         QStringList mNotifiedList;
         QStringList mQueueList;
         QNetworkReply* mBomgarReply;

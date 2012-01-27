@@ -37,6 +37,9 @@ Kueued::Kueued()
 {
     Debug::print( "kueued", "Constructing" );
     
+    mDB = new Database;
+    mServer = new Server( 8080, this );    
+    
     mSiebelReply = Network::get( QUrl( Settings::dBServer() + "/stefan-siebel.asp" ) );
     mBomgarReply = Network::get( QUrl( Settings::dBServer() + "/chat.asp" ) );
 		        
@@ -46,8 +49,6 @@ Kueued::Kueued()
     connect( mBomgarReply, SIGNAL( finished() ), 
    	     this, SLOT( bomgarJobDone() ) );
 
-    mDB = new Database;
-    mHttpServer = new HttpDaemon( 8080, this );
     mTimer = new QTimer(this);
     
     connect( mTimer, SIGNAL( timeout() ),

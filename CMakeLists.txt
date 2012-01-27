@@ -57,7 +57,8 @@ SET( kueued_CPP main.cpp
 		database.cpp
                 server.cpp
 		network.cpp
-		settings.cpp)
+		settings.cpp
+		xml.cpp)
 
 QT4_AUTOMOC( ${kueued_CPP} )
 

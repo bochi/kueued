@@ -56,7 +56,7 @@ class Database : public QObject
         
         static void updateBomgarItemInDB( BomgarItem* );
         static void deleteBomgarItemFromDB( const QString& );
-        static QList< SiebelItem* > getSrsForQueue( const QString& );
+        static QList< SiebelItem* > getSrsForQueue( const QString& = "NONE" );
         static QStringList getQmonBomgarList();
         static bool bomgarExistsInDB( const QString& );
         static QString getBomgarQueue( const QString& );
