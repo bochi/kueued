@@ -78,7 +78,7 @@ void Server::readClient()
     {
         QString r = socket->readLine();
         Debug::print( "server", socket->peerAddress().toString() + ": " + r.trimmed() );
-        QStringList tokens = QString(r.split(QRegExp("[ \r\n][ \r\n]*"));
+        QStringList tokens = QString(r.split(QRegExp("[ \r\n][ \r\n]*")));
         QTextStream os(socket);    
         os.setAutoDetectUnicode(true);
         
