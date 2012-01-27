@@ -353,8 +353,8 @@ QList< SiebelItem* > Database::getSrsForQueue( const QString& queue )
         si->hours = query.value( 3 ).toString();
         si->source = query.value( 4 ).toString();
         si->contactvia = query.value( 5 ).toString();
-        si->adate = query.value( 6 ).toString();
-        si->odate = query.value( 7 ).toString();
+        si->odate = query.value( 6 ).toString();
+        si->adate = query.value( 7 ).toString();
         si->qdate = query.value( 8 ).toString();
         si->status = query.value( 9 ).toString();
         si->contract = query.value( 10 ).toString();
