@@ -32,7 +32,7 @@ Server::Server( quint16 port, QObject* parent )
     : QTcpServer(parent), disabled(false)
 {
     Debug::print( "server", "Constructing" );
-    listen(QHostAddress::Any, port);
+    listen( QHostAddress::Any, port );
 }
 
 void Server::incomingConnection( int socket )
@@ -78,12 +78,12 @@ void Server::readClient()
     {
         QString r = socket->readLine();
         Debug::print( "server", socket->peerAddress().toString() + " - " + r.trimmed() );
-        QStringList tokens = r.split(QRegExp("[ \r\n][ \r\n]*"));
-        QTextStream os(socket);    
-        os.setAutoDetectUnicode(true);
+        QStringList tokens = r.split( QRegExp( "[ \r\n][ \r\n]*" ) );
+        QTextStream os( socket );    
+        os.setAutoDetectUnicode( true );
         
-        QString req = tokens[0];
-        QString cmd = tokens[1];
+        QString req = tokens[ 0 ];
+        QString cmd = tokens[ 1 ];
         
         if ( req == "GET" )
         {
@@ -105,7 +105,7 @@ void Server::readClient()
                 
                 for ( int i = 0; i < l.size(); ++i ) 
                 {
-                    os << XML::sr(l.at(i));
+                    os << XML::sr( l.at( i ) );
                     delete l.at( i );
                 }
                 
@@ -138,7 +138,7 @@ void Server::readClient()
 
         socket->close();
         
-        if (socket->state() == QTcpSocket::UnconnectedState) 
+        if ( socket->state() == QTcpSocket::UnconnectedState ) 
         {
             delete socket;
         }
@@ -147,7 +147,7 @@ void Server::readClient()
 
 void Server::discardClient()
 {
-    QTcpSocket* socket = (QTcpSocket*)sender();
+    QTcpSocket* socket = ( QTcpSocket* )sender();
     socket->deleteLater();
 }
 

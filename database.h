@@ -66,7 +66,6 @@ class Database : public QObject
         static QString convertTime( const QString& );
 
     private:
-        QSqlDatabase mDb;
         QString mDBfile;        
 };
 

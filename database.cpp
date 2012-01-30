@@ -25,6 +25,7 @@
 
 #include "database.h"
 #include "debug.h"
+#include "settings.h"
 
 #include <QFile>
 #include <QDesktopServices>
@@ -43,15 +44,28 @@ Database::Database()
     
     mDBfile = dir.path() + "/db.sqlite";
     
-    mDb = QSqlDatabase::addDatabase( "QSQLITE", "sqliteDB" );
-    mDb.setDatabaseName( mDBfile );
     
-    if ( !mDb.open() )
+    QSqlDatabase sqliteDB = QSqlDatabase::addDatabase( "QSQLITE", "sqliteDB" );
+    sqliteDB.setDatabaseName( mDBfile );
+    
+    if ( !sqliteDB.open() )
     {
-        Debug::print( "database", "Failed to open the database " + mDb.lastError().text() );
+        Debug::print( "database", "Failed to open the database " + sqliteDB.lastError().text() );
     }
-                         
-    QSqlQuery query( mDb );
+
+    QSqlDatabase oracleDB = QSqlDatabase::addDatabase( "QOCI", "oracleDB" );
+    oracleDB.setDatabaseName( "oracleDB" );
+    oracleDB.setHostName( Settings::oracleHost() );
+    oracleDB.setPort( Settings::oraclePort() );
+    oracleDB.setUserName( Settings::oracleUser() );
+    oracleDB.setPassword( Settings::oraclePassword() );
+
+    if ( !oracleDB.open() )
+    {
+        Debug::print( "database", "Failed to open the Oracle DB " + oracleDB.lastError().text() );
+    }
+    
+    QSqlQuery query( sqliteDB );
     
     if ( !query.exec("PRAGMA temp_store = MEMORY" ) )
     {
@@ -92,9 +106,7 @@ Database::Database()
 Database::~Database()
 {   
     Debug::print( "database", "Destroying" );
-
-    mDb.close();    
-    QSqlDatabase::removeDatabase( mDb.connectionName() );
+    QSqlDatabase::removeDatabase( "sqliteDB" );
 }
 
 void Database::insertSiebelItemIntoDB( SiebelItem* item )
@@ -105,7 +117,7 @@ void Database::insertSiebelItemIntoDB( SiebelItem* item )
                      "STATUS, CONTRACT, QUEUE1, PHONE, ONSITEPHONE, GEO, WTF, ROUTING, BDESC, SLA )"
                      "VALUES"
                      "( :id, :queue, :severity, :hours, :source, :contactvia, :odate, :adate, :qdate, :status, :contract, "
-                     ":queue1, :phone, :onsitephone, :geo, :wtf, :routing, :bdesc, :sla )", QSqlDatabase::database("sqliteDB" ) );
+                     ":queue1, :phone, :onsitephone, :geo, :wtf, :routing, :bdesc, :sla )", QSqlDatabase::database( "sqliteDB" ) );
 
     query.bindValue( ":id", item->id );
     query.bindValue( ":queue", item->queue );
@@ -133,7 +145,7 @@ void Database::insertSiebelItemIntoDB( SiebelItem* item )
 void Database::updateSiebelQueue( SiebelItem* si )
 {
     Debug::print( "database", "Updating Siebel queue for " + si->id + " to " + si->queue );
-    QSqlQuery query( "UPDATE qmon_siebel SET QUEUE = :queue WHERE id = :id", QSqlDatabase::database("sqliteDB" ) );
+    QSqlQuery query( "UPDATE qmon_siebel SET QUEUE = :queue WHERE id = :id", QSqlDatabase::database( "sqliteDB" ) );
                 
     query.bindValue( ":queue", si->queue );
     query.bindValue( ":id", si->id );
@@ -144,7 +156,7 @@ void Database::updateSiebelQueue( SiebelItem* si )
 void Database::updateSiebelSeverity( SiebelItem* si )
 {
     Debug::print( "database", "Updating Siebel Severity for " + si->id + " to " + si->severity );
-    QSqlQuery query( "UPDATE qmon_siebel SET SEVERITY = :severity WHERE id = :id", QSqlDatabase::database("sqliteDB" ) );
+    QSqlQuery query( "UPDATE qmon_siebel SET SEVERITY = :severity WHERE id = :id", QSqlDatabase::database( "sqliteDB" ) );
                 
     query.bindValue( ":severity", si->severity );
     query.bindValue( ":id", si->id );
@@ -166,7 +178,7 @@ void Database::deleteSiebelItemFromDB( const QString& id )
 {
     Debug::print( "database", "Deleting SiebelItem " + id );
     
-    QSqlQuery query( QSqlDatabase::database("sqliteDB" ) );
+    QSqlQuery query( QSqlDatabase::database( "sqliteDB" ) );
     query.prepare( "DELETE FROM qmon_siebel WHERE ID = :id" );
     query.bindValue( ":id", id );
     query.exec();
@@ -174,7 +186,7 @@ void Database::deleteSiebelItemFromDB( const QString& id )
 
 QStringList Database::getQmonSiebelList()
 {
-    QSqlQuery query( QSqlDatabase::database("sqliteDB" ) );
+    QSqlQuery query( QSqlDatabase::database( "sqliteDB" ) );
     QStringList l;
     query.prepare( "SELECT ID FROM qmon_siebel" );
     query.exec();
@@ -189,7 +201,7 @@ QStringList Database::getQmonSiebelList()
 
 bool Database::siebelExistsInDB( const QString& id )
 {
-    QSqlQuery query( QSqlDatabase::database("sqliteDB" ) );
+    QSqlQuery query( QSqlDatabase::database( "sqliteDB" ) );
     query.prepare( "SELECT ID FROM qmon_siebel WHERE ( ID = :id )" );
     query.bindValue( ":id", id );
     query.exec();
@@ -206,7 +218,7 @@ bool Database::siebelExistsInDB( const QString& id )
 
 bool Database::siebelQueueChanged( SiebelItem* si  )
 {
-    QSqlQuery query( QSqlDatabase::database("sqliteDB" ) );
+    QSqlQuery query( QSqlDatabase::database( "sqliteDB" ) );
     query.prepare( "SELECT QUEUE FROM qmon_siebel WHERE ( ID = :id )" );
     query.bindValue( ":id", si->id );
     query.exec();
@@ -230,7 +242,7 @@ bool Database::siebelQueueChanged( SiebelItem* si  )
 
 bool Database::siebelSeverityChanged( SiebelItem* si  )
 {
-    QSqlQuery query( QSqlDatabase::database("sqliteDB" ) );
+    QSqlQuery query( QSqlDatabase::database( "sqliteDB" ) );
     query.prepare( "SELECT SEVERITY FROM qmon_siebel WHERE ( ID = :id )" );
     query.bindValue( ":id", si->id );
     query.exec();
@@ -254,7 +266,7 @@ bool Database::siebelSeverityChanged( SiebelItem* si  )
 
 bool Database::isChat( const QString& id )
 {
-    QSqlQuery query( QSqlDatabase::database("sqliteDB" ) );
+    QSqlQuery query( QSqlDatabase::database( "sqliteDB" ) );
     query.prepare( "SELECT ID FROM qmon_chat WHERE ( SR = :id )" );
     query.bindValue( ":id", id );
     query.exec();
@@ -271,7 +283,7 @@ bool Database::isChat( const QString& id )
 
 QString Database::getQmonBdesc( const QString& id )
 {
-    QSqlQuery query( QSqlDatabase::database("sqliteDB" ) );
+    QSqlQuery query( QSqlDatabase::database( "sqliteDB" ) );
     query.prepare( "SELECT BDESC FROM qmon_siebel WHERE ( ID = :id )" );
     query.bindValue( ":id", id );
     query.exec();
@@ -301,7 +313,7 @@ void Database::updateBomgarItemInDB( BomgarItem* bi )
         
     QSqlQuery query( "INSERT INTO qmon_chat( ID, SR, REPTEAM, NAME, DATE, QDATE, SOMENR )"
                      "VALUES"
-                     "( :id, :sr, :repteam, :name, :date, :qdate, :somenr )", QSqlDatabase::database("sqliteDB" ) );
+                     "( :id, :sr, :repteam, :name, :date, :qdate, :somenr )", QSqlDatabase::database( "sqliteDB" ) );
                      
     query.bindValue( ":id", bi->id );
     query.bindValue( ":sr", bi->sr );
@@ -317,7 +329,7 @@ void Database::deleteBomgarItemFromDB( const QString& id )
 {
     Debug::print( "database", "Deleting BomgarItem " + id );
     
-    QSqlQuery query( QSqlDatabase::database("sqliteDB" ) );
+    QSqlQuery query( QSqlDatabase::database( "sqliteDB" ) );
     query.prepare( "DELETE FROM qmon_chat WHERE ID = :id" );
     query.bindValue( ":id", id );
     query.exec();
@@ -325,7 +337,7 @@ void Database::deleteBomgarItemFromDB( const QString& id )
 
 QList< SiebelItem* > Database::getSrsForQueue( const QString& queue )
 {
-    QSqlQuery query( QSqlDatabase::database("sqliteDB" ) );
+    QSqlQuery query( QSqlDatabase::database( "sqliteDB" ) );
     QList< SiebelItem* > list;
     
     if (  queue == "NONE" )
@@ -373,7 +385,7 @@ QList< SiebelItem* > Database::getSrsForQueue( const QString& queue )
 
 QStringList Database::getQmonBomgarList()
 {
-    QSqlQuery query( QSqlDatabase::database("sqliteDB" ) );
+    QSqlQuery query( QSqlDatabase::database( "sqliteDB" ) );
     QStringList l;
     query.prepare( "SELECT ID FROM qmon_chat" );
     query.exec();
@@ -385,7 +397,7 @@ QStringList Database::getQmonBomgarList()
 
 bool Database::bomgarExistsInDB( const QString& id )
 {
-    QSqlQuery query( QSqlDatabase::database("sqliteDB" ) );
+    QSqlQuery query( QSqlDatabase::database( "sqliteDB" ) );
     query.prepare( "SELECT ID FROM qmon_chat WHERE ( ID = :id )" );
     query.bindValue( ":id", id );
     query.exec();
@@ -404,7 +416,7 @@ void Database::updateBomgarQueue( BomgarItem* bi )
 {
     Debug::print( "database", "Updating BomgarQueue for " + bi->id + " " + bi->sr + " to " + bi->name );
     
-    QSqlQuery query( QSqlDatabase::database("sqliteDB" ) );
+    QSqlQuery query( QSqlDatabase::database( "sqliteDB" ) );
     query.prepare( "UPDATE qmon_chat SET NAME = :name WHERE ID = :id" );
     query.bindValue( ":name", bi->name );
     query.bindValue( ":id", bi->id );
@@ -413,7 +425,7 @@ void Database::updateBomgarQueue( BomgarItem* bi )
 
 QString Database::getBomgarQueue( const QString& id )
 {
-    QSqlQuery query( QSqlDatabase::database("sqliteDB" ) );
+    QSqlQuery query( QSqlDatabase::database( "sqliteDB" ) );
     query.prepare( "SELECT NAME FROM qmon_chat WHERE ( SR = :id )" );
     query.bindValue( ":id", id );
     query.exec();
@@ -430,7 +442,7 @@ QString Database::getBomgarQueue( const QString& id )
 
 QString Database::getBomgarQueueById( const QString& id )
 {
-    QSqlQuery query( QSqlDatabase::database("sqliteDB" ) );
+    QSqlQuery query( QSqlDatabase::database( "sqliteDB" ) );
     query.prepare( "SELECT NAME FROM qmon_chat WHERE ( ID = :id )" );
     query.bindValue( ":id", id );
     query.exec();

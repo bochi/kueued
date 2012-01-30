@@ -43,6 +43,18 @@ QString Settings::oracleHost()
     return settings.value( "oracleHost" ).toString();
 }
 
+QString Settings::oracleUser()
+{
+    QSettings settings( "/etc/kueued/kueued.conf", QSettings::NativeFormat);
+    return settings.value( "oracleUser" ).toString();
+}
+
+QString Settings::oraclePassword()
+{
+    QSettings settings( "/etc/kueued/kueued.conf", QSettings::NativeFormat);
+    return settings.value( "oraclePassword" ).toString();
+}
+
 int Settings::oraclePort()
 {
     QSettings settings( "/etc/kueued/kueued.conf", QSettings::NativeFormat);
