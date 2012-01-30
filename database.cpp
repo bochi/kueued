@@ -53,8 +53,8 @@ Database::Database()
         Debug::print( "database", "Failed to open the database " + sqliteDB.lastError().text() );
     }
 
-    QSqlDatabase oracleDB = QSqlDatabase::addDatabase( "QSQLOCI", "oracleDB" );
-    oracleDB.setDatabaseName( "oracleDB" );
+    QSqlDatabase oracleDB = QSqlDatabase::addDatabase( "QOCI", "oracleDB" );
+    oracleDB.setDatabaseName( "report" );
     oracleDB.setHostName( Settings::oracleHost() );
     oracleDB.setPort( Settings::oraclePort() );
     oracleDB.setUserName( Settings::oracleUser() );
