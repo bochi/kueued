@@ -111,6 +111,14 @@ void Server::readClient()
                 
                 os << "</qmon>";
             }
+	    else if ( cmd.startsWith( "/test" ) )
+	    {
+		QStringList l = Database::getOracleSrList();
+		for ( int i = 0; i < l.size(); ++i )
+		{
+			os << l.at(i) << "\n";
+		}
+	    }
             else
             {
                 os << "Welcome to kueue.hwlab.suse.de!\n\n";

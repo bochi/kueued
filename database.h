@@ -48,6 +48,7 @@ class Database : public QObject
         static void updateSiebelDisplay( const QString& );
         static void deleteSiebelItemFromDB( const QString& );
         static QStringList getQmonSiebelList();
+	static QStringList getOracleSrList();
         static bool siebelExistsInDB( const QString& );
         static bool siebelQueueChanged( SiebelItem* );
         static bool siebelSeverityChanged( SiebelItem* );

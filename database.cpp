@@ -64,6 +64,21 @@ Database::Database()
     {
         Debug::print( "database", "Failed to open the Oracle DB " + oracleDB.lastError().text() );
     }
+    else
+    {
+//	qDebug() << oracleDB.tables( QSql::AllTables );
+        QSqlQuery oq( oracleDB );
+	
+	qDebug() << oracleDB.lastError().text();
+
+    //    if ( !oq.exec( "SELECT * FROM NTSDM.NTS_OPEN_SR" ) ) qDebug() << "Couldn't exec query";
+//	else
+//	qDebug() << oq.isValid() << oq.numRowsAffected() << oq.size() << oq.lastError().text() << oq.executedQuery();
+//	while ( oq.next() ) qDebug() << oq.value( 1 ).toString();
+
+	qDebug() << oracleDB.lastError().text();
+
+    }
     
     QSqlQuery query( sqliteDB );
     
@@ -394,6 +409,24 @@ QStringList Database::getQmonBomgarList()
     
     return l;    
 }
+
+
+QStringList Database::getOracleSrList()
+{
+    QSqlQuery query( QSqlDatabase::database( "oracleDB" ) );
+    QStringList l;
+    query.prepare( "SELECT SR_NUM FROM NTSDM.NTS_OPEN_SR WHERE OWNER='SBOGNER'" );
+    query.exec();
+
+    while( query.next() ) 
+    {
+	    l.append( query.value( 0 ).toString() );
+	    qDebug() << "append";
+    }
+
+    return l;
+}
+
 
 bool Database::bomgarExistsInDB( const QString& id )
 {
