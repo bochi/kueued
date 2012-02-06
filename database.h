@@ -29,7 +29,6 @@
 #include "kueued.h"
 
 #include <QtSql>
-#include "../qt-examples/tools/customcompleter/textedit.h"
 
 class SiebelItem;
 class BomgarItem;
