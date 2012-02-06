@@ -29,6 +29,7 @@
 #include "kueued.h"
 
 #include <QtSql>
+#include "../qt-examples/tools/customcompleter/textedit.h"
 
 class SiebelItem;
 class BomgarItem;
@@ -64,6 +65,11 @@ class Database : public QObject
         static QString getBomgarQueueById( const QString& );
         static void updateBomgarQueue( BomgarItem* );
         
+        static QString getBugForSr( const QString& );
+        static QString critSitFlagForSr( const QString& );
+        static QString highValueFlagForSr( const QString& );
+        static QString highValueCritSitFlagForSr( const QString& );
+        
         static QString convertTime( const QString& );
 
     private:
@@ -96,6 +102,8 @@ class SiebelItem
         QString display;
         QString bomgarQ;
         bool isChat;
+        QString critSit;
+        QString highValue;
 };
 
 class BomgarItem 

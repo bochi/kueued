@@ -111,6 +111,30 @@ void Server::readClient()
                 
                 os << "</qmon>";
             }
+            else if ( cmd.startsWith( "/bug" ) )
+            {
+                QString q = cmd.remove( "/bug/" );
+                
+                os << Database::getBugForSr( q );
+            }
+            else if ( cmd.startsWith( "/critsit" ) )
+            {
+                QString q = cmd.remove( "/critsit/" );
+                
+                os << Database::critSitFlagForSr( q );
+            }
+            else if ( cmd.startsWith( "/highvaluecritsit" ) )
+            {
+                QString q = cmd.remove( "/highvaluecritsit/" );
+                
+                os << Database::highValueCritSitFlagForSr( q );
+            }
+            else if ( ( cmd.startsWith( "/highvalue" ) ) && !( cmd.startsWith( "/highvaluecritsit" ) ) )
+            {
+                QString q = cmd.remove( "/highvalue/" );
+                
+                os << Database::highValueFlagForSr( q );
+            }
 	    else if ( cmd.startsWith( "/test" ) )
 	    {
 		QStringList l = Database::getOracleSrList();
@@ -123,23 +147,27 @@ void Server::readClient()
             {
                 os << "Welcome to kueue.hwlab.suse.de!\n\n";
                 os << "Usage:\n\n";
-                os << "  http://kueue.hwlab.suse.de:8080/qmon\n  Get a list of all SRs in all pseudo queues\n\n";
-                os << "  http://kueue.hwlab.suse.de:8080/qmon/$QUEUE-NAME\n  Get a list of all SRs in $QUEUE-NAME\n\n";
-                os << "The output will contain the following xml elements:\n\n";
-                os << "  id              SR Number\n";
-                os << "  queue           Current Queue\n";
-                os << "  severity        Severity\n";
-                os << "  geo             GEO\n";
-                os << "  type            Type (SR/CR)\n";
-                os << "  bomgarQ         Current Bomgar Queue (only available if the customer is in chat)\n";
-                os << "  age             SR age in seconds\n";
-                os << "  timeinqueue     Time in queue in seconds\n";
-                os << "  sla             SLA left in seconds (only available if there is SLA left)\n";
-                os << "  lastupdate      Last activity in SR (only available if SR is not new)\n";
-                os << "  description     Brief description\n";
-                os << "  status          Status\n";
-                os << "  contract        Customer's contract\n";
-                os << "  contact         Preferred contact method\n\n";
+                os << "  * http://kueue.hwlab.suse.de:8080/qmon\n    Get a list of all SRs in all pseudo queues\n\n";
+                os << "  * http://kueue.hwlab.suse.de:8080/qmon/$QUEUE-NAME\n    Get a list of all SRs in $QUEUE-NAME\n\n";
+                os << "    The output will contain the following xml elements:\n\n";
+                os << "      id              SR Number\n";
+                os << "      queue           Current Queue\n";
+                os << "      severity        Severity\n";
+                os << "      geo             GEO\n";
+                os << "      type            Type (SR/CR)\n";
+                os << "      bomgarQ         Current Bomgar Queue (only available if the customer is in chat)\n";
+                os << "      age             SR age in seconds\n";
+                os << "      timeinqueue     Time in queue in seconds\n";
+                os << "      sla             SLA left in seconds (only available if there is SLA left)\n";
+                os << "      lastupdate      Last activity in SR (only available if SR is not new)\n";
+                os << "      description     Brief description\n";
+                os << "      status          Status\n";
+                os << "      contract        Customer's contract\n";
+                os << "      contact         Preferred contact method\n\n";
+                os << "  * http://kueue.hwlab.suse.de:8080/critsit/$SRNR\n    Is there a critsit with this customer? (Y/N)\n\n";
+                os << "  * http://kueue.hwlab.suse.de:8080/highvalue/$SRNR\n    Is $SRNR considered high value? (Y/N)\n\n";
+                os << "  * http://kueue.hwlab.suse.de:8080/highvaluecritsit/$SRNR\n    The last two queries combined (sample output: YN)\n\n";
+                os << "  * http://kueue.hwlab.suse.de:8080/bug/$SRNR\n    Get the bugreport for $SRNR (if any)\n\n";
                 os << "Stay tuned for more features!";
             }
         }

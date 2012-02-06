@@ -79,6 +79,8 @@ QString XML::sr( SiebelItem* si )
     xml += "    <status>" + si->status + "</status>\n";
     xml += "    <contract>" + si->contract + "</contract>\n";
     xml += "    <contact>" + si->contactvia + "</contact>\n";
+    xml += "    <critsit>" + si->critSit + "</critsit>\n";
+    xml += "    <highvalue>" + si->highValue + "</highvalue>\n";
     xml += "  </sr>\n";
   
     return xml;
