@@ -68,44 +68,9 @@ Database::Database()
     {
         Debug::print( "database", "Failed to open the Oracle DB " + oracleDB.lastError().text() );
     }
-    else
-    {
-//	qDebug() << oracleDB.tables( QSql::AllTables );
-        QSqlQuery oq( oracleDB );
-	
-	qDebug() << oracleDB.lastError().text();
-
-    //    if ( !oq.exec( "SELECT * FROM NTSDM.NTS_OPEN_SR" ) ) qDebug() << "Couldn't exec query";
-//	else
-//	qDebug() << oq.isValid() << oq.numRowsAffected() << oq.size() << oq.lastError().text() << oq.executedQuery();
-//	while ( oq.next() ) qDebug() << oq.value( 1 ).toString();
-
-	qDebug() << oracleDB.lastError().text();
-
-    }
     
     QSqlQuery query( mysqlDB );
-    
-   /* if ( !query.exec("PRAGMA temp_store = MEMORY" ) )
-    {
-        Debug::print( "database", "Error: " + query.lastError().text() );
-    }
-    
-    if ( !query.exec("PRAGMA synchronous = OFF" ) )
-    {
-        Debug::print( "database", "Error: " + query.lastError().text() );
-    }
-    
-    if ( !query.exec("PRAGMA journal_mode = MEMORY" ) )
-    {
-        Debug::print( "database", "Error: " + query.lastError().text() );
-    }
-    
-    if ( !query.exec("PRAGMA locking_mode = EXCLUSIVE" ) )
-    {
-        Debug::print( "database", "Error: " + query.lastError().text() );
-    }*/
-    
+       
     if ( !query.exec( "CREATE TABLE IF NOT EXISTS qmon_siebel( ID VARCHAR(20) PRIMARY KEY UNIQUE, QUEUE TEXT, SEVERITY TEXT, HOURS TEXT, "
                       "SOURCE TEXT, CONTACTVIA TEXT, ODATE TEXT, ADATE TEXT, QDATE TEXT, STATUS TEXT, "
                       "CONTRACT TEXT, QUEUE1 TEXT, PHONE TEXT, ONSITEPHONE TEXT, GEO TEXT, "
@@ -160,8 +125,6 @@ void Database::insertSiebelItemIntoDB( SiebelItem* item )
     query.bindValue( ":sla", convertTime( item->sla ) );
 
     query.exec();
-    qDebug() << query.executedQuery();
-    qDebug() << query.lastError();
 }
 
 void Database::updateSiebelQueue( SiebelItem* si )
@@ -416,8 +379,6 @@ void Database::updateBomgarItemInDB( BomgarItem* bi )
     query.bindValue( ":somenr", bi->someNumber );
     
     query.exec();
-    qDebug() << query.executedQuery();
-    qDebug() << query.lastError().text();
 }
 
 void Database::deleteBomgarItemFromDB( const QString& id )
