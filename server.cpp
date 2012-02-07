@@ -100,12 +100,13 @@ void Server::readClient()
                 {
                     l = Database::getSrsForQueue();
                 }
-                    os << "HTTP/1.1 200 OK";
-                    os << "Server: kueued (Linux)";
+                    os << "HTTP/1.1 200 OK\r\n";
+                    os << "Server: kueued (Linux)\r\n";
                     //os Content-Length: (Größe von infotext.html in Byte)
-                    os << "Content-Language: en";
-                    os << "Connection: close";
-                    os << "Content-Type: text/xml";
+                    os << "Content-Language: en\r\n";
+                    os << "Connection: close\r\n";
+                    os << "Content-Type: text/xml\r\n";
+                    os << "\r\n";
                 os << "<?xml version='1.0'?>\n\n<qmon>\n";
                 
                 for ( int i = 0; i < l.size(); ++i ) 
