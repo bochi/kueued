@@ -84,6 +84,9 @@ void Server::readClient()
         
         QString req = tokens[ 0 ];
         QString cmd = tokens[ 1 ];
+                       
+        os << "HTTP/1.1 200 OK\r\n";
+        os << "Server: kueued (Linux)\r\n";     
         
         if ( req == "GET" )
         {
@@ -100,8 +103,7 @@ void Server::readClient()
                 {
                     l = Database::getSrsForQueue();
                 }
-                    os << "HTTP/1.1 200 OK\r\n";
-                    os << "Server: kueued (Linux)\r\n";
+
                     //os Content-Length: (Größe von infotext.html in Byte)
                     //os << "Content-Language: en\r\n";
                     //os << "Connection: close\r\n";
@@ -121,36 +123,52 @@ void Server::readClient()
             {
                 QString q = cmd.remove( "/bug/" );
                 
+                os << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
+                os << "\r\n";
+                                
                 os << Database::getBugForSr( q );
             }
             else if ( cmd.startsWith( "/critsit" ) )
             {
                 QString q = cmd.remove( "/critsit/" );
                 
+                os << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
+                os << "\r\n";
+                                
                 os << Database::critSitFlagForSr( q );
             }
             else if ( cmd.startsWith( "/highvaluecritsit" ) )
             {
                 QString q = cmd.remove( "/highvaluecritsit/" );
                 
+                os << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
+                os << "\r\n";
+                                
                 os << Database::highValueCritSitFlagForSr( q );
             }
             else if ( ( cmd.startsWith( "/highvalue" ) ) && !( cmd.startsWith( "/highvaluecritsit" ) ) )
             {
                 QString q = cmd.remove( "/highvalue/" );
                 
+                os << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
+                os << "\r\n";
+                
                 os << Database::highValueFlagForSr( q );
             }
 	    else if ( cmd.startsWith( "/test" ) )
 	    {
 		QStringList l = Database::getOracleSrList();
-		for ( int i = 0; i < l.size(); ++i )
+		
+                for ( int i = 0; i < l.size(); ++i )
 		{
 			os << l.at(i) << "\n";
 		}
 	    }
             else
             {
+                os << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
+                os << "\r\n";
+                
                 os << "Welcome to kueue.hwlab.suse.de!\n\n";
                 os << "Usage:\n\n";
                 os << "  * http://kueue.hwlab.suse.de:8080/qmon\n    Get a list of all SRs in all pseudo queues\n\n";
