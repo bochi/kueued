@@ -179,8 +179,7 @@ void Server::readClient()
                 
                 for ( int i = 0; i < l.size(); ++i )
                 {
-                        qDebug() << l.at(i).split("|||").at(0);
-                        qDebug() << l.at(i).split("|||").at(1);
+                    os << l.at(i).split("|||").at(0) + "   " + l.at(i).split("|||").at(1);
                 }
             }
 	    else if ( cmd.startsWith( "/test" ) )
