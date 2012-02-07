@@ -85,11 +85,7 @@ void Server::readClient()
             
             if ( tmp.startsWith( "User-Agent" ) )
             {
-                dm += "(" + tmp.remove( "User-Agent: " ) + "/";
-            }
-            if ( tmp.startsWith( "User-Name" ) )
-            {
-                dm += tmp.remove( "User-Name: " ) + ")";
+                dm += "(" + tmp.remove( "User-Agent: " ) + ")";
             }
         }
         
