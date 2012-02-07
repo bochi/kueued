@@ -73,7 +73,6 @@ void Server::readClient()
     }
     
     QTcpSocket* socket = ( QTcpSocket* )sender();
-    socket->waitForReadyRead();
     
     if ( socket->canReadLine() ) 
     {
