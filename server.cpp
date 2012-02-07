@@ -178,6 +178,7 @@ void Server::readClient()
         }
 
         socket->close();
+        socket->waitForDisconnected();
         
         if ( socket->state() == QTcpSocket::UnconnectedState ) 
         {
