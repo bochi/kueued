@@ -175,7 +175,7 @@ void Server::readClient()
             }
             else if ( cmd.startsWith( "/chat" ) )
             {
-                QList< QMap< QString, QString > > l;
+                QList< QMap< QString, QString > > l = Database::getCurrentBomgars();
                 
                 for ( int i = 0; i < l.size(); ++i )
                 {
