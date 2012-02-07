@@ -173,6 +173,15 @@ void Server::readClient()
                 
                 os << Database::highValueFlagForSr( q );
             }
+            else if ( cmd.startsWith( "/chat" ) )
+            {
+                QList< QMap< QString, QString > > l;
+                
+                for ( int i = 0; i < l.size(); ++i )
+                {
+                        qDebug() << l.at(i).keys();
+                }
+            }
 	    else if ( cmd.startsWith( "/test" ) )
 	    {
 		QStringList l = Database::getOracleSrList();

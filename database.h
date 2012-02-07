@@ -29,6 +29,8 @@
 #include "kueued.h"
 
 #include <QtSql>
+#include <QMap>
+#include <QList>
 
 class SiebelItem;
 class BomgarItem;
@@ -63,6 +65,8 @@ class Database : public QObject
         static QString getBomgarQueue( const QString& );
         static QString getBomgarQueueById( const QString& );
         static void updateBomgarQueue( BomgarItem* );
+        
+        static QList< QMap<QString,QString> > getCurrentBomgars();
         
         static QString getBugForSr( const QString& );
         static QString critSitFlagForSr( const QString& );
