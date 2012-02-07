@@ -38,7 +38,7 @@ Kueued::Kueued()
     Debug::print( "kueued", "Constructing" );
     
     mDB = new Database;
-    mServer = new Server( 8080, this );    
+    mServer = new Server( 80, this );    
     
     mSiebelReply = Network::get( QUrl( Settings::dBServer() + "/stefan-siebel.asp" ) );
     mBomgarReply = Network::get( QUrl( Settings::dBServer() + "/chat.asp" ) );

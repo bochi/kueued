@@ -46,6 +46,10 @@ QString XML::sr( SiebelItem* si )
     xml += "    <queue>" + si->queue + "</queue>\n";
     xml += "    <severity>" + si->severity + "</severity>\n";
     xml += "    <geo>" + si->geo + "</geo>\n";
+    xml += "    <hours>" + si->hours + "</hours>\n";
+    xml += "    <source>" + si->source + "</source>\n";
+    xml += "    <contactvia>" + si->contactvia + "</contactvia>\n";
+    xml += "    <phone>" + si->phone + "</phone>\n";
     
     if (  si->source == "Internal" )
     {
