@@ -85,11 +85,18 @@ void Server::readClient()
             
             if ( tmp.startsWith( "User-Agent" ) )
             {
-                dm += " (" + tmp.remove( "User-Agent: " ).trimmed() + ") ";
+                dm += " - " + tmp.remove( "User-Agent: " ).trimmed() + " - ";
             }
         }
         
-        Debug::print( "server", dm + r.trimmed() );
+        if ( dm.isEmpty() )
+        {
+            Debug::print( "server", " - " + r.trimmed() );
+        }
+        else
+        {
+            Debug::print( "server", dm + r.trimmed() );
+        }
 
         QStringList tokens = r.split( QRegExp( "[ \r\n][ \r\n]*" ) );
         
