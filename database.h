@@ -66,7 +66,7 @@ class Database : public QObject
         static QString getBomgarQueueById( const QString& );
         static void updateBomgarQueue( BomgarItem* );
         
-        static QList< QMap<QString,QString> > getCurrentBomgars();
+        static QStringList getCurrentBomgars();
         
         static QString getBugForSr( const QString& );
         static QString critSitFlagForSr( const QString& );

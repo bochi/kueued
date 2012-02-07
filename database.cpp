@@ -440,22 +440,21 @@ QList< SiebelItem* > Database::getSrsForQueue( const QString& queue )
     return list;
 }
 
-QList< QMap<QString,QString> > Database::getCurrentBomgars()
+QStringList Database::getCurrentBomgars()
 {
-    QList< QMap<QString,QString> > maplist;
+    QStringList list;
     QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
-    QStringList l;
+
     query.prepare( "SELECT SR, NAME FROM qmon_chat" );
     query.exec();
     
     while( query.next() )
     {
-        QMap<QString, QString> map;
-        map.insert( query.value( 0 ).toString(), query.value( 1 ).toString() );
-        maplist.append( map );
+        QString tmp = query.value(0).toString() + "|||" + query.value(1).toString();
+        list.append(tmp);
     }
 
-    return maplist;
+    return list;
 }
 
 

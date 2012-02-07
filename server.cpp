@@ -175,11 +175,12 @@ void Server::readClient()
             }
             else if ( cmd.startsWith( "/chat" ) )
             {
-                QList< QMap< QString, QString > > l = Database::getCurrentBomgars();
+               QStringList l = Database::getCurrentBomgars();
                 
                 for ( int i = 0; i < l.size(); ++i )
                 {
-                        qDebug() << l.at(i).keys();
+                        qDebug() << l.at(i).split("|||").at(0);
+                        qDebug() << l.at(i).split("|||").at(1);
                 }
             }
 	    else if ( cmd.startsWith( "/test" ) )
