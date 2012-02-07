@@ -175,8 +175,11 @@ void Server::readClient()
             }
             else if ( cmd.startsWith( "/chat" ) )
             {
-               QStringList l = Database::getCurrentBomgars();
-                
+                QStringList l = Database::getCurrentBomgars();
+              
+                os << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
+                os << "\r\n"; 
+               
                 for ( int i = 0; i < l.size(); ++i )
                 {
                     os << l.at(i).split("|||").at(0) + "   " + l.at(i).split("|||").at(1);
