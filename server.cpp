@@ -72,14 +72,29 @@ void Server::readClient()
     }
     
     QTcpSocket* socket = ( QTcpSocket* )sender();
+    QString dm;
+    dm += socket->peerAddress().toString();
     
-    if ( socket->canReadLine() ) 
+    if ( socket->canReadLine() )
     {
         QString r = socket->readLine();
-        Debug::print( "server", socket->peerAddress().toString() + " - " + r.trimmed() );
-
-        while ( socket->canReadLine() ) qDebug() << socket->readLine();
         
+        while ( socket->canReadLine() ) 
+        {
+            QString tmp = socket->readLine();
+            
+            if ( tmp.startsWith( "User-Agent" ) )
+            {
+                dm += "(" + tmp.remove( "User-Agent: " ) + "/";
+            }
+            if ( tmp.startsWith( "User-Name" ) )
+            {
+                dm += tmp.remove( "User-Name: " ) + ")";
+            }
+        }
+        
+        Debug::print( "server", dm + r.trimmed() );
+
         QStringList tokens = r.split( QRegExp( "[ \r\n][ \r\n]*" ) );
         
         QTextStream os( socket );    
