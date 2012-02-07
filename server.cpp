@@ -23,13 +23,12 @@
 
 */
 
-
 #include "server.h"
 #include "database.h"
 #include "debug.h"
 
 Server::Server( quint16 port, QObject* parent )
-    : QTcpServer(parent), disabled(false)
+    : QTcpServer( parent ), disabled( false )
 {
     Debug::print( "server", "Constructing" );
     listen( QHostAddress::Any, port );
@@ -78,7 +77,11 @@ void Server::readClient()
     {
         QString r = socket->readLine();
         Debug::print( "server", socket->peerAddress().toString() + " - " + r.trimmed() );
+
+        while ( socket->canReadLine() ) qDebug() << socket->readLine();
+        
         QStringList tokens = r.split( QRegExp( "[ \r\n][ \r\n]*" ) );
+        
         QTextStream os( socket );    
         os.setAutoDetectUnicode( true );
         
@@ -103,13 +106,10 @@ void Server::readClient()
                 {
                     l = Database::getSrsForQueue();
                 }
-
-                    //os Content-Length: (Größe von infotext.html in Byte)
-                    //os << "Content-Language: en\r\n";
-                    //os << "Connection: close\r\n";
                     os << "Content-Type: text/xml; charset=\"utf-8\"\r\n";
                     os << "\r\n";
-                    os << "<?xml version='1.0'?>\n\n<qmon>\n";
+                    os << "<?xml version='1.0'?>\n\n";
+                    os << "<qmon>\n";
                 
                 for ( int i = 0; i < l.size(); ++i ) 
                 {
