@@ -177,8 +177,9 @@ void Server::readClient()
             {
                 QStringList l = Database::getCurrentBomgars();
               
-                os << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
-                os << "\r\n"; 
+                os << "Content-Type: text/xml; charset=\"utf-8\"\r\n";
+                os << "\r\n";
+                os << "<?xml version='1.0'?>\n\n";
                 os << "<chat>\n";
                 
                 for ( int i = 0; i < l.size(); ++i )
