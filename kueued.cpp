@@ -115,7 +115,7 @@ void Kueued::siebelJobDone()
         initial = true;
     }
         
-    if ( !mSiebelReply->error() )
+    if ( !mSiebelReply->error() && !list.isEmpty() )
     {
         for ( int i = 0; i < list.size(); ++i ) 
         {
@@ -184,17 +184,15 @@ void Kueued::siebelJobDone()
 void Kueued::bomgarJobDone()
 {
     QString replydata = mBomgarReply->readAll();
-    QStringList list;
+    replydata.remove( QRegExp( "<(?:div|span|tr|td|body|html|tt|a|strong|p)[^>]*>", Qt::CaseInsensitive ) );
+
+    QStringList list = replydata.split( "<br>" );
+    list.removeDuplicates();
     QStringList existList( Database::getQmonBomgarList() );
     bool changed = false;
     
-    if ( !mBomgarReply->error() )
+    if ( !mBomgarReply->error() && !list.isEmpty() )
     {
-        replydata.remove( QRegExp( "<(?:div|span|tr|td|body|html|tt|a|strong|p)[^>]*>", Qt::CaseInsensitive ) );
-    
-        QStringList list = replydata.split( "<br>" );
-        list.removeDuplicates();
-    
         for ( int i = 0; i < list.size(); ++i ) 
         {
             if ( ( ( !list.at( i ).isEmpty() ) && 
