@@ -179,11 +179,17 @@ void Server::readClient()
               
                 os << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
                 os << "\r\n"; 
-               
+                os << "<chat>\n>";
+                
                 for ( int i = 0; i < l.size(); ++i )
                 {
-                    os << l.at(i).split("|||").at(1) + " | " + l.at(i).split("|||").at(0) + "\n";
+                    os << "  <bomgar>\n";
+                    os << "    <bomgarQ>" + l.at(i).split("|||").at(1) + "</bomgarQ>\n";
+                    os << "    <sr>" + l.at(i).split("|||").at(0) + "</sr>\n";
+                    os << "  </bomgar>\n";
                 }
+                
+                os << "</chat>";
             }
 	    else if ( cmd.startsWith( "/test" ) )
 	    {
