@@ -179,7 +179,7 @@ void Server::readClient()
               
                 os << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
                 os << "\r\n"; 
-                os << "<chat>\n>";
+                os << "<chat>\n";
                 
                 for ( int i = 0; i < l.size(); ++i )
                 {
