@@ -131,9 +131,10 @@ void Database::updateSiebelQueue( SiebelItem* si )
 {
     Debug::print( "database", "Updating Siebel queue for " + si->id + " to " + si->queue );
     QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
-    query.prepare( "UPDATE qmon_siebel SET QUEUE = :queue WHERE id = :id" );
+    query.prepare( "UPDATE qmon_siebel SET QUEUE = :queue, QDATE = :qdate WHERE id = :id" );
                 
     query.bindValue( ":queue", si->queue );
+    query.bindValue( ":qdate", QDateTime::currentDateTime().toString( "yyyy-MM-dd hh:mm:ss" ) );
     query.bindValue( ":id", si->id );
                 
     query.exec();
@@ -399,14 +400,14 @@ QList< SiebelItem* > Database::getSrsForQueue( const QString& queue )
     if (  queue == "NONE" )
     {
         
-    query.prepare( "SELECT ID, QUEUE, SEVERITY, HOURS, SOURCE, CONTACTVIA, ODATE, ADATE, QDATE, STATUS, CONTRACT, GEO, BDESC, SLA, DISPLAY "
-                   "FROM qmon_siebel" );
+        query.prepare( "SELECT ID, QUEUE, SEVERITY, HOURS, SOURCE, CONTACTVIA, ODATE, ADATE, QDATE, STATUS, CONTRACT, GEO, BDESC, SLA, DISPLAY "
+                       "FROM qmon_siebel" );
     }
     else
     {
-    query.prepare( "SELECT ID, QUEUE, SEVERITY, HOURS, SOURCE, CONTACTVIA, ODATE, ADATE, QDATE, STATUS, CONTRACT, GEO, BDESC, SLA, DISPLAY "
-                   "FROM qmon_siebel WHERE ( QUEUE = :queue )" );
-    query.bindValue( ":queue", queue );
+        query.prepare( "SELECT ID, QUEUE, SEVERITY, HOURS, SOURCE, CONTACTVIA, ODATE, ADATE, QDATE, STATUS, CONTRACT, GEO, BDESC, SLA, DISPLAY "
+                       "FROM qmon_siebel WHERE ( QUEUE = :queue )" );
+        query.bindValue( ":queue", queue );
     }
     
     query.exec();
@@ -432,7 +433,7 @@ QList< SiebelItem* > Database::getSrsForQueue( const QString& queue )
         si->display = query.value( 14 ).toString();
         si->isChat = isChat( query.value( 0 ).toString() );
         si->bomgarQ = getBomgarQueue( query.value( 0 ).toString() );
-        si->critSit = highValueCritSitFlagForSr( query.value( 0 ).toString() );
+        //si->critSit = highValueCritSitFlagForSr( query.value( 0 ).toString() );
      
         list.append( si );
     }
