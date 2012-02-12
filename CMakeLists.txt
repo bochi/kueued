@@ -60,5 +60,5 @@ ADD_SUBDIRECTORY( db )
 SET( kueued-db_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/db )
 INCLUDE_DIRECTORIES( ${kueued-db_INCLUDE_DIR} )
 
-INSTALL( SCRIPT kueued_post.cmake )
+INSTALL( SCRIPT scripts/kueued_post.cmake )
 
