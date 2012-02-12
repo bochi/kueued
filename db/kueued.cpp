@@ -74,6 +74,8 @@ Kueued::~Kueued()
      
 void Kueued::update()
 {
+    Debug::print( "kueued", "Starting update" );
+    
     if ( !mSiebelReply->isRunning() ) 
     {
         mSiebelReply = Network::get( QUrl( Settings::dBServer() + "/stefan-siebel.asp" ) );
