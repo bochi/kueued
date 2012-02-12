@@ -1,0 +1,38 @@
+#!/bin/bash
+#
+# copy to /usr/bin and run as cronjob 
+# */10 * * * * /usr/bin/check_kueued
+
+DATE=$(LANG=en_EN date)
+
+/etc/init.d/kueued-db status
+   
+if [ "$?" != "0" ]; then
+
+  echo "$DATE -- kueued database not OK - restarting" >> /var/log/kueued/kueued-check.log
+  /etc/init.d/kueued-db stop
+  sleep 1
+  killall -9 kueued-db
+  /etc/init.d/kueued-db start
+
+else
+
+  echo "$DATE -- kueued database running fine" >> /var/log/kueued/kueued-check.log
+
+fi
+
+/etc/init.d/kueued-srv status
+
+if [ "$?" != "0" ]; then
+
+  echo "$DATE -- kueued server not OK - restarting" >> /var/log/kueued/kueued-check.log
+  /etc/init.d/kueued-srv stop
+  sleep 1
+  killall -9 kueued-srv
+  /etc/init.d/kueued-srv start
+
+else 
+
+  echo "$DATE -- kueued server running fine" >> /var/log/kueued/kueued-check.log
+
+fi

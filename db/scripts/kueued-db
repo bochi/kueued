@@ -54,7 +54,7 @@ case "$1" in
             echo "Please check /etc/kueued/kueued.conf before starting this service."
             rc_failed
     else
-    	    startproc -u "kueued" -l "/var/log/kueued-db.log" -e $KUEUED_BIN 
+    	    startproc -u "kueued" -l "/var/log/kueued/kueued-db.log" -e $KUEUED_BIN 
     fi
     # Remember status and be verbose
 	rc_status -v

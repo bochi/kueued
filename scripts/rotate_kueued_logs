@@ -1,0 +1,28 @@
+#!/bin/bash
+#
+# copy to /usr/bin and run as cronjob
+# 59 23 * * sun /usr/bin/rotate_kueued_logs
+
+DATE=$(date +%Y%m%d)
+
+/etc/init.d/kueued-srv stop
+/etc/init.d/kueued-db stop
+
+cd /var/log/kueued
+
+for i in *.log; do 
+
+    mv $i $i.$DATE
+    touch $i
+    chown kueued $i
+
+done
+
+/etc/init.d/kueued-db start
+/etc/init.d/kueued-srv start
+
+for i in *.$DATE; do
+
+    bzip2 $i
+
+done
