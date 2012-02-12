@@ -22,25 +22,25 @@
     Have a lot of fun :-)
 
 */
+#include "kueued.h"
+#include <QDebug>
+#include <QtSingleCoreApplication>
+#include <iostream>
 
-#ifndef SETTINGS_H
-#define SETTINGS_H
-
-#include <QSettings>
-
-class Settings
+int main(int argc, char *argv[])
 {
-    public:
-       
-        /* General Group */
-        
-        static QString dBServer();
-        static int refreshSeconds();
-        static QString oracleHost();
-        static QString oracleUser();
-        static QString oraclePassword();
-        static int oraclePort();
-        static int timezoneCorrection();
-};    
+    QtSingleCoreApplication app( argc, argv );
 
-#endif
+    if ( app.isRunning() )
+    {
+        std::cout <<  "kueued-srv is already running, exiting";
+    	return 0;
+    }
+        
+    QCoreApplication::setOrganizationName( "nts" );
+    QCoreApplication::setApplicationName( "kueued-srv" );
+    QCoreApplication::setApplicationVersion( "git" );
+
+     Kueued k;
+     return app.exec();
+}

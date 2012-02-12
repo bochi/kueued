@@ -22,25 +22,22 @@
     Have a lot of fun :-)
 
 */
-#include "kueued.h"
+
+#ifndef DEBUG_H
+#define DEBUG_H
+
 #include <QDebug>
-#include <QtSingleCoreApplication>
+#include <QDateTime>
+#include <QString>
 #include <iostream>
 
-int main(int argc, char *argv[])
+namespace Debug
 {
-    QtSingleCoreApplication app( argc, argv );
-
-    if ( app.isRunning() )
+    static void print( const QString& c, const QString& msg )
     {
-        std::cout <<  "kueued is already running, exiting";
-    	return 0;
+        QString t = "[" + QDateTime::currentDateTime().toString( "MM/dd hh:mm:ss" ) + "] [" + c.toUpper() + "] ";
+        std::cout << t.toStdString() << msg.toStdString() << std::endl;
     }
-        
-    QCoreApplication::setOrganizationName( "nts" );
-    QCoreApplication::setApplicationName( "kueued" );
-    QCoreApplication::setApplicationVersion( "git" );
-
-     Kueued k;
-     return app.exec();
 }
+
+#endif

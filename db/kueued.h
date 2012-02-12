@@ -28,7 +28,6 @@
 
 #include "database.h"
 #include "qtservice/qtservice.h"
-#include "server.h"
 
 #include <QObject>
 #include <QString>
@@ -37,7 +36,6 @@
 #include <QNetworkAccessManager>
 
 class Database;
-class Server;
 
 class Kueued : public QObject
  {
@@ -48,7 +46,6 @@ class Kueued : public QObject
      ~Kueued();
 
     private:
-        Server *mServer;
         QStringList mNotifiedList;
         QStringList mQueueList;
         QNetworkReply* mBomgarReply;

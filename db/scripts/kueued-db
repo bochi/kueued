@@ -18,7 +18,7 @@
 ### END INIT INFO
 
 
-KUEUED_BIN=/usr/bin/kueued
+KUEUED_BIN=/usr/bin/kueued-db
 test -x $KUEUED_BIN || exit 5
 
 . /etc/rc.status
@@ -42,7 +42,7 @@ rc_reset
 
 case "$1" in
     start)
-	echo -n "Starting kueued "
+	echo -n "Starting kueued database"
 	## Start daemon with startproc(8). If this fails
 	## the return value is set appropriately by startproc.
     UID_ENT="$(/usr/bin/getent passwd kueued)"
@@ -54,17 +54,17 @@ case "$1" in
             echo "Please check /etc/kueued/kueued.conf before starting this service."
             rc_failed
     else
-    	    startproc -u "kueued" -l "/var/log/kueued.log" -e $KUEUED_BIN 
+    	    startproc -u "kueued" -l "/var/log/kueued-db.log" -e $KUEUED_BIN 
     fi
     # Remember status and be verbose
 	rc_status -v
 	;;
     stop)
-	echo -n "Shutting down kueued "
+	echo -n "Shutting down kueued database"
 	## Stop daemon with killproc(8) and if this fails
 	## killproc sets the return value according to LSB.
 
-	killproc -TERM "kueued"
+	killproc -TERM "kueued-db"
 
 	# Remember status and be verbose
 	rc_status -v
@@ -88,12 +88,12 @@ case "$1" in
 	;;
     force-reload)
 
-	echo -n "Reload service kueued "
+	echo -n "Reload service kueued database"
 	$0 stop  &&  $0 start
 	#rc_status
 	;;
     status)
-	echo -n "Checking for service kueued "
+	echo -n "Checking for service kueued database"
 	## Check status with checkproc(8), if process is running
 	## checkproc will return with exit status 0.
 

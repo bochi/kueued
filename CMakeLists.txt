@@ -52,29 +52,13 @@ SET( QT_SERVICE_LIBRARY qtservice )
 
 INCLUDE_DIRECTORIES(${QtService_INCLUDE_DIR} ${QtSingleApp_INCLUDE_DIR} )
 
-SET( kueued_CPP main.cpp
-                kueued.cpp
-		database.cpp
-                server.cpp
-		network.cpp
-		settings.cpp
-		xml.cpp)
+ADD_SUBDIRECTORY( srv )
+SET( kueued-srv_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/srv )
+INCLUDE_DIRECTORIES( ${kueued-srv_INCLUDE_DIR} )
 
-QT4_AUTOMOC( ${kueued_CPP} )
+ADD_SUBDIRECTORY( db )
+SET( kueued-db_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/db )
+INCLUDE_DIRECTORIES( ${kueued-db_INCLUDE_DIR} )
 
-ADD_EXECUTABLE( kueued ${kueued_CPP} )
-INSTALL( TARGETS kueued DESTINATION bin )
-INSTALL( PROGRAMS scripts/kueued DESTINATION /etc/init.d )
-#INSTALL( FILES kueued.conf DESTINATION /etc/kueued )
-#INSTALL( FILES kueued.log DESTINATION /var/log )
-INSTALL( SCRIPT scripts/kueued_post.cmake )
-
-TARGET_LINK_LIBRARIES( kueued ${QT_LIBRARIES} 
-                              ${QT_QTCORE_LIBRARY} 
-                              ${QT_QTSQL_LIBRARIES} 
-                              ${QT_QTNETWORK_LIBRARY} 
-			      ${QT_QTXML_LIBRARY}
-			      ${QT_SINGLEAPP_LIBRARY} 
-                              ${QT_SERVICE_LIBRARY} )
-
+INSTALL( SCRIPT kueued_post.cmake )
 

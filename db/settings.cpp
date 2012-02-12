@@ -27,42 +27,72 @@
 
 QString Settings::dBServer()
 {
-    QSettings settings( "/etc/kueued/kueued.conf", QSettings::NativeFormat);
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
     return settings.value( "DBServer" ).toString();
 }
 
 int Settings::refreshSeconds()
 {
-    QSettings settings( "/etc/kueued/kueued.conf",QSettings::NativeFormat);
+    QSettings settings( "/etc/kueued.conf",QSettings::NativeFormat);
     return settings.value( "refreshSeconds", 60 ).toInt();
+}
+
+QString Settings::mysqlHost()
+{
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
+    return settings.value( "mysqlHost" ).toString();
+}
+
+QString Settings::mysqlUser()
+{
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
+    return settings.value( "mysqlUser" ).toString();
+}
+
+QString Settings::mysqlDatabase()
+{
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
+    return settings.value( "mysqlDatabase" ).toString();
+}
+
+QString Settings::mysqlPassword()
+{
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
+    return settings.value( "mysqlPassword" ).toString();
 }
 
 QString Settings::oracleHost()
 {
-    QSettings settings( "/etc/kueued/kueued.conf", QSettings::NativeFormat);
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
     return settings.value( "oracleHost" ).toString();
 }
 
 QString Settings::oracleUser()
 {
-    QSettings settings( "/etc/kueued/kueued.conf", QSettings::NativeFormat);
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
     return settings.value( "oracleUser" ).toString();
 }
 
 QString Settings::oraclePassword()
 {
-    QSettings settings( "/etc/kueued/kueued.conf", QSettings::NativeFormat);
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
     return settings.value( "oraclePassword" ).toString();
+}
+
+QString Settings::oracleDatabase()
+{
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
+    return settings.value( "oracleDatabase" ).toString();
 }
 
 int Settings::oraclePort()
 {
-    QSettings settings( "/etc/kueued/kueued.conf", QSettings::NativeFormat);
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
     return settings.value( "oraclePort" ).toInt();
 }
 
 int Settings::timezoneCorrection()
 {
-    QSettings settings( "/etc/kueued/kueued.conf", QSettings::NativeFormat);
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
     return settings.value( "timezoneCorrection" ).toInt();
 }

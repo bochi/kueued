@@ -35,22 +35,12 @@ Database::Database()
 {   
     Debug::print( "database", "Constructing" );
     
-    QDir dir = QDir( "/etc/kueued" );
-
-    if ( !dir.exists() )
-    {
-        dir.mkpath( dir.path() );
-    }
-    
-    mDBfile = dir.path() + "/db.sqlite";
-    
     QSqlDatabase mysqlDB = QSqlDatabase::addDatabase("QMYSQL", "mysqlDB" );
-    mysqlDB.setHostName("localhost");
-    mysqlDB.setDatabaseName("kueued");
-    mysqlDB.setUserName("kueued");
-    mysqlDB.setPassword("kueued");
-    //QSqlDatabase mysqlDB = QSqlDatabase::addDatabase( "QSQLITE", "mysqlDB" );
-    //mysqlDB.setDatabaseName( mDBfile );
+    
+    mysqlDB.setHostName( Settings::mysqlHost() );
+    mysqlDB.setDatabaseName( Settings::mysqlDatabase() );
+    mysqlDB.setUserName( Settings::mysqlUser() );
+    mysqlDB.setPassword( Settings::mysqlPassword() );
     
     if ( !mysqlDB.open() )
     {
@@ -58,7 +48,8 @@ Database::Database()
     }
 
     QSqlDatabase oracleDB = QSqlDatabase::addDatabase( "QOCI", "oracleDB" );
-    oracleDB.setDatabaseName( "report" );
+    
+    oracleDB.setDatabaseName( Settings::oracleDatabase() );
     oracleDB.setHostName( Settings::oracleHost() );
     oracleDB.setPort( Settings::oraclePort() );
     oracleDB.setUserName( Settings::oracleUser() );
