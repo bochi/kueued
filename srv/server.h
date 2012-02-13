@@ -25,6 +25,7 @@
 
 #ifndef SERVER_H
 #define SERVER_H
+
 #include "qtservice/qtservice.h"
 #include "xml.h"
 

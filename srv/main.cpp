@@ -22,7 +22,8 @@
     Have a lot of fun :-)
 
 */
-#include "kueued.h"
+
+#include "kueuedsrv.h"
 #include <QDebug>
 #include <QtSingleCoreApplication>
 #include <iostream>
@@ -41,6 +42,6 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName( "kueued-srv" );
     QCoreApplication::setApplicationVersion( "git" );
 
-     Kueued k;
+     KueuedSrv k;
      return app.exec();
 }

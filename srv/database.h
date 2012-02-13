@@ -26,7 +26,7 @@
 #ifndef DATABASE_H_
 #define DATABASE_H_
 
-#include "kueued.h"
+#include "kueuedsrv.h"
 
 #include <QtSql>
 #include <QMap>
