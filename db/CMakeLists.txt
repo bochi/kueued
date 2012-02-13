@@ -26,7 +26,7 @@ CMAKE_MINIMUM_REQUIRED( VERSION 2.6 )
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR} ) 
 
 SET( kueued-db_CPP main.cpp
-                   kueued.cpp
+                   kueueddb.cpp
                    database.cpp
                    network.cpp
                    settings.cpp )

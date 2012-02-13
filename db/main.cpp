@@ -22,7 +22,7 @@
     Have a lot of fun :-)
 
 */
-#include "kueued.h"
+#include "kueueddb.h"
 #include <QDebug>
 #include <QtSingleCoreApplication>
 #include <iostream>
@@ -41,6 +41,6 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName( "kueued-db" );
     QCoreApplication::setApplicationVersion( "git" );
 
-     Kueued k;
+     KueuedDB k;
      return app.exec();
 }
