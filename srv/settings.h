@@ -44,6 +44,7 @@ class Settings
         static QString oracleUser();
         static QString oraclePassword();
         static QString oracleDatabase();
+        static QString latestVersion();
         static int oraclePort();
         static int timezoneCorrection();
 };    

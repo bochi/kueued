@@ -25,6 +25,7 @@
 
 #include "server.h"
 #include "database.h"
+#include "settings.h"
 #include "debug.h"
 
 Server::Server( quint16 port, QObject* parent )
@@ -172,6 +173,13 @@ void Server::readClient()
                 os << "\r\n";
                 
                 os << Database::highValueFlagForSr( q );
+            }
+            else if ( cmd.startsWith( "/latestkueue" ) )
+            {
+                os << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
+                os << "\r\n";
+                                
+                os << Settings::latestVersion();
             }
             else if ( cmd.startsWith( "/chat" ) )
             {
