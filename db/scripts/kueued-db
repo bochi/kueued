@@ -6,15 +6,15 @@
 # /usr/sbin/rckueued
 #
 ### BEGIN INIT INFO
-# Provides:          kueued
-# Required-Start:
-# Should-Start:      $syslog 
+# Provides:          kueued-db
+# Required-Start:    $network mysql
+# Should-Start:      $syslog  
 # Required-Stop:     $syslog
 # Should-Stop:       
 # Default-Start:     3 5
 # Default-Stop:      0 1 2 6
-# Short-Description:  kueued
-# Description:        Daemon to create QMON XML data
+# Short-Description:  kueued-db
+# Description:        Daemon to create QMON XML data (Database part)
 ### END INIT INFO
 
 
