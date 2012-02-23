@@ -200,6 +200,20 @@ void Server::readClient()
                 
                 os << "</chat>";
             }
+            else if ( cmd.startsWith( "/userqueue-num" ) )
+            {
+                QString q = cmd.remove( "/userqueue-num/" );
+                QStringList l = Database::getSrsForUser( q );
+              
+                os << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
+                os << "\r\n";
+                
+                for ( int i = 0; i < l.size(); ++i )
+                {
+                    os << l.at( i ) + "\n";
+                }
+                
+            }
 	    else if ( cmd.startsWith( "/test" ) )
 	    {
 		QStringList l = Database::getOracleSrList();

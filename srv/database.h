@@ -52,6 +52,7 @@ class Database : public QObject
         static QString highValueCritSitFlagForSr( const QString& );
 	static QStringList getOracleSrList();        
         static QString convertTime( const QString& );
+        static QStringList getSrsForUser( const QString& );
 };
 
 

@@ -62,26 +62,13 @@ Database::Database()
     
     QSqlDatabase qmonDB = QSqlDatabase::addDatabase( "QODBC", "qmonDB" );
     
-    qmonDB.setDatabaseName( "qmonDB" );
-    qmonDB.setUserName( "wallboard" );
-    qmonDB.setPassword( "Wallb0ard" );
+    qmonDB.setDatabaseName( Settings::qmonDbDatabase() );
+    qmonDB.setUserName( Settings::qmonDbUser() );
+    qmonDB.setPassword( Settings::qmonDbPassword() );
     
     if ( !qmonDB.open() )
     {
         Debug::print( "database", "Failed to open the Qmon DB " + qmonDB.lastError().text() );
-    }
-    
-    QSqlDatabase siebelDB = QSqlDatabase::addDatabase( "QOCI", "siebelDB" );
-    
-    siebelDB.setDatabaseName( Settings::siebelDatabase() );
-    siebelDB.setHostName( Settings::siebelHost() );
-    siebelDB.setPort( 1521 );
-    siebelDB.setUserName( Settings::siebelUser() );
-    siebelDB.setPassword( Settings::siebelPassword() );
-
-    if ( !siebelDB.open() )
-    {
-        Debug::print( "database", "Failed to open the Siebel DB " + siebelDB.lastError().text() );
     }
     
     QSqlQuery query( mysqlDB );

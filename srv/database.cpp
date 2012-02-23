@@ -60,6 +60,19 @@ Database::Database()
         Debug::print( "database", "Failed to open the Oracle DB " + oracleDB.lastError().text() );
     }
     
+    QSqlDatabase siebelDB = QSqlDatabase::addDatabase( "QOCI", "siebelDB" );
+    
+    siebelDB.setDatabaseName( Settings::siebelDatabase() );
+    siebelDB.setHostName( Settings::siebelHost() );
+    siebelDB.setPort( 1521 );
+    siebelDB.setUserName( Settings::siebelUser() );
+    siebelDB.setPassword( Settings::siebelPassword() );
+
+    if ( !siebelDB.open() )
+    {
+        Debug::print( "database", "Failed to open the Siebel DB " + siebelDB.lastError().text() );
+    }
+    
     QSqlQuery query( mysqlDB );
        
     if ( !query.exec( "CREATE TABLE IF NOT EXISTS qmon_siebel( ID VARCHAR(20) PRIMARY KEY UNIQUE, QUEUE TEXT, SEVERITY TEXT, HOURS TEXT, "
@@ -100,6 +113,26 @@ QString Database::getBugForSr( const QString& sr )
     {
         return "NOBUG";
     }
+}
+
+QStringList Database::getSrsForUser( const QString& user )
+{
+    QStringList list;
+    
+    QSqlQuery query( QSqlDatabase::database( "siebelDB" ) );
+    query.prepare( "SELECT SR_NUM FROM SIEBEL.S_SRV_REQ WHERE OWNER_EMP_ID=(SELECT PAR_ROW_ID FROM SIEBEL.S_USER WHERE LOGIN = :user ) AND SR_STAT_ID = 'Open'" );
+    
+    query.bindValue( ":user", user.toUpper() );
+    query.exec();
+    
+    qDebug() << query.lastError().text();
+
+    while ( query.next() )
+    {
+        list.append( query.value( 0 ).toString() );
+    }
+    
+    return list;
 }
 
 QString Database::critSitFlagForSr( const QString& sr )

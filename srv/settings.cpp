@@ -102,3 +102,27 @@ int Settings::timezoneCorrection()
     QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
     return settings.value( "timezoneCorrection" ).toInt();
 }
+
+QString Settings::siebelDatabase()
+{
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
+    return settings.value( "siebelDatabase" ).toString();
+}
+
+QString Settings::siebelHost()
+{
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
+    return settings.value( "siebelHost" ).toString();
+}
+
+QString Settings::siebelUser()
+{
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
+    return settings.value( "siebelUser" ).toString();
+}
+
+QString Settings::siebelPassword()
+{
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
+    return settings.value( "siebelPassword" ).toString();
+}
