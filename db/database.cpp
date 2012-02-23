@@ -75,7 +75,7 @@ Database::Database()
     
     siebelDB.setDatabaseName( Settings::siebelDatabase() );
     siebelDB.setHostName( Settings::siebelHost() );
-    siebelDB.setPort( "1521" );
+    siebelDB.setPort( 1521 );
     siebelDB.setUserName( Settings::siebelUser() );
     siebelDB.setPassword( Settings::siebelPassword() );
 
