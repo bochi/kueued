@@ -66,9 +66,9 @@ Database::Database()
     qmonDB.setUserName( "wallboard" );
     qmonDB.setPassword( "Wallb0ard" );
     
-    if ( !siebelDB.open() )
+    if ( !qmonDB.open() )
     {
-        Debug::print( "database", "Failed to open the Siebel DB " + siebelDB.lastError().text() );
+        Debug::print( "database", "Failed to open the Qmon DB " + qmonDB.lastError().text() );
     }
     
     QSqlDatabase siebelDB = QSqlDatabase::addDatabase( "QOCI", "siebelDB" );
