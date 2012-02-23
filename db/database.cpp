@@ -60,6 +60,30 @@ Database::Database()
         Debug::print( "database", "Failed to open the Oracle DB " + oracleDB.lastError().text() );
     }
     
+    QSqlDatabase qmonDB = QSqlDatabase::addDatabase( "QODBC", "qmonDB" );
+    
+    qmonDB.setDatabaseName( "qmonDB" );
+    qmonDB.setUserName( "wallboard" );
+    qmonDB.setPassword( "Wallb0ard" );
+    
+    if ( !siebelDB.open() )
+    {
+        Debug::print( "database", "Failed to open the Siebel DB " + siebelDB.lastError().text() );
+    }
+    
+    QSqlDatabase siebelDB = QSqlDatabase::addDatabase( "QOCI", "siebelDB" );
+    
+    siebelDB.setDatabaseName( Settings::siebelDatabase() );
+    siebelDB.setHostName( Settings::siebelHost() );
+    siebelDB.setPort( "1521" );
+    siebelDB.setUserName( Settings::siebelUser() );
+    siebelDB.setPassword( Settings::siebelPassword() );
+
+    if ( !siebelDB.open() )
+    {
+        Debug::print( "database", "Failed to open the Siebel DB " + siebelDB.lastError().text() );
+    }
+    
     QSqlQuery query( mysqlDB );
        
     if ( !query.exec( "CREATE TABLE IF NOT EXISTS qmon_siebel( ID VARCHAR(20) PRIMARY KEY UNIQUE, QUEUE TEXT, SEVERITY TEXT, HOURS TEXT, "

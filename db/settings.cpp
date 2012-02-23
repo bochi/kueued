@@ -96,3 +96,45 @@ int Settings::timezoneCorrection()
     QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
     return settings.value( "timezoneCorrection" ).toInt();
 }
+
+QString Settings::qmonDbDatabase()
+{
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
+    return settings.value( "qmonDbDatabase" ).toString();
+}
+
+QString Settings::qmonDbUser()
+{
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
+    return settings.value( "qmonDbUser" ).toString();
+}
+
+QString Settings::qmonDbPassword()
+{
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
+    return settings.value( "qmonDbPassword" ).toString();
+}
+
+QString Settings::siebelDatabase()
+{
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
+    return settings.value( "siebelDatabase" ).toString();
+}
+
+QString Settings::siebelHost()
+{
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
+    return settings.value( "siebelHost" ).toString();
+}
+
+QString Settings::siebelUser()
+{
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
+    return settings.value( "siebelUser" ).toString();
+}
+
+QString Settings::siebelPassword()
+{
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
+    return settings.value( "siebelPassword" ).toString();
+}

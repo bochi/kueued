@@ -44,6 +44,13 @@ class Settings
         static QString oracleUser();
         static QString oraclePassword();
         static QString oracleDatabase();
+        static QString qmonDbDatabase();
+        static QString qmonDbUser();
+        static QString qmonDbPassword();
+        static QString siebelHost();
+        static QString siebelUser();
+        static QString siebelPassword();
+        static QString siebelDatabase();
         static int oraclePort();
         static int timezoneCorrection();
 };    
