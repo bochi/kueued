@@ -33,6 +33,7 @@
 #include <QList>
 
 class SiebelItem;
+class PseudoQueueItem;
 
 class Database : public QObject
 {
@@ -53,6 +54,7 @@ class Database : public QObject
 	static QStringList getOracleSrList();        
         static QString convertTime( const QString& );
         static QStringList getSrsForUser( const QString& );
+        static QList< PseudoQueueItem* > getPseudoQueues();
 };
 
 
@@ -83,6 +85,13 @@ class SiebelItem
         bool isChat;
         QString critSit;
         QString highValue;
+};
+
+class PseudoQueueItem
+{
+    public:
+        QString display;
+        QString name;
 };
 
 #endif

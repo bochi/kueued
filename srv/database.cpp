@@ -73,6 +73,17 @@ Database::Database()
         Debug::print( "database", "Failed to open the Siebel DB " + siebelDB.lastError().text() );
     }
     
+    QSqlDatabase qmonDB = QSqlDatabase::addDatabase( "QODBC", "qmonDB" );
+    
+    qmonDB.setDatabaseName( Settings::qmonDbDatabase() );
+    qmonDB.setUserName( Settings::qmonDbUser() );
+    qmonDB.setPassword( Settings::qmonDbPassword() );
+    
+    if ( !qmonDB.open() )
+    {
+        Debug::print( "database", "Failed to open the Qmon DB " + qmonDB.lastError().text() );
+    }
+    
     QSqlQuery query( mysqlDB );
        
     if ( !query.exec( "CREATE TABLE IF NOT EXISTS qmon_siebel( ID VARCHAR(20) PRIMARY KEY UNIQUE, QUEUE TEXT, SEVERITY TEXT, HOURS TEXT, "
@@ -120,9 +131,9 @@ QStringList Database::getSrsForUser( const QString& user )
     QStringList list;
     
     QSqlQuery query( QSqlDatabase::database( "siebelDB" ) );
-    query.prepare( "SELECT SR_NUM FROM SIEBEL.S_SRV_REQ WHERE OWNER_EMP_ID=(SELECT PAR_ROW_ID FROM SIEBEL.S_USER WHERE LOGIN = :user ) AND SR_STAT_ID = 'Open'" );
-    
-    query.bindValue( ":user", user.toUpper() );
+    query.prepare( "SELECT SR_NUM FROM SIEBEL.S_SRV_REQ WHERE OWNER_EMP_ID = ( SELECT PAR_ROW_ID FROM SIEBEL.S_USER WHERE LOGIN = :login ) AND SR_STAT_ID = 'Open'" );
+    //query.prepare( "SELECT * FROM ALL_TABLES" );
+    query.bindValue( ":login", user.toUpper() );
     query.exec();
     
     qDebug() << query.lastError().text();
@@ -183,6 +194,25 @@ QString Database::highValueCritSitFlagForSr( const QString& sr )
     {
         return "ERROR";
     }
+}
+
+QList< PseudoQueueItem* > Database::getPseudoQueues()
+{
+    QSqlQuery query( QSqlDatabase::database( "qmonDB" ) );
+    QList< PseudoQueueItem* > list;
+    
+    query.prepare( "SELECT DisplayName, PseudoQueue from _NovQueuePseudoQueue" );
+    query.exec();
+
+    while ( query.next() )
+    {
+        PseudoQueueItem* i = new PseudoQueueItem;
+        i->display = query.value( 0 ).toString();
+        i->name = query.value( 1 ).toString();
+        list.append( i );
+    }
+    
+    return list;
 }
 
 bool Database::isChat( const QString& id )

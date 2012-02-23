@@ -49,6 +49,9 @@ class Settings
         static QString siebelUser();
         static QString siebelPassword();
         static QString siebelDatabase();
+        static QString qmonDbDatabase();
+        static QString qmonDbUser();
+        static QString qmonDbPassword();
         static int oraclePort();
         static int timezoneCorrection();
 };    

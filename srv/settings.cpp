@@ -126,3 +126,21 @@ QString Settings::siebelPassword()
     QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
     return settings.value( "siebelPassword" ).toString();
 }
+
+QString Settings::qmonDbDatabase()
+{
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
+    return settings.value( "qmonDbDatabase" ).toString();
+}
+
+QString Settings::qmonDbUser()
+{
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
+    return settings.value( "qmonDbUser" ).toString();
+}
+
+QString Settings::qmonDbPassword()
+{
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
+    return settings.value( "qmonDbPassword" ).toString();
+}

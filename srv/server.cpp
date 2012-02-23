@@ -200,19 +200,40 @@ void Server::readClient()
                 
                 os << "</chat>";
             }
-            else if ( cmd.startsWith( "/userqueue-num" ) )
+            else if ( cmd.startsWith( "/pseudoQ" ) )
             {
-                QString q = cmd.remove( "/userqueue-num/" );
+                QList< PseudoQueueItem* > l = Database::getPseudoQueues();
+              
+                os << "Content-Type: text/xml; charset=\"utf-8\"\r\n";
+                os << "\r\n";
+                os << "<?xml version='1.0'?>\n\n";
+                os << "<pseudoqueues>\n";
+                
+                for ( int i = 0; i < l.size(); ++i )
+                {
+                    os << "  <queue>\n";
+                    os << "    <DisplayName>" + l.at( i )->display + "</DisplayName>\n";
+                    os << "    <QueueName>" + l.at( i )->name + "</QueueName>\n";
+                    os << "  </queue>\n";
+                    
+                    delete l.at( i );
+                }
+                
+                os << "</pseudoqueues>";
+            }
+            else if ( cmd.startsWith( "/userqueue" ) )
+            {
+                QString q = cmd.remove( "/userqueue/" );
                 QStringList l = Database::getSrsForUser( q );
               
                 os << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
                 os << "\r\n";
+                os << "TOTAL:" + QString::number( l.size() ) + "\n";
                 
                 for ( int i = 0; i < l.size(); ++i )
                 {
                     os << l.at( i ) + "\n";
-                }
-                
+                } 
             }
 	    else if ( cmd.startsWith( "/test" ) )
 	    {
