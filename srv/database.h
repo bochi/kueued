@@ -26,13 +26,10 @@
 #ifndef DATABASE_H_
 #define DATABASE_H_
 
-#include "kueuedsrv.h"
-
 #include <QtSql>
-#include <QMap>
-#include <QList>
 
 class SiebelItem;
+class BomgarItem;
 class PseudoQueueItem;
 
 class Database : public QObject
@@ -43,65 +40,58 @@ class Database : public QObject
         Database();
         ~Database();
     
+        static QStringList getQmonSiebelList();
+        static bool siebelExistsInDB( const QString& );
+        static bool siebelQueueChanged( SiebelItem* );
+        static bool siebelSeverityChanged( SiebelItem* );
         static bool isChat( const QString& );
+        static QString getQmonBdesc( const QString& );
+        
+        static void updateBomgarItemInDB( BomgarItem* );
+        static void deleteBomgarItemFromDB( const QString& );
         static QList< SiebelItem* > getSrsForQueue( const QString& = "NONE" );
+        static QStringList getQmonBomgarList();
+        static bool bomgarExistsInDB( const QString& );
         static QString getBomgarQueue( const QString& );
-        static QStringList getCurrentBomgars();
-        static QString getBugForSr( const QString& );
-        static QString critSitFlagForSr( const QString& );
-        static QString highValueFlagForSr( const QString& );
-        static QString highValueCritSitFlagForSr( const QString& );
-	static QStringList getOracleSrList();        
-        static QString convertTime( const QString& );
-        static QStringList getSrsForUser( const QString& );
+        
         static QStringList getSrNumsForQueue( const QString&, const QString& );
-        static QList< PseudoQueueItem* > getPseudoQueues();
-        static QList< SiebelItem* > getQmonSrs();
+        static QStringList getCurrentBomgars();
+        
+        static QString convertTime( const QString& );
 };
 
-
 class SiebelItem 
-{
+{ 
     public:
         QString id;
         QString queue;
-        QString severity;
         QString hours;
-        QString source;
-        QString contactvia;
-        QString category;
-        QString supportprogram;
-        QString supportgroup;
-        QString srtype;
-        QString srsubtype;
-        QString servicelevel;
-        QString cid;
-        QString pq_email;
-        QString last_activity;
-        QString account;
-        QString pq_phone;
+        QString geo;
         QString odate;
-        QString detdesc;
         QString adate;
         QString qdate;
         QString status;
+        QString severity;
         QString contract;
-        QString queue1; 
-        QString phone;
-        QString onsitephone;
-        QString geo; 
-        QString wtf;
-        QString routing;
-        QString bdesc;
         QString sla;
-        QString display;
-        QString bomgarQ;
         QString crSr;
+        QString bdesc;
         QString customer;
-        bool isChat;
+        QString bomgarQ;
+        QString contactvia;
         bool isCr;
-        QString critSit;
-        QString highValue;
+        bool isChat;
+        bool highValue;
+        bool critSit;
+};
+
+class BomgarItem 
+{
+    public:
+        QString id;
+        QString sr;
+        QString name;
+        QString date;
 };
 
 class PseudoQueueItem

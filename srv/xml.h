@@ -36,7 +36,7 @@ class XML
 {
     public:
         static QString sr( SiebelItem* );
-        static QString srNew( SiebelItem* );
+        //static QString srNew( SiebelItem* );
     
 };
 

@@ -26,8 +26,6 @@
 #ifndef DATABASE_H_
 #define DATABASE_H_
 
-#include "kueueddb.h"
-
 #include <QtSql>
 
 class SiebelItem;
@@ -91,6 +89,8 @@ class SiebelItem
         QString contactvia;
         bool isCr;
         bool isChat;
+        bool highValue;
+        bool critSit;
 };
 
 class BomgarItem 

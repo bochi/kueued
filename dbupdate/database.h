@@ -89,6 +89,8 @@ class SiebelItem
         QString contactvia;
         bool isCr;
         bool isChat;
+        bool highValue;
+        bool critSit;
 };
 
 class BomgarItem 

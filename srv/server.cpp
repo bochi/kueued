@@ -138,7 +138,7 @@ void Server::readClient()
                 
                 os << "</qmon>";
             }
-            else if ( cmd.startsWith( "/testqmon" ) )
+            /*else if ( cmd.startsWith( "/testqmon" ) )
             {
                 QList< SiebelItem* > l = Database::getQmonSrs();
                 QString q = cmd.remove( "/testqmon/" );
@@ -150,12 +150,12 @@ void Server::readClient()
                 
                 for ( int i = 0; i < l.size(); ++i ) 
                 {
-                    os << XML::srNew( l.at( i ) );
+                    os << XML::sr( l.at( i ) );
                     delete l.at( i );
                 }
                 
                 os << "</qmon>";
-            }
+            }*/
             else if ( cmd.startsWith( "/srnrs" ) )
             {  
                 QString q = cmd.remove( "/srnrs" );
@@ -181,7 +181,7 @@ void Server::readClient()
                     }
                 }
             }
-            else if ( cmd.startsWith( "/bug" ) )
+            /*else if ( cmd.startsWith( "/bug" ) )
             {
                 QString q = cmd.remove( "/bug/" );
                 
@@ -216,7 +216,7 @@ void Server::readClient()
                 os << "\r\n";
                 
                 os << Database::highValueFlagForSr( q );
-            }
+            }*/
             else if ( cmd.startsWith( "/latestkueue" ) )
             {
                 os << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
@@ -243,7 +243,7 @@ void Server::readClient()
                 
                 os << "</chat>";
             }
-            else if ( cmd.startsWith( "/pseudoQ" ) )
+            /*else if ( cmd.startsWith( "/pseudoQ" ) )
             {
                 QList< PseudoQueueItem* > l = Database::getPseudoQueues();
               
@@ -286,7 +286,7 @@ void Server::readClient()
 		{
 			os << l.at(i) << "\n";
 		}
-	    }
+	    }*/
             else
             {
                 os << "Content-Type: text/plain; charset=\"utf-8\"\r\n";

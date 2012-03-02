@@ -34,74 +34,12 @@ QString XML::sr( SiebelItem* si )
     QDateTime adate = QDateTime::fromString( si->adate, "yyyy-MM-dd hh:mm:ss" );
     QDateTime sladate = QDateTime::fromString( si->sla, "yyyy-MM-dd hh:mm:ss" );
     QDateTime qdate = QDateTime::fromString( si->qdate, "yyyy-MM-dd hh:mm:ss" );
+    
     QString xml;
     
     qint64 age = ( odate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 ) );
     qint64 lu = ( adate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 ));
     qint64 qt = ( qdate.secsTo( now ) );
-    qint64 sla = ( now.secsTo( sladate ) );
-    
-    xml += "  <sr>\n";
-    xml += "    <id>" + si->id + "</id>\n";
-    xml += "    <queue>" + si->queue + "</queue>\n";
-    xml += "    <severity>" + si->severity + "</severity>\n";
-    xml += "    <geo>" + si->geo + "</geo>\n";
-    xml += "    <hours>" + si->hours + "</hours>\n";
-    xml += "    <source>" + si->source + "</source>\n";
-    xml += "    <contactvia>" + si->contactvia + "</contactvia>\n";
-    xml += "    <phone>" + si->phone + "</phone>\n";
-    
-    if (  si->source == "Internal" )
-    {
-        xml += "    <type>cr</type>\n";
-    }
-    else
-    {
-        xml += "    <type>sr</type>\n";
-    }
-    
-    if ( si->isChat )
-    {
-        xml += "    <bomgarQ>" + si->bomgarQ + "</bomgarQ>\n";
-    }    
-    
-       
-    xml += "    <age>" + QString::number( age ) + "</age>\n";
-   
-    if ( sla > 0 )      
-    {
-         xml += "    <sla>" + QString::number( sla ) + "</sla>\n";
-    }
-
-    if ( lu < age )
-    {
-        xml += "    <lastupdate>" + QString::number( lu ) + "</lastupdate>\n";
-    }
-    
-    xml += "    <timeinqueue>" +  QString::number( qt ) + "</timeinqueue>\n"; 
-    xml += "    <description><![CDATA[" + si->bdesc + "]]></description>\n";
-    xml += "    <status>" + si->status + "</status>\n";
-    xml += "    <contract>" + si->contract + "</contract>\n";
-    xml += "    <contact>" + si->contactvia + "</contact>\n";
-    xml += "    <critsit>" + si->critSit + "</critsit>\n";
-    xml += "    <highvalue>" + si->highValue + "</highvalue>\n";
-    xml += "  </sr>\n";
-  
-    return xml;
-}
-
-QString XML::srNew( SiebelItem* si )
-{
-    QDateTime now = QDateTime::currentDateTime();
-    QDateTime odate = QDateTime::fromString( si->odate, "yyyy-MM-ddThh:mm:ss" );
-    QDateTime adate = QDateTime::fromString( si->adate, "yyyy-MM-ddThh:mm:ss" );
-    QDateTime sladate = QDateTime::fromString( si->sla, "yyyy-MM-ddThh:mm:ss" );
-    //QDateTime qdate = QDateTime::fromString( si->qdate, "yyyy-MM-dd hh:mm:ss" );
-    QString xml;
-    
-    qint64 age = ( odate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 ) );
-    qint64 lu = ( adate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 ));
-    //qint64 qt = ( qdate.secsTo( now ) );
     qint64 sla = ( now.secsTo( sladate ) );
     
     /*id
@@ -144,13 +82,14 @@ bomgarQ*/
     if ( si->isCr )
     {
         xml += "    <srtype>cr</srtype>\n";
-        xml += "    <crsr>" + si->crSr + "</crsr>\n";
+        
     }
     else
     {
         xml += "    <srtype>sr</srtype>\n";
     }
     
+    xml += "    <crsr>" + si->crSr + "</crsr>\n";
     xml += "    <bdesc><![CDATA[" + si->bdesc + "]]></bdesc>\n";
     xml += "    <customer><![CDATA[" + si->customer + "]]></customer>\n";
     
@@ -160,15 +99,34 @@ bomgarQ*/
     }
     
     xml += "    <age>" + QString::number( age ) + "</age>\n";
-   
+    xml += "    <lastupdate>" + QString::number( lu ) + "</lastupdate>\n";
+    xml += "    <timeinQ>" + QString::number( qt ) + "</timeinQ>\n";
+
     if ( sla > 0 )      
     {
          xml += "    <sla>" + QString::number( sla ) + "</sla>\n";
     }
-
-    if ( lu < age )
+    else
     {
-        xml += "    <lastupdate>" + QString::number( lu ) + "</lastupdate>\n";
+         xml += "    <sla>" + QString::number( 0 ) + "</sla>\n";
+    }
+    
+    if ( si->highValue )
+    {
+        xml += "    <highvalue>yes</highvalue>\n";
+    }
+    else
+    {
+        xml += "    <highvalue>no</highvalue>\n";
+    }
+    
+    if ( si->critSit )
+    {
+        xml += "    <critsit>yes</critsit>\n";
+    }
+    else
+    {
+        xml += "    <critsit>no</critsit>\n";
     }
     
     xml += "  </sr>\n";
