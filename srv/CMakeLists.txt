@@ -29,7 +29,6 @@ SET( kueued-srv_CPP main.cpp
                     kueuedsrv.cpp
                     database.cpp
 		    ../settings.cpp
-		    ../kueuedthreads.cpp
                     server.cpp
                     xml.cpp)
 
@@ -45,6 +44,5 @@ TARGET_LINK_LIBRARIES( kueued-srv ${QT_LIBRARIES}
                                   ${QT_QTNETWORK_LIBRARY} 
                                   ${QT_QTXML_LIBRARY}
                                   ${QT_SINGLEAPP_LIBRARY} 
-                                  ${QT_SERVICE_LIBRARY} 
-				  ${THREADWEAVER_LIBRARY} )
+                                  ${QT_SERVICE_LIBRARY} )
 
