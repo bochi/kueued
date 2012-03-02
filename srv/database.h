@@ -54,6 +54,7 @@ class Database : public QObject
 	static QStringList getOracleSrList();        
         static QString convertTime( const QString& );
         static QStringList getSrsForUser( const QString& );
+        static QStringList getSrNumsForQueue( const QString&, const QString& );
         static QList< PseudoQueueItem* > getPseudoQueues();
         static QList< SiebelItem* > getQmonSrs();
 };

@@ -156,6 +156,31 @@ void Server::readClient()
                 
                 os << "</qmon>";
             }
+            else if ( cmd.startsWith( "/srnrs" ) )
+            {  
+                QString q = cmd.remove( "/srnrs" );
+
+                os << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
+                os << "\r\n";
+
+                if ( q.remove( "/" ).isEmpty() )
+                {  
+                    os << "Please specify queue";
+                }
+                else if ( !q.contains( "|" ) )
+                {  
+                    os << "Please specify geo";
+                }
+                else
+                {  
+                    QStringList l = Database::getSrNumsForQueue( q.remove( "/" ).split( "|" ).at( 0 ), q.remove( "/" ).split( "|" ).at( 1 ) );
+
+                    for ( int i = 0; i < l.size(); ++i )
+                    {  
+                        os << l.at( i ) + "\n";
+                    }
+                }
+            }
             else if ( cmd.startsWith( "/bug" ) )
             {
                 QString q = cmd.remove( "/bug/" );

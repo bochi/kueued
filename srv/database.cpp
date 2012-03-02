@@ -242,6 +242,25 @@ QString Database::highValueCritSitFlagForSr( const QString& sr )
     }
 }
 
+QStringList Database::getSrNumsForQueue( const QString& queue, const QString& geo )
+{
+    QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
+    QStringList list;
+
+    query.prepare( "SELECT ID FROM qmon_siebel WHERE ( QUEUE = :queue ) AND ( GEO = :geo )" );
+    query.bindValue( ":queue", queue );
+    query.bindValue( ":geo", geo );
+
+    query.exec();
+
+    while( query.next() )
+    {  
+        list.append( query.value( 0 ).toString() );
+    }
+
+    return list;
+}
+
 QList< PseudoQueueItem* > Database::getPseudoQueues()
 {
     QSqlQuery query( QSqlDatabase::database( "qmonDB" ) );
