@@ -26,8 +26,6 @@
 #ifndef DATABASE_H_
 #define DATABASE_H_
 
-#include "kueueddb.h"
-
 #include <QtSql>
 
 class SiebelItem;
