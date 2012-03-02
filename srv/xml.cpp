@@ -89,3 +89,89 @@ QString XML::sr( SiebelItem* si )
   
     return xml;
 }
+
+QString XML::srNew( SiebelItem* si )
+{
+    QDateTime now = QDateTime::currentDateTime();
+    QDateTime odate = QDateTime::fromString( si->odate, "yyyy-MM-ddThh:mm:ss" );
+    QDateTime adate = QDateTime::fromString( si->adate, "yyyy-MM-ddThh:mm:ss" );
+    QDateTime sladate = QDateTime::fromString( si->sla, "yyyy-MM-ddThh:mm:ss" );
+    //QDateTime qdate = QDateTime::fromString( si->qdate, "yyyy-MM-dd hh:mm:ss" );
+    QString xml;
+    
+    qint64 age = ( odate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 ) );
+    qint64 lu = ( adate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 ));
+    //qint64 qt = ( qdate.secsTo( now ) );
+    qint64 sla = ( now.secsTo( sladate ) );
+    
+    /*id
+queue
+hours
+source
+contactvia
+odate
+adate
+status
+category
+severity
+supportprogram
+supportgroup
+sla
+srtype
+srsubtype
+servicelevel
+cid
+pq_email
+bdesc
+last_activity
+account
+pq_phone
+onsitephone
+detdesc
+routing
+geo
+bomgarQ*/
+    xml += "  <sr>\n";
+    xml += "    <id><![CDATA[" + si->id + "]]></id>\n";
+    xml += "    <queue><![CDATA[" + si->queue + "]]></queue>\n";
+    xml += "    <hours><![CDATA[" + si->hours + "]]></hours>\n";
+    xml += "    <geo><![CDATA[" + si->geo + "]]></geo>\n";
+    xml += "    <contactvia><![CDATA[" + si->contactvia + "]]></contactvia>\n";
+    xml += "    <status><![CDATA[" + si->status + "]]></status>\n";
+    xml += "    <severity><![CDATA[" + si->severity + "]]></severity>\n";
+    xml += "    <contract><![CDATA[" + si->contract + "]]></contract>\n";
+    
+    if ( si->isCr )
+    {
+        xml += "    <srtype>cr</srtype>\n";
+        xml += "    <crsr>" + si->crSr + "</crsr>\n";
+    }
+    else
+    {
+        xml += "    <srtype>sr</srtype>\n";
+    }
+    
+    xml += "    <bdesc><![CDATA[" + si->bdesc + "]]></bdesc>\n";
+    xml += "    <customer><![CDATA[" + si->customer + "]]></customer>\n";
+    
+    if ( si->bomgarQ != "NOCHAT" )
+    {
+        xml += "    <bomgarQ>" + si->bomgarQ + "</bomgarQ>\n";
+    }
+    
+    xml += "    <age>" + QString::number( age ) + "</age>\n";
+   
+    if ( sla > 0 )      
+    {
+         xml += "    <sla>" + QString::number( sla ) + "</sla>\n";
+    }
+
+    if ( lu < age )
+    {
+        xml += "    <lastupdate>" + QString::number( lu ) + "</lastupdate>\n";
+    }
+    
+    xml += "  </sr>\n";
+  
+    return xml;
+}

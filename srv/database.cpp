@@ -126,6 +126,52 @@ QString Database::getBugForSr( const QString& sr )
     }
 }
 
+QList< SiebelItem* > Database::getQmonSrs()
+{
+    QSqlQuery query( QSqlDatabase::database( "qmonDB" ) );
+    QList< SiebelItem* > list;
+    
+    query.prepare( "SELECT SR_NUM, PSEUDOQUEUE_ID, SUPPORT_HOURS, RESPOND_VIA, CREATED, LAST_UPD, SR_SUBSTATUS, "
+                          "SR_SEVERITY, SR_SUPPORT_PROGRAM, SR_SLA_REMAINING, SR_SUBTYPE_SUPT_PROD_COLLAB, CID, SR_BRIEF_DESC, ACCOUNT "
+                          "FROM Collector_ODBC_SIEBEL" );
+    query.exec();
+    
+    while ( query.next() ) 
+    {
+        SiebelItem* si = new SiebelItem;
+        
+        si->id = query.value( 0 ).toString();
+        si->queue = query.value( 1 ).toString();
+        si->hours = query.value( 2 ).toString().split("|").at(0).trimmed();
+        si->geo = query.value( 2 ).toString().split("|").at(1).trimmed();
+        si->contactvia = query.value( 3 ).toString();
+        si->odate = query.value( 4 ).toString();
+        si->adate = query.value( 5 ).toString();
+        si->status = query.value( 6 ).toString();
+        si->severity = query.value( 7 ).toString();
+        si->contract = query.value( 8 ).toString();
+        si->sla = query.value( 9 ).toString();
+        
+        if ( query.value( 10 ).toString() == "Collaboration" )
+        {
+            si->isCr = true;
+        }
+        else
+        {
+            si->isCr = false;
+        }
+        
+        si->crSr = query.value( 11 ).toString();
+        si->bdesc = query.value( 12 ).toString();
+        si->customer = query.value( 13 ).toString();
+        si->bomgarQ = getBomgarQueue( query.value( 0 ).toString() );
+     
+        list.append( si );
+    }
+        
+    return list;
+}
+
 QStringList Database::getSrsForUser( const QString& user )
 {
     QStringList list;

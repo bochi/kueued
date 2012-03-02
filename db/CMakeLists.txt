@@ -23,13 +23,16 @@
 
 CMAKE_MINIMUM_REQUIRED( VERSION 2.6 )
 
-INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR} ) 
+INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ) 
 
 SET( kueued-db_CPP main.cpp
                    kueueddb.cpp
                    database.cpp
                    network.cpp
-                   settings.cpp )
+		   ../settings.cpp 
+		   ../kueuedthreads.cpp
+		   dbupdatejob.cpp
+		   bomgarupdatejob.cpp )
 
 QT4_AUTOMOC( ${kueued-db_CPP} )
 
@@ -42,5 +45,6 @@ TARGET_LINK_LIBRARIES( kueued-db  ${QT_LIBRARIES}
                                   ${QT_QTSQL_LIBRARIES} 
                                   ${QT_QTNETWORK_LIBRARY} 
                                   ${QT_SINGLEAPP_LIBRARY} 
-                                  ${QT_SERVICE_LIBRARY} )
+                                  ${QT_SERVICE_LIBRARY} 
+				  ${THREADWEAVER_LIBRARY} )
 

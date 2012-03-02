@@ -138,6 +138,24 @@ void Server::readClient()
                 
                 os << "</qmon>";
             }
+            else if ( cmd.startsWith( "/testqmon" ) )
+            {
+                QList< SiebelItem* > l = Database::getQmonSrs();
+                QString q = cmd.remove( "/testqmon/" );
+                
+                    os << "Content-Type: text/xml; charset=\"utf-8\"\r\n";
+                    os << "\r\n";
+                    os << "<?xml version='1.0'?>\n\n";
+                    os << "<qmon>\n";
+                
+                for ( int i = 0; i < l.size(); ++i ) 
+                {
+                    os << XML::srNew( l.at( i ) );
+                    delete l.at( i );
+                }
+                
+                os << "</qmon>";
+            }
             else if ( cmd.startsWith( "/bug" ) )
             {
                 QString q = cmd.remove( "/bug/" );

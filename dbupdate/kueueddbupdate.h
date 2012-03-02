@@ -23,36 +23,30 @@
 
 */
 
-#ifndef SETTINGS_H
-#define SETTINGS_H
+#ifndef KUEUEDDBUPDATE_H
+#define KUEUEDDBUPDATE_H
 
-#include <QSettings>
+#include "database.h"
 
-class Settings
-{
-    public:
-       
-        /* General Group */
+class Database;
+
+class KueuedDbUpdate : public QObject
+ {
+     Q_OBJECT
+     
+ public:
+     KueuedDbUpdate();
+     ~KueuedDbUpdate();
+
+    private:
+        Database* mDB;
+        bool mBomgarDone;
+        bool mSiebelDone;
         
-        static QString dBServer();
-        static int refreshSeconds();
-        static QString mysqlHost();
-        static QString mysqlUser();
-        static QString mysqlPassword();
-        static QString mysqlDatabase();
-        static QString oracleHost();
-        static QString oracleUser();
-        static QString oraclePassword();
-        static QString oracleDatabase();
-        static QString qmonDbDatabase();
-        static QString qmonDbUser();
-        static QString qmonDbPassword();
-        static QString siebelHost();
-        static QString siebelUser();
-        static QString siebelPassword();
-        static QString siebelDatabase();
-        static int oraclePort();
-        static int timezoneCorrection();
-};    
-
+    private slots:
+        void updateBomgar();
+        void updateUnity();
+        void finished();
+};
+ 
 #endif

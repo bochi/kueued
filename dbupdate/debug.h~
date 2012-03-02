@@ -23,37 +23,18 @@
 
 */
 
-#ifndef KUEUEDDB_H
-#define KUEUEDDB_H
+#ifndef DEBUG_H
+#define DEBUG_H
 
-#include "database.h"
-#include "qtservice/qtservice.h"
-#include "kueuedthreads.h"
-#include "dbupdatejob.h"
+#include <iostream>
 
-#include <QObject>
-#include <QString>
-#include <QTimer>
+namespace Debug
+{
+    static void print( const QString& c, const QString& msg )
+    {
+        QString t = "[" + QDateTime::currentDateTime().toString( "MM/dd hh:mm:ss" ) + "] [" + c.toUpper() + "] ";
+        std::cout << t.toStdString() << msg.toStdString() << std::endl;
+    }
+}
 
-class KueuedThreads;
-class DBUpdateJob;
-
-class KueuedDB : public QObject
- {
-     Q_OBJECT
-     
- public:
-     KueuedDB();
-     ~KueuedDB();
-
-    private:
-        QTimer* mTimer;
-        KueuedThreads* mThreads;
-
-        
-    public slots:
-        void update();
-};
-
- 
 #endif

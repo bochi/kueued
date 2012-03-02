@@ -25,26 +25,20 @@ CMAKE_MINIMUM_REQUIRED( VERSION 2.6 )
 
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ) 
 
-SET( kueued-srv_CPP main.cpp
-                    kueuedsrv.cpp
-                    database.cpp
-		    ../settings.cpp
-		    ../kueuedthreads.cpp
-                    server.cpp
-                    xml.cpp)
+SET( kueued-dbupdate_CPP main.cpp
+                         kueueddbupdate.cpp
+                         database.cpp
+                         ../settings.cpp )
 
-QT4_AUTOMOC( ${kueued-srv_CPP} )
+QT4_AUTOMOC( ${kueued-dbupdate_CPP} )
 
-ADD_EXECUTABLE( kueued-srv ${kueued-srv_CPP} )
-INSTALL( TARGETS kueued-srv DESTINATION bin )
-INSTALL( PROGRAMS scripts/kueued-srv DESTINATION /etc/init.d )
+ADD_EXECUTABLE( kueued-dbupdate ${kueued-dbupdate_CPP} )
+INSTALL( TARGETS kueued-dbupdate DESTINATION bin )
 
-TARGET_LINK_LIBRARIES( kueued-srv ${QT_LIBRARIES} 
-                                  ${QT_QTCORE_LIBRARY} 
-                                  ${QT_QTSQL_LIBRARIES} 
-                                  ${QT_QTNETWORK_LIBRARY} 
-                                  ${QT_QTXML_LIBRARY}
-                                  ${QT_SINGLEAPP_LIBRARY} 
-                                  ${QT_SERVICE_LIBRARY} 
-				  ${THREADWEAVER_LIBRARY} )
+TARGET_LINK_LIBRARIES( kueued-dbupdate  ${QT_LIBRARIES} 
+                                        ${QT_QTCORE_LIBRARY} 
+                                        ${QT_QTSQL_LIBRARIES} )
+                                  
+                
+		
 

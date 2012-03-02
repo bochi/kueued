@@ -44,69 +44,65 @@ class Database : public QObject
         Database();
         ~Database();
     
-        static void insertSiebelItemIntoDB( SiebelItem* );
-        static void updateSiebelQueue( SiebelItem* );
-        static void updateSiebelSeverity( SiebelItem* );
-        static void updateSiebelDisplay( const QString& );
-        static void deleteSiebelItemFromDB( const QString& );
-        static QStringList getQmonSiebelList();
+        static void insertSiebelItemIntoDB( SiebelItem*, QSqlDatabase );
+        static void updateSiebelQueue( SiebelItem*, QSqlDatabase );
+        static void updateSiebelSeverity( SiebelItem*, QSqlDatabase );
+        static void updateSiebelDisplay( const QString&, QSqlDatabase );
+        static void deleteSiebelItemFromDB( const QString&, QSqlDatabase );
+        static QStringList getQmonSiebelList( QSqlDatabase);
 	static QStringList getOracleSrList();
-        static bool siebelExistsInDB( const QString& );
-        static bool siebelQueueChanged( SiebelItem* );
-        static bool siebelSeverityChanged( SiebelItem* );
-        static bool isChat( const QString& );
-        static QString getQmonBdesc( const QString& );
+        static bool siebelExistsInDB( const QString&, QSqlDatabase );
+        static bool siebelQueueChanged( SiebelItem*, QSqlDatabase );
+        static bool siebelSeverityChanged( SiebelItem*, QSqlDatabase );
+        static bool isChat( const QString&, QSqlDatabase );
+        static QString getQmonBdesc( const QString&, QSqlDatabase );
         
-        static void updateBomgarItemInDB( BomgarItem* );
-        static void deleteBomgarItemFromDB( const QString& );
-        static QList< SiebelItem* > getSrsForQueue( const QString& = "NONE" );
-        static QStringList getQmonBomgarList();
-        static bool bomgarExistsInDB( const QString& );
-        static QString getBomgarQueue( const QString& );
-        static QString getBomgarQueueById( const QString& );
-        static void updateBomgarQueue( BomgarItem* );
+        static void updateBomgarItemInDB( BomgarItem*, QSqlDatabase );
+        static void deleteBomgarItemFromDB( const QString&, QSqlDatabase );
+        static QList< SiebelItem* > getSrsForQueue( QSqlDatabase, const QString& = "NONE" );
+        static QStringList getQmonBomgarList(QSqlDatabase);
+        static bool bomgarExistsInDB( const QString&, QSqlDatabase );
+        static QString getBomgarQueue( const QString&, QSqlDatabase );
+        static QString getBomgarQueueById( const QString&, QSqlDatabase );
+        static void updateBomgarQueue( BomgarItem*, QSqlDatabase );
         
-        static QStringList getCurrentBomgars();
+        static QStringList getCurrentBomgars( QSqlDatabase );
         
-        static QString getBugForSr( const QString& );
-        static QString critSitFlagForSr( const QString& );
-        static QString highValueFlagForSr( const QString& );
-        static QString highValueCritSitFlagForSr( const QString& );
+        static QString getBugForSr( const QString&, QSqlDatabase );
+        static QString critSitFlagForSr( const QString&, QSqlDatabase );
+        static QString highValueFlagForSr( const QString&, QSqlDatabase );
+        static QString highValueCritSitFlagForSr( const QString&, QSqlDatabase );
         
         static QString convertTime( const QString& );
+        
+        static QList< SiebelItem* > getQmonSrs( QSqlDatabase, QSqlDatabase );
+        static QList< BomgarItem* > getChats( QSqlDatabase );
 
     private:
         QString mDBfile;        
 };
 
-
 class SiebelItem 
-{
+{ 
     public:
         QString id;
         QString queue;
-        QString severity;
         QString hours;
-        QString source;
-        QString contactvia;
+        QString geo;
         QString odate;
         QString adate;
         QString qdate;
         QString status;
+        QString severity;
         QString contract;
-        QString queue1; 
-        QString phone;
-        QString onsitephone;
-        QString geo; 
-        QString wtf;
-        QString routing;
-        QString bdesc;
         QString sla;
-        QString display;
+        QString crSr;
+        QString bdesc;
+        QString customer;
         QString bomgarQ;
+        QString contactvia;
+        bool isCr;
         bool isChat;
-        QString critSit;
-        QString highValue;
 };
 
 class BomgarItem 
@@ -114,20 +110,8 @@ class BomgarItem
     public:
         QString id;
         QString sr;
-        QString repteam;
         QString name;
         QString date;
-        QString qdate;
-        QString someNumber;
-};
-
-class WhoIsInBomgarItem
-{
-    public:
-        QString name;
-        QString sr;
-        QString timeInQueue;
-        QString timeInSystem;
 };
 
 #endif

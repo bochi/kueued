@@ -23,37 +23,30 @@
 
 */
 
-#ifndef KUEUEDDB_H
-#define KUEUEDDB_H
+#ifndef KUEUEDDBUPDATE_H
+#define KUEUEDDBUPDATE_H
 
 #include "database.h"
-#include "qtservice/qtservice.h"
-#include "kueuedthreads.h"
-#include "dbupdatejob.h"
 
-#include <QObject>
-#include <QString>
-#include <QTimer>
+class Database;
 
-class KueuedThreads;
-class DBUpdateJob;
-
-class KueuedDB : public QObject
+class KueuedDbUpdate : public QObject
  {
      Q_OBJECT
      
  public:
-     KueuedDB();
-     ~KueuedDB();
+     KueuedDbUpdate();
+     ~KueuedDbUpdate();
 
     private:
-        QTimer* mTimer;
-        KueuedThreads* mThreads;
-
+        Database* mDB;
+        bool mBomgarDone;
+        bool mSiebelDone;
         
-    public slots:
-        void update();
+    private slots:
+        void updateBomgar();
+        void updateUnity();
+        void finished();
 };
-
  
 #endif

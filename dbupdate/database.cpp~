@@ -33,8 +33,6 @@
 
 Database::Database()
 {   
-    Debug::print( "database", "Constructing" );
-    
     QSqlDatabase mysqlDB = QSqlDatabase::addDatabase("QMYSQL", "mysqlDB" );
     
     mysqlDB.setHostName( Settings::mysqlHost() );
@@ -46,19 +44,6 @@ Database::Database()
     {
         Debug::print( "database", "Failed to open the database " + mysqlDB.lastError().text() );
     }
-
-    /*QSqlDatabase oracleDB = QSqlDatabase::addDatabase( "QOCI", "oracleDB" );
-    
-    oracleDB.setDatabaseName( Settings::oracleDatabase() );
-    oracleDB.setHostName( Settings::oracleHost() );
-    oracleDB.setPort( Settings::oraclePort() );
-    oracleDB.setUserName( Settings::oracleUser() );
-    oracleDB.setPassword( Settings::oraclePassword() );
-
-    if ( !oracleDB.open() )
-    {
-        Debug::print( "database", "Failed to open the Oracle DB " + oracleDB.lastError().text() );
-    }*/
     
     QSqlDatabase qmonDB = QSqlDatabase::addDatabase( "QODBC", "qmonDB" );
     
@@ -89,15 +74,15 @@ Database::Database()
 
 Database::~Database()
 {   
-    Debug::print( "database", "Destroying" );
     QSqlDatabase::removeDatabase( "mysqlDB" );
+    QSqlDatabase::removeDatabase( "qmonDB" );
 }
 
-void Database::insertSiebelItemIntoDB( SiebelItem* item, QSqlDatabase db )
+void Database::insertSiebelItemIntoDB( SiebelItem* item )
 {
     Debug::print( "database", "Inserting SiebelItem for " + item->id + " " + item->queue );
 
-    QSqlQuery query( db );
+    QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
     
     query.prepare( "INSERT INTO qmon_siebel( ID, QUEUE, HOURS, GEO, ODATE, ADATE, QDATE, STATUS, SEVERITY, "
                      "CONTRACT, SLA, CRSR, BDESC, CUSTOMER, CONTACTVIA )"
@@ -124,10 +109,12 @@ void Database::insertSiebelItemIntoDB( SiebelItem* item, QSqlDatabase db )
     query.exec();
 }
 
-void Database::updateSiebelQueue( SiebelItem* si, QSqlDatabase db )
+void Database::updateSiebelQueue( SiebelItem* si )
 {
     Debug::print( "database", "Updating Siebel queue for " + si->id + " to " + si->queue );
-    QSqlQuery query( db );
+    
+    QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
+    
     query.prepare( "UPDATE qmon_siebel SET QUEUE = :queue, QDATE = :qdate WHERE id = :id" );
                 
     query.bindValue( ":queue", si->queue );
@@ -137,10 +124,12 @@ void Database::updateSiebelQueue( SiebelItem* si, QSqlDatabase db )
     query.exec();
 }
 
-void Database::updateSiebelSeverity( SiebelItem* si, QSqlDatabase db )
+void Database::updateSiebelSeverity( SiebelItem* si )
 {
-    Debug::print( "database", "Updating Siebel Severity for " + si->id + " to " + si->severity );
-    QSqlQuery query( db );
+    Debug::print( "database", "Updating SR Severity for " + si->id + " to " + si->severity );
+    
+    QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
+    
     query.prepare( "UPDATE qmon_siebel SET SEVERITY = :severity WHERE id = :id" );
                 
     query.bindValue( ":severity", si->severity );
@@ -149,100 +138,25 @@ void Database::updateSiebelSeverity( SiebelItem* si, QSqlDatabase db )
     query.exec();
 }
 
-QString Database::getBugForSr( const QString& sr, QSqlDatabase db )
-{
-    QSqlQuery query( QSqlDatabase::database( "oracleDB" ) );
-    query.prepare( "SELECT DEFECT_ID from NTSDM.OLAP_SR_DX2 WHERE SR_NUM = :srnum" );
-    query.bindValue( ":srnum", sr );
-    query.exec();
-
-    if ( query.next() )
-    {
-        return query.value( 0 ).toString();
-    }
-    else
-    {
-        return "NOBUG";
-    }
-}
-
-QString Database::critSitFlagForSr( const QString& sr, QSqlDatabase db )
-{
-    QSqlQuery query( QSqlDatabase::database( "oracleDB" ) );
-    query.prepare("SELECT CRITSIT_FLAG from NTSDM.OLAP_SR_DX2 WHERE SR_NUM = :srnum");
-    query.bindValue( ":srnum", sr );
-    query.exec();
-
-    if ( query.next() )
-    {
-        return query.value( 0 ).toString();
-    }
-    else
-    {
-        return "ERROR";
-    }
-}
-
-QString Database::highValueFlagForSr( const QString& sr, QSqlDatabase db )
-{
-    QSqlQuery query( QSqlDatabase::database( "oracleDB" ) );
-    query.prepare("SELECT HIGHVALUE_FLAG from NTSDM.OLAP_SR_DX2 WHERE SR_NUM = :srnum");
-    query.bindValue( ":srnum", sr );
-    query.exec();
-
-    if ( query.next() )
-    {
-        return query.value( 0 ).toString();
-    }
-    else
-    {
-        return "ERROR";
-    }
-}
-
-QString Database::highValueCritSitFlagForSr( const QString& sr, QSqlDatabase db )
-{
-    QSqlQuery query( "SELECT HIGHVALUE_FLAG, CRITSIT_FLAG from NTSDM.OLAP_SR_DX2 WHERE SR_NUM = :srnum", db );
-    query.bindValue( ":srnum", sr );
-    query.exec();
-
-    if ( query.next() )
-    {
-        return query.value( 0 ).toString() + query.value( 1 ).toString();
-    }
-    else
-    {
-        return "ERROR";
-    }
-}
-
-
-void Database::updateSiebelDisplay( const QString& display, QSqlDatabase db )
-{
-    QSqlQuery query( db );
-    query.prepare("UPDATE qmon_siebel SET DISPLAY = :display WHERE id = :id");
-                
-    query.bindValue( ":display", display.split( "-" ).at( 1 ) );
-    query.bindValue( ":id", display.split( "-" ).at( 0 ) );
-                
-    query.exec();   
-}
-
-void Database::deleteSiebelItemFromDB( const QString& id, QSqlDatabase db )
+void Database::deleteSiebelItemFromDB( const QString& id )
 {
     Debug::print( "database", "Deleting SiebelItem " + id );
     
-    QSqlQuery query( db );
+    QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
+    
     query.prepare( "DELETE FROM qmon_siebel WHERE ID = :id" );
     query.bindValue( ":id", id );
+    
     query.exec();
 }
 
-QStringList Database::getQmonSiebelList( QSqlDatabase db)
+QStringList Database::getQmonSiebelList()
 {
-    QSqlQuery query( db );
+    QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
     QStringList l;
+    
     query.prepare( "SELECT ID FROM qmon_siebel" );
+    
     query.exec();
     
     while( query.next() )
@@ -253,11 +167,13 @@ QStringList Database::getQmonSiebelList( QSqlDatabase db)
     return l;    
 }
 
-bool Database::siebelExistsInDB( const QString& id, QSqlDatabase db )
+bool Database::siebelExistsInDB( const QString& id )
 {
-    QSqlQuery query( db );
+    QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
+    
     query.prepare( "SELECT ID FROM qmon_siebel WHERE ( ID = :id )" );
     query.bindValue( ":id", id );
+    
     query.exec();
     
     if ( query.next() )
@@ -270,11 +186,13 @@ bool Database::siebelExistsInDB( const QString& id, QSqlDatabase db )
     }
 }
 
-bool Database::siebelQueueChanged( SiebelItem* si, QSqlDatabase db  )
+bool Database::siebelQueueChanged( SiebelItem* si )
 {
-    QSqlQuery query( db );
+    QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
+    
     query.prepare( "SELECT QUEUE FROM qmon_siebel WHERE ( ID = :id )" );
     query.bindValue( ":id", si->id );
+    
     query.exec();
 
     if ( query.next() )
@@ -294,11 +212,13 @@ bool Database::siebelQueueChanged( SiebelItem* si, QSqlDatabase db  )
     }
 }
 
-bool Database::siebelSeverityChanged( SiebelItem* si, QSqlDatabase db  )
+bool Database::siebelSeverityChanged( SiebelItem* si )
 {
-    QSqlQuery query( db );
+    QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
+    
     query.prepare( "SELECT SEVERITY FROM qmon_siebel WHERE ( ID = :id )" );
     query.bindValue( ":id", si->id );
+    
     query.exec();
 
     if ( query.next() )
@@ -318,11 +238,13 @@ bool Database::siebelSeverityChanged( SiebelItem* si, QSqlDatabase db  )
     }
 }
 
-bool Database::isChat( const QString& id, QSqlDatabase db )
+bool Database::isChat( const QString& id )
 {
-    QSqlQuery query( db );
+    QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
+    
     query.prepare( "SELECT ID FROM qmon_chat WHERE ( SR = :id )" );
     query.bindValue( ":id", id );
+    
     query.exec();
     
     if ( query.next() )
@@ -335,11 +257,13 @@ bool Database::isChat( const QString& id, QSqlDatabase db )
     }
 }
 
-QString Database::getQmonBdesc( const QString& id, QSqlDatabase db )
+QString Database::getQmonBdesc( const QString& id )
 {
-    QSqlQuery query( db );
+    QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
+    
     query.prepare( "SELECT BDESC FROM qmon_siebel WHERE ( ID = :id )" );
     query.bindValue( ":id", id );
+    
     query.exec();
     
     if ( query.next() )
@@ -352,20 +276,12 @@ QString Database::getQmonBdesc( const QString& id, QSqlDatabase db )
     }
 }
 
-
-/*
-
-
-                B O M G A R 
-
-
-*/
-
-void Database::updateBomgarItemInDB( BomgarItem* bi, QSqlDatabase db )
+void Database::updateBomgarItemInDB( BomgarItem* bi )
 {
     Debug::print( "database", "Inserting BomgarItem " + bi->id + " " + bi->sr );
         
-    QSqlQuery query( db );
+    QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
+    
     query.prepare( "INSERT INTO qmon_chat( ID, SR, NAME, DATE ) VALUES ( :id, :sr, :name, :date )" );
                      
     query.bindValue( ":id", bi->id );
@@ -376,24 +292,25 @@ void Database::updateBomgarItemInDB( BomgarItem* bi, QSqlDatabase db )
     query.exec();
 }
 
-void Database::deleteBomgarItemFromDB( const QString& id, QSqlDatabase db )
+void Database::deleteBomgarItemFromDB( const QString& id )
 {
     Debug::print( "database", "Deleting BomgarItem " + id );
     
-    QSqlQuery query( db );
+    QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
+    
     query.prepare( "DELETE FROM qmon_chat WHERE ID = :id" );
     query.bindValue( ":id", id );
+    
     query.exec();
 }
 
-QList< SiebelItem* > Database::getSrsForQueue( QSqlDatabase db, const QString& queue )
+QList< SiebelItem* > Database::getSrsForQueue( const QString& queue )
 {
-    QSqlQuery query( db );
+    QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
     QList< SiebelItem* > list;
     
     if (  queue == "NONE" )
     {
-        
         query.prepare( "SELECT ID, QUEUE, HOURS, GEO, ODATE, ADATE, QDATE, STATUS, SEVERITY, "
                        "CONTRACT, SLA, CRSR, BDESC, CUSTOMER, CONTACTVIA FROM qmon_siebel" );
     }
@@ -427,14 +344,14 @@ QList< SiebelItem* > Database::getSrsForQueue( QSqlDatabase db, const QString& q
         si->customer = query.value( 13 ).toString();
         si->contactvia = query.value( 14 ).toString();
         
-        if ( getBomgarQueue( query.value( 0 ).toString(), QSqlDatabase::database( "mysqlDB" ) ) == "NOCHAT" )
+        if ( getBomgarQueue( query.value( 0 ).toString() ) == "NOCHAT" )
         {
             si->isChat = false;
         }
         else
         {
             si->isChat = true;
-            si->bomgarQ = getBomgarQueue( query.value( 0 ).toString(), QSqlDatabase::database( "mysqlDB" ) );
+            si->bomgarQ = getBomgarQueue( query.value( 0 ).toString() );
         }
      
         if ( query.value( 11 ).toString().isEmpty() )
@@ -452,59 +369,48 @@ QList< SiebelItem* > Database::getSrsForQueue( QSqlDatabase db, const QString& q
     return list;
 }
 
-QStringList Database::getCurrentBomgars( QSqlDatabase db )
+QStringList Database::getCurrentBomgars()
 {
     QStringList list;
-    QSqlQuery query( db );
+    QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
 
     query.prepare( "SELECT SR, NAME FROM qmon_chat" );
+    
     query.exec();
     
     while( query.next() )
     {
-        QString tmp = query.value(0).toString() + "|||" + query.value(1).toString();
-        list.append(tmp);
+        QString tmp = query.value( 0 ).toString() + "|||" + query.value( 1 ).toString();
+        list.append( tmp );
     }
 
     return list;
 }
 
-
-QStringList Database::getQmonBomgarList( QSqlDatabase db)
+QStringList Database::getQmonBomgarList()
 {
-    QSqlQuery query( db );
+    QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
     QStringList l;
+    
     query.prepare( "SELECT ID FROM qmon_chat" );
+    
     query.exec();
     
-    while( query.next() ) l.append( query.value( 0 ).toString() );
+    while( query.next() ) 
+    {
+        l.append( query.value( 0 ).toString() );
+    }
     
     return l;    
 }
 
-
-QStringList Database::getOracleSrList()
+bool Database::bomgarExistsInDB( const QString& id )
 {
-    QSqlQuery query( QSqlDatabase::database( "oracleDB" ) );
-    QStringList l;
-    query.prepare( "SELECT SR_NUM FROM NTSDM.NTS_OPEN_SR WHERE OWNER='SBOGNER'" );
-    query.exec();
-
-    while( query.next() ) 
-    {
-	    l.append( query.value( 0 ).toString() );
-	    qDebug() << "append";
-    }
-
-    return l;
-}
-
-
-bool Database::bomgarExistsInDB( const QString& id, QSqlDatabase db )
-{
-    QSqlQuery query( db );
+    QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
+    
     query.prepare( "SELECT ID FROM qmon_chat WHERE ( ID = :id )" );
     query.bindValue( ":id", id );
+    
     query.exec();
     
     if ( query.next() )
@@ -517,22 +423,26 @@ bool Database::bomgarExistsInDB( const QString& id, QSqlDatabase db )
     }
 }
 
-void Database::updateBomgarQueue( BomgarItem* bi, QSqlDatabase db )
+void Database::updateBomgarQueue( BomgarItem* bi )
 {
     Debug::print( "database", "Updating BomgarQueue for " + bi->id + " " + bi->sr + " to " + bi->name );
     
-    QSqlQuery query( db );
+    QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
+    
     query.prepare( "UPDATE qmon_chat SET NAME = :name WHERE ID = :id" );
     query.bindValue( ":name", bi->name );
     query.bindValue( ":id", bi->id );
+    
     query.exec();
 }
 
-QString Database::getBomgarQueue( const QString& id, QSqlDatabase db )
+QString Database::getBomgarQueue( const QString& id )
 {
-    QSqlQuery query( db );
+    QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
+    
     query.prepare( "SELECT NAME FROM qmon_chat WHERE ( SR = :id )" );
     query.bindValue( ":id", id );
+    
     query.exec();
     
     if( query.next() ) 
@@ -545,11 +455,13 @@ QString Database::getBomgarQueue( const QString& id, QSqlDatabase db )
     }
 }
 
-QString Database::getBomgarQueueById( const QString& id, QSqlDatabase db )
+QString Database::getBomgarQueueById( const QString& id )
 {
-    QSqlQuery query( db );
+    QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
+    
     query.prepare( "SELECT NAME FROM qmon_chat WHERE ( ID = :id )" );
     query.bindValue( ":id", id );
+    
     query.exec();
     
     if( query.next() ) 
@@ -568,9 +480,9 @@ QString Database::convertTime( const QString& dt )
     return ( d.toString("yyyy-MM-dd hh:mm:ss") );
 }
 
-QList< SiebelItem* > Database::getQmonSrs( QSqlDatabase q, QSqlDatabase m )
+QList< SiebelItem* > Database::getQmonSrs()
 {
-    QSqlQuery query( q );
+    QSqlQuery query( QSqlDatabase::database( "qmonDB" ) );
     QList< SiebelItem* > list;
     
     query.prepare( "SELECT SR_NUM, PSEUDOQUEUE_ID, SUPPORT_HOURS, RESPOND_VIA, CREATED, LAST_UPD, SR_SUBSTATUS, "
@@ -606,7 +518,7 @@ QList< SiebelItem* > Database::getQmonSrs( QSqlDatabase q, QSqlDatabase m )
         si->crSr = query.value( 11 ).toString();
         si->bdesc = query.value( 12 ).toString();
         si->customer = query.value( 13 ).toString();
-        si->bomgarQ = getBomgarQueue( query.value( 0 ).toString(), m );
+        si->bomgarQ = getBomgarQueue( query.value( 0 ).toString() );
      
         list.append( si );
     }
@@ -614,9 +526,9 @@ QList< SiebelItem* > Database::getQmonSrs( QSqlDatabase q, QSqlDatabase m )
     return list;
 }
 
-QList< BomgarItem* > Database::getChats( QSqlDatabase db )
+QList< BomgarItem* > Database::getChats()
 {
-    QSqlQuery query( db );
+    QSqlQuery query( QSqlDatabase::database( "qmonDB" ) );
     QList< BomgarItem* > list;
     
     query.prepare( "SELECT LSID, EXTERNAL_KEY, CONFERENCE_NAME, TIMESTAMP FROM Collector_ODBC_NTSCHAT" );

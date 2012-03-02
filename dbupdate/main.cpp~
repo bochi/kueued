@@ -22,38 +22,18 @@
     Have a lot of fun :-)
 
 */
+#include "kueueddbupdate.h"
 
-#ifndef KUEUEDDB_H
-#define KUEUEDDB_H
+#include <QCoreApplication>
 
-#include "database.h"
-#include "qtservice/qtservice.h"
-#include "kueuedthreads.h"
-#include "dbupdatejob.h"
+int main(int argc, char *argv[])
+{
+    QCoreApplication app( argc, argv );
 
-#include <QObject>
-#include <QString>
-#include <QTimer>
+    QCoreApplication::setOrganizationName( "nts" );
+    QCoreApplication::setApplicationName( "kueued-dbupdate" );
+    QCoreApplication::setApplicationVersion( "git" );
 
-class KueuedThreads;
-class DBUpdateJob;
-
-class KueuedDB : public QObject
- {
-     Q_OBJECT
-     
- public:
-     KueuedDB();
-     ~KueuedDB();
-
-    private:
-        QTimer* mTimer;
-        KueuedThreads* mThreads;
-
-        
-    public slots:
-        void update();
-};
-
- 
-#endif
+    KueuedDbUpdate k;
+    return app.exec();
+}
