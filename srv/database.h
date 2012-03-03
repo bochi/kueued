@@ -74,7 +74,7 @@ class SiebelItem
         QString severity;
         QString contract;
         QString sla;
-        QString crSr;
+        QString creator;
         QString bdesc;
         QString customer;
         QString bomgarQ;

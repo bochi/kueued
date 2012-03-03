@@ -54,11 +54,25 @@ Database::Database()
         Debug::print( "database", "Failed to open the Qmon DB " + qmonDB.lastError().text() );
     }
     
+    QSqlDatabase siebelDB = QSqlDatabase::addDatabase( "QOCI", "siebelDB" );
+
+    siebelDB.setDatabaseName( Settings::siebelDatabase() );
+    siebelDB.setHostName( Settings::siebelHost() );
+    siebelDB.setPort( 1521 );
+    siebelDB.setUserName( Settings::siebelUser() );
+    siebelDB.setPassword( Settings::siebelPassword() );
+
+    if ( !siebelDB.open() )
+    {
+        Debug::print( "database", "Failed to open the Siebel DB " + siebelDB.lastError().text() );
+    }
+
     QSqlQuery query( mysqlDB );
        
     if ( !query.exec( "CREATE TABLE IF NOT EXISTS qmon_siebel( ID VARCHAR(20) PRIMARY KEY UNIQUE, QUEUE TEXT, "
-                      "HOURS TEXT, GEO TEXT, ODATE TEXT, ADATE TEXT, QDATE TEXT, STATUS TEXT, SEVERITY TEXT, "
-                      "CONTRACT TEXT, SLA TEXT, CRSR TEXT, BDESC TEXT, CUSTOMER TEXT, CONTACTVIA TEXT, HIGHVALUE TINYINT, CRITSIT TINYINT )" ) )
+                      "HOURS TEXT, GEO TEXT, ODATE TEXT, ADATE TEXT, QDATE TEXT, SLADATE TEXT, STATUS TEXT, SEVERITY TEXT, "
+                      "CONTRACT TEXT, ISCR TINYINT, CREATOR TEXT, BDESC TEXT, CUSTOMER TEXT, "
+                      "CONTACTVIA TEXT, HIGHVALUE TINYINT, CRITSIT TINYINT )" ) )
     {
         Debug::print( "database", "Error: " + query.lastError().text() );
     }
@@ -82,11 +96,11 @@ void Database::insertSiebelItemIntoDB( SiebelItem* item )
 
     QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
     
-    query.prepare( "INSERT INTO qmon_siebel( ID, QUEUE, HOURS, GEO, ODATE, ADATE, QDATE, STATUS, SEVERITY, "
-                     "CONTRACT, SLA, CRSR, BDESC, CUSTOMER, CONTACTVIA, HIGHVALUE, CRITSIT )"
-                     " VALUES "
-                     "( :id, :queue, :hours, :geo, :odate, :adate, :qdate, :status, :severity, "
-                     ":contract, :sla, :crsr, :bdesc, :customer, :contactvia, :highvalue, :critsit )" );
+    query.prepare( "INSERT INTO qmon_siebel( ID, QUEUE, HOURS, GEO, ODATE, ADATE, QDATE, SLADATE, STATUS, SEVERITY, "
+                   "CONTRACT, ISCR, CREATOR, BDESC, CUSTOMER, CONTACTVIA, HIGHVALUE, CRITSIT )"
+                   " VALUES "
+                   "( :id, :queue, :hours, :geo, :odate, :adate, :qdate, :sladate, :status, :severity, "
+                   ":contract, :iscr, :creator, :bdesc, :customer, :contactvia, :highvalue, :critsit )" );
 
     query.bindValue( ":id", item->id );
     query.bindValue( ":queue", item->queue );
@@ -95,17 +109,40 @@ void Database::insertSiebelItemIntoDB( SiebelItem* item )
     query.bindValue( ":odate", convertTime( item->odate ) );
     query.bindValue( ":adate", convertTime( item->adate ) );
     query.bindValue( ":qdate", QDateTime::currentDateTime().toString( "yyyy-MM-dd hh:mm:ss" ) );
+    query.bindValue( ":sladate", convertTime( item->sla ) );
     query.bindValue( ":status", item->status );
     query.bindValue( ":severity", item->severity );
     query.bindValue( ":contract", item->contract );
-    query.bindValue( ":sla", convertTime( item->sla ) );
-    query.bindValue( ":crsr", item->crSr );
+    query.bindValue( ":iscr", item->isCr );
+    query.bindValue( ":creator", item->creator );
     query.bindValue( ":bdesc", item->bdesc );
     query.bindValue( ":customer", item->customer );
     query.bindValue( ":contactvia", item->contactvia );
     query.bindValue( ":highvalue", item->highValue );
     query.bindValue( ":critsit", item->critSit );
     
+    query.exec();
+}
+
+void Database::updateSiebelItem( SiebelItem* item )
+{
+    QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
+    
+    query.prepare( "UPDATE qmon_siebel SET ADATE = :adate, STATUS = :status, SEVERITY = :severity, "
+                   "CONTRACT = :contract, BDESC = :bdesc, CUSTOMER = :customer, CONTACTVIA = :contactvia, "
+                   "HIGHVALUE = :highvalue, CRITSIT = :critsit WHERE ID = :id" );
+    
+    query.bindValue( ":adate", convertTime( item->adate ) );
+    query.bindValue( ":status", item->status );
+    query.bindValue( ":severity", item->severity );
+    query.bindValue( ":contract", item->contract );
+    query.bindValue( ":bdesc", item->bdesc );
+    query.bindValue( ":customer", item->customer );
+    query.bindValue( ":contactvia", item->contactvia );
+    query.bindValue( ":highvalue", item->highValue );
+    query.bindValue( ":critsit", item->critSit );
+    query.bindValue( ":id", item->id );
+
     query.exec();
 }
 
@@ -137,6 +174,47 @@ void Database::updateSiebelSeverity( SiebelItem* si )
                 
     query.exec();
 }
+
+QString Database::getDetDesc( const QString& sr )
+{
+    QSqlQuery query( QSqlDatabase::database( "siebelDB" ) );
+    
+    query.prepare( "SELECT DESC_TEXT, CREATED_BY AS CB FROM SIEBEL.S_SRV_REQ WHERE SR_NUM = :sr" );
+
+    query.bindValue( ":sr", sr );
+    
+    query.exec();
+
+    if ( query.next() )
+    {
+        return query.value( 0 ).toString() + "||" + query.value(1).toString();
+    }
+    else
+    {
+        return "ERROR";
+    }
+}
+
+QString Database::getCreator(const QString& sr)
+{
+    QSqlQuery query( QSqlDatabase::database( "siebelDB" ) );
+    query.prepare( "SELECT LOGIN FROM SIEBEL.S_USER WHERE PAR_ROW_ID = ( SELECT CREATED_BY FROM SIEBEL.S_SRV_REQ WHERE SR_NUM = :sr )" );
+
+    query.bindValue( ":sr", sr );
+    
+    query.exec();
+
+    if ( query.next() )
+    {
+        return query.value( 0 ).toString();
+    }
+    else
+    {
+        return "ERROR";
+    }
+}
+
+
 
 void Database::deleteSiebelItemFromDB( const QString& id )
 {
@@ -310,14 +388,14 @@ QList< SiebelItem* > Database::getSrsForQueue( const QString& queue )
     QList< SiebelItem* > list;
     
     if (  queue == "NONE" )
-    {
-        query.prepare( "SELECT ID, QUEUE, HOURS, GEO, ODATE, ADATE, QDATE, STATUS, SEVERITY, "
-                       "CONTRACT, SLA, CRSR, BDESC, CUSTOMER, CONTACTVIA, HIGHVALUE, CRITSIT FROM qmon_siebel" );
+    {    
+        query.prepare( "SELECT ID, QUEUE, HOURS, GEO, ODATE, ADATE, QDATE, SLADATE, STATUS, SEVERITY, "
+                       "CONTRACT, ISCR, CREATOR, BDESC, CUSTOMER, CONTACTVIA, HIGHVALUE, CRITSIT FROM qmon_siebel" );
     }
     else
     {
-        query.prepare( "SELECT ID, QUEUE, HOURS, GEO, ODATE, ADATE, QDATE, STATUS, SEVERITY, "
-                       "CONTRACT, SLA, CRSR, BDESC, CUSTOMER, CONTACTVIA, HIGHVALUE, CRITSIT FROM qmon_siebel WHERE ( QUEUE = :queue )" );
+        query.prepare( "SELECT ID, QUEUE, HOURS, GEO, ODATE, ADATE, QDATE, SLADATE, STATUS, SEVERITY, "
+                       "CONTRACT, ISCR, CREATOR, BDESC, CUSTOMER, CONTACTVIA, HIGHVALUE, CRITSIT FROM qmon_siebel WHERE ( QUEUE = :queue )" );
         
         query.bindValue( ":queue", queue );
     }
@@ -335,16 +413,17 @@ QList< SiebelItem* > Database::getSrsForQueue( const QString& queue )
         si->odate = query.value( 4 ).toString();
         si->adate = query.value( 5 ).toString();
         si->qdate = query.value( 6 ).toString();
-        si->status = query.value( 7 ).toString();
-        si->severity = query.value( 8 ).toString();
-        si->contract = query.value( 9 ).toString();
-        si->sla = query.value( 10 ).toString();
-        si->crSr = query.value( 11 ).toString();
-        si->bdesc = query.value( 12 ).toString();
-        si->customer = query.value( 13 ).toString();
-        si->contactvia = query.value( 14 ).toString();
-        si->highValue = query.value( 15 ).toBool();
-        si->critSit = query.value( 16 ).toBool();
+        si->sla = query.value( 7 ).toString();
+        si->status = query.value( 8 ).toString();
+        si->severity = query.value( 9 ).toString();
+        si->contract = query.value( 10 ).toString();
+        si->isCr = query.value( 11 ).toBool();
+        si->creator = query.value( 12 ).toString();
+        si->bdesc = query.value( 13 ).toString();
+        si->customer = query.value( 14 ).toString();
+        si->contactvia = query.value( 15 ).toString();
+        si->highValue = query.value( 16 ).toBool();
+        si->critSit = query.value( 17 ).toBool();
         
         if ( getBomgarQueue( query.value( 0 ).toString() ) == "NOCHAT" )
         {
@@ -354,15 +433,6 @@ QList< SiebelItem* > Database::getSrsForQueue( const QString& queue )
         {
             si->isChat = true;
             si->bomgarQ = getBomgarQueue( query.value( 0 ).toString() );
-        }
-     
-        if ( query.value( 11 ).toString().isEmpty() )
-        {
-            si->isCr = false;
-        }
-        else
-        {
-            si->isCr = true;
         }
         
         list.append( si );
@@ -478,7 +548,7 @@ QString Database::getBomgarQueueById( const QString& id )
 
 QString Database::convertTime( const QString& dt )
 {
-    QDateTime d = QDateTime::fromString( dt, "M/d/yyyy h:mm:ss AP" );
+    QDateTime d = QDateTime::fromString( dt, "yyyy-MM-ddThh:mm:ss" );
     return ( d.toString("yyyy-MM-dd hh:mm:ss") );
 }
 
@@ -511,13 +581,13 @@ QList< SiebelItem* > Database::getQmonSrs()
         if ( query.value( 10 ).toString() == "Collaboration" )
         {
             si->isCr = true;
+            si->creator = getCreator( si->id );
         }
         else
         {
             si->isCr = false;
         }
         
-        si->crSr = query.value( 11 ).toString();
         si->bdesc = query.value( 12 ).toString();
         si->customer = query.value( 13 ).toString().split( "|" ).at( 2 );
         si->bomgarQ = getBomgarQueue( query.value( 0 ).toString() );

@@ -41,7 +41,7 @@ class Database : public QObject
     
         static void insertSiebelItemIntoDB( SiebelItem* );
         static void updateSiebelQueue( SiebelItem* );
-        static void updateSiebelSeverity( SiebelItem* );
+        static void updateSiebelItem( SiebelItem* );
         static void deleteSiebelItemFromDB( const QString& );
         static QStringList getQmonSiebelList();
 	static QStringList getOracleSrList();
@@ -50,6 +50,8 @@ class Database : public QObject
         static bool siebelSeverityChanged( SiebelItem* );
         static bool isChat( const QString& );
         static QString getQmonBdesc( const QString& );
+        static QString getDetDesc( const QString& );
+        static QString getCreator( const QString& );
         
         static void updateBomgarItemInDB( BomgarItem* );
         static void deleteBomgarItemFromDB( const QString& );
@@ -82,7 +84,7 @@ class SiebelItem
         QString severity;
         QString contract;
         QString sla;
-        QString crSr;
+        QString creator;
         QString bdesc;
         QString customer;
         QString bomgarQ;

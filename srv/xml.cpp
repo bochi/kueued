@@ -41,63 +41,35 @@ QString XML::sr( SiebelItem* si )
     qint64 lu = ( adate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 ));
     qint64 qt = ( qdate.secsTo( now ) );
     qint64 sla = ( now.secsTo( sladate ) );
-    
-    /*id
-queue
-hours
-source
-contactvia
-odate
-adate
-status
-category
-severity
-supportprogram
-supportgroup
-sla
-srtype
-srsubtype
-servicelevel
-cid
-pq_email
-bdesc
-last_activity
-account
-pq_phone
-onsitephone
-detdesc
-routing
-geo
-bomgarQ*/
+
     xml += "  <sr>\n";
     xml += "    <id><![CDATA[" + si->id + "]]></id>\n";
     xml += "    <queue><![CDATA[" + si->queue + "]]></queue>\n";
-    xml += "    <hours><![CDATA[" + si->hours + "]]></hours>\n";
-    xml += "    <geo><![CDATA[" + si->geo + "]]></geo>\n";
-    xml += "    <contactvia><![CDATA[" + si->contactvia + "]]></contactvia>\n";
-    xml += "    <status><![CDATA[" + si->status + "]]></status>\n";
-    xml += "    <severity><![CDATA[" + si->severity + "]]></severity>\n";
-    xml += "    <contract><![CDATA[" + si->contract + "]]></contract>\n";
-    
+   
+    if ( si->isChat )
+    {
+        xml += "    <bomgarQ>" + si->bomgarQ + "</bomgarQ>\n";
+    }
+
     if ( si->isCr )
     {
         xml += "    <srtype>cr</srtype>\n";
+        xml += "    <creator>" + si->creator + "</creator>\n";
         
     }
     else
     {
         xml += "    <srtype>sr</srtype>\n";
     }
-    
-    xml += "    <crsr>" + si->crSr + "</crsr>\n";
+
+    xml += "    <severity><![CDATA[" + si->severity + "]]></severity>\n";
+    xml += "    <status><![CDATA[" + si->status + "]]></status>\n";
     xml += "    <bdesc><![CDATA[" + si->bdesc + "]]></bdesc>\n";
+    xml += "    <geo><![CDATA[" + si->geo + "]]></geo>\n";
+    xml += "    <hours><![CDATA[" + si->hours + "]]></hours>\n";
     xml += "    <customer><![CDATA[" + si->customer + "]]></customer>\n";
-    
-    if ( si->bomgarQ != "NOCHAT" )
-    {
-        xml += "    <bomgarQ>" + si->bomgarQ + "</bomgarQ>\n";
-    }
-    
+    xml += "    <contactvia><![CDATA[" + si->contactvia + "]]></contactvia>\n";
+    xml += "    <contract><![CDATA[" + si->contract + "]]></contract>\n";
     xml += "    <age>" + QString::number( age ) + "</age>\n";
     xml += "    <lastupdate>" + QString::number( lu ) + "</lastupdate>\n";
     xml += "    <timeinQ>" + QString::number( qt ) + "</timeinQ>\n";
@@ -106,27 +78,15 @@ bomgarQ*/
     {
          xml += "    <sla>" + QString::number( sla ) + "</sla>\n";
     }
-    else
-    {
-         xml += "    <sla>" + QString::number( 0 ) + "</sla>\n";
-    }
     
     if ( si->highValue )
     {
         xml += "    <highvalue>yes</highvalue>\n";
     }
-    else
-    {
-        xml += "    <highvalue>no</highvalue>\n";
-    }
     
     if ( si->critSit )
     {
         xml += "    <critsit>yes</critsit>\n";
-    }
-    else
-    {
-        xml += "    <critsit>no</critsit>\n";
     }
     
     xml += "  </sr>\n";

@@ -47,7 +47,7 @@ Database::Database()
        
     if ( !query.exec( "CREATE TABLE IF NOT EXISTS qmon_siebel( ID VARCHAR(20) PRIMARY KEY UNIQUE, QUEUE TEXT, "
                       "HOURS TEXT, GEO TEXT, ODATE TEXT, ADATE TEXT, QDATE TEXT, STATUS TEXT, SEVERITY TEXT, "
-                      "CONTRACT TEXT, SLA TEXT, CRSR TEXT, BDESC TEXT, CUSTOMER TEXT, CONTACTVIA TEXT )" ) )
+                      "CONTRACT TEXT, SLA TEXT, CRSR TEXT, CRSROWN TEXT BDESC TEXT, CUSTOMER TEXT, CONTACTVIA TEXT )" ) )
     {
         Debug::print( "database", "Error: " + query.lastError().text() );
     }
@@ -125,14 +125,14 @@ QList< SiebelItem* > Database::getSrsForQueue( const QString& queue )
     QList< SiebelItem* > list;
     
     if (  queue == "NONE" )
-    {
-        query.prepare( "SELECT ID, QUEUE, HOURS, GEO, ODATE, ADATE, QDATE, STATUS, SEVERITY, "
-                       "CONTRACT, SLA, CRSR, BDESC, CUSTOMER, CONTACTVIA, HIGHVALUE, CRITSIT FROM qmon_siebel" );
+    {    
+        query.prepare( "SELECT ID, QUEUE, HOURS, GEO, ODATE, ADATE, QDATE, SLADATE, STATUS, SEVERITY, "
+                       "CONTRACT, ISCR, CREATOR, BDESC, CUSTOMER, CONTACTVIA, HIGHVALUE, CRITSIT FROM qmon_siebel" );
     }
     else
     {
-        query.prepare( "SELECT ID, QUEUE, HOURS, GEO, ODATE, ADATE, QDATE, STATUS, SEVERITY, "
-                       "CONTRACT, SLA, CRSR, BDESC, CUSTOMER, CONTACTVIA, HIGHVALUE, CRITSIT FROM qmon_siebel WHERE ( QUEUE = :queue )" );
+        query.prepare( "SELECT ID, QUEUE, HOURS, GEO, ODATE, ADATE, QDATE, SLADATE, STATUS, SEVERITY, "
+                       "CONTRACT, ISCR, CREATOR, BDESC, CUSTOMER, CONTACTVIA, HIGHVALUE, CRITSIT FROM qmon_siebel WHERE ( QUEUE = :queue )" );
         
         query.bindValue( ":queue", queue );
     }
@@ -150,16 +150,17 @@ QList< SiebelItem* > Database::getSrsForQueue( const QString& queue )
         si->odate = query.value( 4 ).toString();
         si->adate = query.value( 5 ).toString();
         si->qdate = query.value( 6 ).toString();
-        si->status = query.value( 7 ).toString();
-        si->severity = query.value( 8 ).toString();
-        si->contract = query.value( 9 ).toString();
-        si->sla = query.value( 10 ).toString();
-        si->crSr = query.value( 11 ).toString();
-        si->bdesc = query.value( 12 ).toString();
-        si->customer = query.value( 13 ).toString();
-        si->contactvia = query.value( 14 ).toString();
-        si->highValue = query.value( 15 ).toBool();
-        si->critSit = query.value( 16 ).toBool();
+        si->sla = query.value( 7 ).toString();
+        si->status = query.value( 8 ).toString();
+        si->severity = query.value( 9 ).toString();
+        si->contract = query.value( 10 ).toString();
+        si->isCr = query.value( 11 ).toBool();
+        si->creator = query.value( 12 ).toString();
+        si->bdesc = query.value( 13 ).toString();
+        si->customer = query.value( 14 ).toString();
+        si->contactvia = query.value( 15 ).toString();
+        si->highValue = query.value( 16 ).toBool();
+        si->critSit = query.value( 17 ).toBool();
         
         if ( getBomgarQueue( query.value( 0 ).toString() ) == "NOCHAT" )
         {
@@ -169,15 +170,6 @@ QList< SiebelItem* > Database::getSrsForQueue( const QString& queue )
         {
             si->isChat = true;
             si->bomgarQ = getBomgarQueue( query.value( 0 ).toString() );
-        }
-     
-        if ( query.value( 11 ).toString().isEmpty() )
-        {
-            si->isCr = false;
-        }
-        else
-        {
-            si->isCr = true;
         }
         
         list.append( si );

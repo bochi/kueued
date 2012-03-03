@@ -24,7 +24,6 @@
 */
 
 #include "kueueddbupdate.h"
-#include "database.h"
 #include "debug.h"
 
 KueuedDbUpdate::KueuedDbUpdate()

@@ -103,10 +103,7 @@ void KueuedDbUpdate::updateUnity()
                 Database::updateSiebelQueue( l.at( i ) );
             }
                     
-            if ( Database::siebelSeverityChanged( l.at( i ) ) )
-            {
-                Database::updateSiebelSeverity( l.at( i ) );
-            }
+            Database::updateSiebelItem( l.at( i ) );
         }
         
         delete l.at( i );
