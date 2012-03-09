@@ -62,20 +62,54 @@ QString XML::sr( SiebelItem* si )
         xml += "    <srtype>sr</srtype>\n";
         xml += "    <customer>\n";
         xml += "      <account><![CDATA[" + si->customer + "]]></account>\n";
-        xml += "      <firstname><![CDATA[" + si->contact_firstname + "]]></firstname>\n";
-        xml += "      <lastname><![CDATA[" + si->contact_lastname + "]]></lastname>\n";
-        xml += "      <title><![CDATA[" + si->contact_title + "]]></title>\n";
-        xml += "      <email><![CDATA[" + si->contact_email + "]]></email>\n";
-        xml += "      <phone><![CDATA[" + si->contact_phone + "]]></phone>\n";
-        xml += "      <onsitephone><![CDATA[" + si->onsite_phone + "]]></onsitephone>\n";
-        xml += "      <lang><![CDATA[" + si->contact_lang + "]]></lang>\n";
+        
+        if ( ( !si->contact_firstname.isEmpty() ) && ( si->contact_firstname != "1" ) && ( si->contact_firstname != "0" ) )
+        {
+            xml += "      <firstname><![CDATA[" + si->contact_firstname + "]]></firstname>\n";
+        }
+        
+        if ( ( !si->contact_lastname.isEmpty() ) && ( si->contact_lastname != "1" )&& ( si->contact_lastname != "0" )   )
+        {
+            xml += "      <lastname><![CDATA[" + si->contact_lastname + "]]></lastname>\n";
+        }
+        
+        if ( ( !si->contact_title.isEmpty() ) && ( si->contact_title != "1" ) && ( si->contact_title != "0" ) )
+        {
+            xml += "      <title><![CDATA[" + si->contact_title + "]]></title>\n";
+        }
+        
+        if ( ( !si->contact_email.isEmpty() ) && ( si->contact_email != "1" ) && ( si->contact_email != "0" ) )
+        {
+            xml += "      <email><![CDATA[" + si->contact_email + "]]></email>\n";  
+        }
+        
+        if ( ( !si->contact_phone.isEmpty() ) && ( si->contact_phone != "1" ) && ( si->contact_phone != "0" ) )
+        {
+            xml += "      <phone><![CDATA[" + si->contact_phone + "]]></phone>\n";
+        }
+        
+        if ( ( !si->onsite_phone.isEmpty() ) && ( si->onsite_phone != "1" ) && ( si->onsite_phone != "0" ) )
+        {
+            xml += "      <onsitephone><![CDATA[" + si->onsite_phone + "]]></onsitephone>\n";
+        }
+        
+        if ( ( !si->contact_lang.isEmpty() ) && ( si->contact_lang != "1" ) && ( si->contact_lang != "0" ) )
+        {
+            xml += "      <lang><![CDATA[" + si->contact_lang + "]]></lang>\n";
+        }
+        
         xml += "    </customer>\n";
     }
 
     xml += "    <severity><![CDATA[" + si->severity + "]]></severity>\n";
     xml += "    <status><![CDATA[" + si->status + "]]></status>\n";
     xml += "    <bdesc><![CDATA[" + si->brief_desc + "]]></bdesc>\n";
-    xml += "    <ddesc><![CDATA[" + si->detailed_desc + "]]></ddesc>\n";
+    
+    if ( ( !si->detailed_desc.isEmpty() ) && ( si->detailed_desc != "1" ) && ( si->detailed_desc != "0" ) )
+    {
+        xml += "    <ddesc><![CDATA[" + si->detailed_desc + "]]></ddesc>\n";        
+    }
+    
     xml += "    <geo><![CDATA[" + si->geo + "]]></geo>\n";
     xml += "    <hours><![CDATA[" + si->hours + "]]></hours>\n";
     xml += "    <source><![CDATA[" + si->source + "]]></source>\n";
