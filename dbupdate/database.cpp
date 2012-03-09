@@ -75,13 +75,13 @@ Database::Database()
                       "SUPPORT_PROGRAM_LONG TEXT, ROUTING_PRODUCT TEXT, SUPPORT_GROUP_ROUTING TEXT, "
                       "INT_TYPE TEXT, SUBTYPE TEXT, SERVICE_LEVEL TEXT, BRIEF_DESC TEXT, CRITSIT TINYINT, "
                       "HIGH_VALUE TINYINT, CUSTOMER TEXT, CONTACT_PHONE TEXT, ONSITE_PHONE TEXT, "
-                      "DETAILED_DESC TEXT, CATEGORY TEXT, CREATOR TEXT, ROW_ID TEXT )" ) );
+                      "DETAILED_DESC TEXT, CATEGORY TEXT, CREATOR TEXT, ROW_ID TEXT ) ENGINE='NDB'" ) );
     {
-        Debug::print( "database", "Error qmon_siebel: " + query.lastError().text() );
+        Debug::print( "database", "Error qmon_siebel: " + query. query.lastError().text() + query.executedQuery() );
     }
     
     if ( !query.exec( "CREATE TABLE IF NOT EXISTS qmon_chat( ID VARCHAR(40) PRIMARY KEY UNIQUE, SR VARCHAR(15), "
-                      "NAME TEXT, DATE TEXT )" ) ) 
+                      "NAME TEXT, DATE TEXT ) ENGINE='NDB'" ) ) 
     {
         Debug::print( "database", "Error qmon_chat: " + query.lastError().text() );
     }
