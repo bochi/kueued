@@ -23,7 +23,7 @@
 
 */
 
-#include "kueuedsrv.h"
+#include "kueued.h"
 #include <QDebug>
 #include <QtSingleCoreApplication>
 #include <iostream>
@@ -34,14 +34,14 @@ int main(int argc, char *argv[])
 
     if ( app.isRunning() )
     {
-        std::cout <<  "kueued-srv is already running, exiting";
+        std::cout <<  "kueued is already running, exiting";
     	return 0;
     }
         
     QCoreApplication::setOrganizationName( "nts" );
-    QCoreApplication::setApplicationName( "kueued-srv" );
+    QCoreApplication::setApplicationName( "kueued" );
     QCoreApplication::setApplicationVersion( "git" );
 
-     KueuedSrv k;
+     Kueued k;
      return app.exec();
 }
