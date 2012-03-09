@@ -67,7 +67,7 @@ Database::Database()
         Debug::print( "database", "Failed to open the Siebel DB " + siebelDB.lastError().text() );
     }
 
-    QSqlQuery query( mysqlDB );
+    /*QSqlQuery query( mysqlDB );
        
     if ( !query.exec( "CREATE TABLE IF NOT EXISTS qmon_siebel( ID VARCHAR(20) PRIMARY KEY UNIQUE, QUEUE TEXT, "
                       "GEO TEXT, HOURS TEXT, STATUS TEXT, SEVERITY TEXT, SOURCE TEXT, RESPOND_VIA TEXT, "
@@ -84,7 +84,7 @@ Database::Database()
                       "NAME TEXT, DATE TEXT ) ENGINE='NDB'" ) ) 
     {
         Debug::print( "database", "Error qmon_chat: " + query.lastError().text() );
-    }
+    }*/
 }
 
 Database::~Database()
