@@ -18,7 +18,7 @@
 ### END INIT INFO
 
 
-KUEUED_BIN=/usr/bin/kueued
+KUEUED_BIN=/usr/bin/kueued.ld
 test -x $KUEUED_BIN || exit 5
 
 . /etc/rc.status

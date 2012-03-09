@@ -37,6 +37,7 @@ QT4_AUTOMOC( ${kueued_CPP} )
 ADD_EXECUTABLE( kueued ${kueued_CPP} )
 INSTALL( TARGETS kueued DESTINATION bin )
 INSTALL( PROGRAMS scripts/kueued DESTINATION /etc/init.d )
+INSTALL( PROGRAMS scripts/kueued.ld DESTINATION /usr/bin/ )
 
 TARGET_LINK_LIBRARIES( kueued     ${QT_LIBRARIES} 
                                   ${QT_QTCORE_LIBRARY} 
