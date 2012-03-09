@@ -184,9 +184,10 @@ void Database::updateSiebelItem( SiebelItem* item )
     query.bindValue( ":category", item->category );
     query.bindValue( ":creator", getCreator( item->id ) );
     query.bindValue( ":row_id", item->row_id );
+    query.bindValue( ":id", item->id );
 
     query.exec();
-     query.lastError().text();
+     qDebug() << query.lastError().text();
 }
 
 void Database::updateSiebelQueue( SiebelItem* si )
