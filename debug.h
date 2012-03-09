@@ -26,16 +26,17 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
-#include <QDebug>
-#include <QDateTime>
-#include <QString>
 #include <iostream>
 
 namespace Debug
 {
     static void print( const QString& c, const QString& msg )
-    {
-        QString t = "[" + QDateTime::currentDateTime().toString( "MM/dd hh:mm:ss" ) + "] [" + c.toUpper() + "] ";
+    {   
+        char hostname[ 1024 ];
+        gethostname( hostname, sizeof( hostname ) );
+        QString host = hostname;
+
+        QString t = "[" + QDateTime::currentDateTime().toString( "MM/dd hh:mm:ss" ) + "] [" + host.toUpper() + "] [" + c.toUpper() + "] ";
         std::cout << t.toStdString() << msg.toStdString() << std::endl;
     }
 }
