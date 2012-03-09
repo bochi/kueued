@@ -30,10 +30,10 @@
 QString XML::sr( SiebelItem* si )
 {
     QDateTime now = QDateTime::currentDateTime();
-    QDateTime odate = QDateTime::fromString( si->odate, "yyyy-MM-dd hh:mm:ss" );
-    QDateTime adate = QDateTime::fromString( si->adate, "yyyy-MM-dd hh:mm:ss" );
+    QDateTime odate = QDateTime::fromString( si->created, "yyyy-MM-dd hh:mm:ss" );
+    QDateTime adate = QDateTime::fromString( si->last_update, "yyyy-MM-dd hh:mm:ss" );
     QDateTime sladate = QDateTime::fromString( si->sla, "yyyy-MM-dd hh:mm:ss" );
-    QDateTime qdate = QDateTime::fromString( si->qdate, "yyyy-MM-dd hh:mm:ss" );
+    QDateTime qdate = QDateTime::fromString( si->inqueue, "yyyy-MM-dd hh:mm:ss" );
     
     QString xml;
     
@@ -60,16 +60,27 @@ QString XML::sr( SiebelItem* si )
     else
     {
         xml += "    <srtype>sr</srtype>\n";
+        xml += "    <customer><![CDATA[" + si->customer + "]]></customer>\n";
     }
 
     xml += "    <severity><![CDATA[" + si->severity + "]]></severity>\n";
     xml += "    <status><![CDATA[" + si->status + "]]></status>\n";
-    xml += "    <bdesc><![CDATA[" + si->bdesc + "]]></bdesc>\n";
+    xml += "    <bdesc><![CDATA[" + si->brief_desc + "]]></bdesc>\n";
+    xml += "    <ddesc><![CDATA[" + si->detailed_desc + "]]></ddesc>\n";
     xml += "    <geo><![CDATA[" + si->geo + "]]></geo>\n";
     xml += "    <hours><![CDATA[" + si->hours + "]]></hours>\n";
-    xml += "    <customer><![CDATA[" + si->customer + "]]></customer>\n";
-    xml += "    <contactvia><![CDATA[" + si->contactvia + "]]></contactvia>\n";
-    xml += "    <contract><![CDATA[" + si->contract + "]]></contract>\n";
+    xml += "    <source><![CDATA[" + si->source + "]]></source>\n";
+    xml += "    <support_program><![CDATA[" + si->support_program + "]]></support_program>\n";
+    xml += "    <support_program_long><![CDATA[" + si->support_program_long + "]]></support_program_long>\n";
+    xml += "    <routing_product><![CDATA[" + si->routing_product + "]]></routing_product>\n";
+    xml += "    <support_group_routing><![CDATA[" + si->support_group_routing + "]]></support_group_routing>\n";
+    xml += "    <int_type><![CDATA[" + si->int_type + "]]></int_type>\n";
+    xml += "    <subtype><![CDATA[" + si->subtype + "]]></subtype>\n";
+    xml += "    <service_level><![CDATA[" + si->service_level + "]]></service_level>\n";
+    xml += "    <contact_phone><![CDATA[" + si->contact_phone + "]]></contact_phone>\n";
+    xml += "    <onsite_phone><![CDATA[" + si->onsite_phone + "]]></onsite_phone>\n";
+    xml += "    <category><![CDATA[" + si->category + "]]></category>\n";
+    xml += "    <respond_via><![CDATA[" + si->respond_via + "]]></respond_via>\n";
     xml += "    <age>" + QString::number( age ) + "</age>\n";
     xml += "    <lastupdate>" + QString::number( lu ) + "</lastupdate>\n";
     xml += "    <timeinQ>" + QString::number( qt ) + "</timeinQ>\n";
@@ -79,12 +90,12 @@ QString XML::sr( SiebelItem* si )
          xml += "    <sla>" + QString::number( sla ) + "</sla>\n";
     }
     
-    if ( si->highValue )
+    if ( si->high_value )
     {
         xml += "    <highvalue>yes</highvalue>\n";
     }
     
-    if ( si->critSit )
+    if ( si->critsit )
     {
         xml += "    <critsit>yes</critsit>\n";
     }

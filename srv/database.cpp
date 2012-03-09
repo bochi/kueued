@@ -126,13 +126,17 @@ QList< SiebelItem* > Database::getSrsForQueue( const QString& queue )
     
     if (  queue == "NONE" )
     {    
-        query.prepare( "SELECT ID, QUEUE, HOURS, GEO, ODATE, ADATE, QDATE, SLADATE, STATUS, SEVERITY, "
-                       "CONTRACT, ISCR, CREATOR, BDESC, CUSTOMER, CONTACTVIA, HIGHVALUE, CRITSIT FROM qmon_siebel" );
+        query.prepare( "SELECT ID, QUEUE, GEO, HOURS, STATUS, SEVERITY, SOURCE, RESPOND_VIA, CREATED, LAST_UPDATE, "
+                       "INQUEUE, SLA, SUPPORT_PROGRAM, SUPPORT_PROGRAM_LONG, ROUTING_PRODUCT, SUPPORT_GROUP_ROUTING, "
+                       "INT_TYPE, SUBTYPE, SERVICE_LEVEL, BRIEF_DESC, CRITSIT, HIGH_VALUE, CUSTOMER, CONTACT_PHONE, "
+                       "ONSITE_PHONE, DETAILED_DESC, CATEGORY, CREATOR, ROW_ID from qmon_siebel" );
     }
     else
     {
-        query.prepare( "SELECT ID, QUEUE, HOURS, GEO, ODATE, ADATE, QDATE, SLADATE, STATUS, SEVERITY, "
-                       "CONTRACT, ISCR, CREATOR, BDESC, CUSTOMER, CONTACTVIA, HIGHVALUE, CRITSIT FROM qmon_siebel WHERE ( QUEUE = :queue )" );
+        query.prepare( "SELECT ID, QUEUE, GEO, HOURS, STATUS, SEVERITY, SOURCE, RESPOND_VIA, CREATED, LAST_UPDATE, "
+                       "INQUEUE, SLA, SUPPORT_PROGRAM, SUPPORT_PROGRAM_LONG, ROUTING_PRODUCT, SUPPORT_GROUP_ROUTING, "
+                       "INT_TYPE, SUBTYPE, SERVICE_LEVEL, BRIEF_DESC, CRITSIT, HIGH_VALUE, CUSTOMER, CONTACT_PHONE, "
+                       "ONSITE_PHONE, DETAILED_DESC, CATEGORY, CREATOR, ROW_ID from qmon_siebel WHERE ( QUEUE = :queue )" );
         
         query.bindValue( ":queue", queue );
     }
@@ -145,22 +149,33 @@ QList< SiebelItem* > Database::getSrsForQueue( const QString& queue )
         
         si->id = query.value( 0 ).toString();
         si->queue = query.value( 1 ).toString();
-        si->hours = query.value( 2 ).toString();
-        si->geo = query.value( 3 ).toString();
-        si->odate = query.value( 4 ).toString();
-        si->adate = query.value( 5 ).toString();
-        si->qdate = query.value( 6 ).toString();
-        si->sla = query.value( 7 ).toString();
-        si->status = query.value( 8 ).toString();
-        si->severity = query.value( 9 ).toString();
-        si->contract = query.value( 10 ).toString();
-        si->isCr = query.value( 11 ).toBool();
-        si->creator = query.value( 12 ).toString();
-        si->bdesc = query.value( 13 ).toString();
-        si->customer = query.value( 14 ).toString();
-        si->contactvia = query.value( 15 ).toString();
-        si->highValue = query.value( 16 ).toBool();
-        si->critSit = query.value( 17 ).toBool();
+        si->geo = query.value( 2 ).toString();
+        si->hours = query.value( 3 ).toString();
+        si->status = query.value( 4 ).toString();
+        si->severity = query.value( 5 ).toString();
+        si->source = query.value( 6 ).toString();
+        si->respond_via = query.value( 7 ).toString();
+        si->created = query.value( 8 ).toString();
+        si->last_update = query.value( 9 ).toString();
+        si->inqueue = query.value( 10 ).toString();
+        si->sla = query.value( 11 ).toString();
+        si->support_program = query.value( 12 ).toString();
+        si->support_program_long = query.value( 13 ).toString();
+        si->routing_product = query.value( 14 ).toString();
+        si->support_group_routing = query.value( 15 ).toString();
+        si->int_type = query.value( 16 ).toString();
+        si->subtype = query.value( 17 ).toString();
+        si->service_level = query.value( 18 ).toString();
+        si->brief_desc = query.value( 19 ).toString();
+        si->critsit = query.value( 20 ).toBool();
+        si->high_value = query.value( 21 ).toBool();
+        si->customer = query.value( 22 ).toString();
+        si->contact_phone = query.value( 23 ).toString();
+        si->onsite_phone = query.value( 24 ).toString();
+        si->detailed_desc = query.value( 25 ).toString();
+        si->category = query.value( 26 ).toString();
+        si->creator = query.value( 27 ).toString();
+        si->row_id = query.value( 28 ).toString();
         
         if ( getBomgarQueue( query.value( 0 ).toString() ) == "NOCHAT" )
         {
@@ -170,6 +185,15 @@ QList< SiebelItem* > Database::getSrsForQueue( const QString& queue )
         {
             si->isChat = true;
             si->bomgarQ = getBomgarQueue( query.value( 0 ).toString() );
+        }
+        
+        if ( si->creator != "" )
+        {
+            si->isCr = true;
+        }
+        else
+        {
+            si->isCr = false;
         }
         
         list.append( si );

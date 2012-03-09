@@ -65,24 +65,37 @@ class SiebelItem
     public:
         QString id;
         QString queue;
-        QString hours;
         QString geo;
-        QString odate;
-        QString adate;
-        QString qdate;
+        QString hours;
         QString status;
         QString severity;
-        QString contract;
+        QString source;
+        QString respond_via;
+        QString created;
+        QString last_update;
+        QString inqueue;
         QString sla;
-        QString creator;
-        QString bdesc;
+        QString support_program;
+        QString support_program_long;
+        QString routing_product;
+        QString support_group_routing;
+        QString int_type;
+        QString subtype;
+        QString service_level;
+        QString brief_desc;
         QString customer;
+        QString contact_phone;
+        QString onsite_phone;
+        QString detailed_desc;
+        QString category;
+        QString row_idetailed_desc;
+        QString row_id;
+        QString creator;
         QString bomgarQ;
-        QString contactvia;
         bool isCr;
         bool isChat;
-        bool highValue;
-        bool critSit;
+        bool critsit;
+        bool high_value;
 };
 
 class BomgarItem 
