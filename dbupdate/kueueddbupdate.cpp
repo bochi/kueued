@@ -47,7 +47,6 @@ void KueuedDbUpdate::updateBomgar()
     Debug::print( "kueued-dbupdate", "Starting Bomgar update..." );
     
     QList< BomgarItem* > list = Database::getChats();
-    QStringList existList = Database::getQmonBomgarList();
     QStringList l;
     
     for ( int i = 0; i < list.size(); ++i ) 
@@ -65,6 +64,8 @@ void KueuedDbUpdate::updateBomgar()
         
         delete list.at( i );
     }
+    
+    QStringList existList = Database::getQmonBomgarList();
 
     for ( int i = 0; i < existList.size(); ++i ) 
     {
@@ -85,7 +86,6 @@ void KueuedDbUpdate::updateUnity()
     Debug::print( "kueued-dbupdate", "Starting Unity update..." );
     
     QList<SiebelItem*> l = Database::getQmonSrs();
-    QStringList existList = Database::getQmonSiebelList();
     QStringList newList;
         
     for ( int i = 0; i < l.size(); ++i ) 
@@ -108,6 +108,8 @@ void KueuedDbUpdate::updateUnity()
         
         delete l.at( i );
     }
+    
+    QStringList existList = Database::getQmonSiebelList();
     
     for ( int i = 0; i < existList.size(); ++i ) 
     {
