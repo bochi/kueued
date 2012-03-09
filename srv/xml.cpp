@@ -60,7 +60,16 @@ QString XML::sr( SiebelItem* si )
     else
     {
         xml += "    <srtype>sr</srtype>\n";
-        xml += "    <customer><![CDATA[" + si->customer + "]]></customer>\n";
+        xml += "    <customer>\n";
+        xml += "      <account><![CDATA[" + si->customer + "]]></account>\n";
+        xml += "      <firstname><![CDATA[" + si->contact_firstname + "]]></firstname>\n";
+        xml += "      <lastname><![CDATA[" + si->contact_lastname + "]]></lastname>\n";
+        xml += "      <title><![CDATA[" + si->contact_title + "]]></title>\n";
+        xml += "      <email><![CDATA[" + si->contact_email + "]]></email>\n";
+        xml += "      <phone><![CDATA[" + si->contact_phone + "]]></phone>\n";
+        xml += "      <onsitephone><![CDATA[" + si->onsite_phone + "]]></onsitephone>\n";
+        xml += "      <lang><![CDATA[" + si->contact_lang + "]]></lang>\n";
+        xml += "    </customer>\n";
     }
 
     xml += "    <severity><![CDATA[" + si->severity + "]]></severity>\n";
@@ -77,8 +86,6 @@ QString XML::sr( SiebelItem* si )
     xml += "    <int_type><![CDATA[" + si->int_type + "]]></int_type>\n";
     xml += "    <subtype><![CDATA[" + si->subtype + "]]></subtype>\n";
     xml += "    <service_level><![CDATA[" + si->service_level + "]]></service_level>\n";
-    xml += "    <contact_phone><![CDATA[" + si->contact_phone + "]]></contact_phone>\n";
-    xml += "    <onsite_phone><![CDATA[" + si->onsite_phone + "]]></onsite_phone>\n";
     xml += "    <category><![CDATA[" + si->category + "]]></category>\n";
     xml += "    <respond_via><![CDATA[" + si->respond_via + "]]></respond_via>\n";
     xml += "    <age>" + QString::number( age ) + "</age>\n";

@@ -95,6 +95,11 @@ class SiebelItem
         QString brief_desc;
         QString customer;
         QString contact_phone;
+        QString contact_firstname;
+        QString contact_lastname;
+        QString contact_email;
+        QString contact_title;
+        QString contact_lang;
         QString onsite_phone;
         QString detailed_desc;
         QString category;

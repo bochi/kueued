@@ -43,7 +43,7 @@ Database::Database()
         Debug::print( "database", "Failed to open the database " + mysqlDB.lastError().text() );
     }
 
-    QSqlQuery query( mysqlDB );
+    /*QSqlQuery query( mysqlDB );
        
     if ( !query.exec( "CREATE TABLE IF NOT EXISTS qmon_siebel( ID VARCHAR(20) PRIMARY KEY UNIQUE, QUEUE TEXT, "
                       "HOURS TEXT, GEO TEXT, ODATE TEXT, ADATE TEXT, QDATE TEXT, STATUS TEXT, SEVERITY TEXT, "
@@ -56,7 +56,7 @@ Database::Database()
                       "NAME TEXT, DATE TEXT )" ) ) 
     {
         Debug::print( "database", "Error: " + query.lastError().text() );
-    }
+    }*/
 }
 
 Database::~Database()
@@ -128,15 +128,15 @@ QList< SiebelItem* > Database::getSrsForQueue( const QString& queue )
     {    
         query.prepare( "SELECT ID, QUEUE, GEO, HOURS, STATUS, SEVERITY, SOURCE, RESPOND_VIA, CREATED, LAST_UPDATE, "
                        "INQUEUE, SLA, SUPPORT_PROGRAM, SUPPORT_PROGRAM_LONG, ROUTING_PRODUCT, SUPPORT_GROUP_ROUTING, "
-                       "INT_TYPE, SUBTYPE, SERVICE_LEVEL, BRIEF_DESC, CRITSIT, HIGH_VALUE, CUSTOMER, CONTACT_PHONE, "
-                       "ONSITE_PHONE, DETAILED_DESC, CATEGORY, CREATOR, ROW_ID from qmon_siebel" );
+                       "INT_TYPE, SUBTYPE, SERVICE_LEVEL, BRIEF_DESC, CRITSIT, HIGH_VALUE, DETAILED_DESC, CATEGORY, "
+                       "CREATOR, ROW_ID from qmon_siebel" );
     }
     else
     {
         query.prepare( "SELECT ID, QUEUE, GEO, HOURS, STATUS, SEVERITY, SOURCE, RESPOND_VIA, CREATED, LAST_UPDATE, "
                        "INQUEUE, SLA, SUPPORT_PROGRAM, SUPPORT_PROGRAM_LONG, ROUTING_PRODUCT, SUPPORT_GROUP_ROUTING, "
-                       "INT_TYPE, SUBTYPE, SERVICE_LEVEL, BRIEF_DESC, CRITSIT, HIGH_VALUE, CUSTOMER, CONTACT_PHONE, "
-                       "ONSITE_PHONE, DETAILED_DESC, CATEGORY, CREATOR, ROW_ID from qmon_siebel WHERE ( QUEUE = :queue )" );
+                       "INT_TYPE, SUBTYPE, SERVICE_LEVEL, BRIEF_DESC, CRITSIT, HIGH_VALUE, DETAILED_DESC, CATEGORY, "
+                       "CREATOR, ROW_ID from qmon_siebel WHERE ( QUEUE = :queue )" );
         
         query.bindValue( ":queue", queue );
     }
@@ -169,13 +169,10 @@ QList< SiebelItem* > Database::getSrsForQueue( const QString& queue )
         si->brief_desc = query.value( 19 ).toString();
         si->critsit = query.value( 20 ).toBool();
         si->high_value = query.value( 21 ).toBool();
-        si->customer = query.value( 22 ).toString();
-        si->contact_phone = query.value( 23 ).toString();
-        si->onsite_phone = query.value( 24 ).toString();
-        si->detailed_desc = query.value( 25 ).toString();
-        si->category = query.value( 26 ).toString();
-        si->creator = query.value( 27 ).toString();
-        si->row_id = query.value( 28 ).toString();
+        si->detailed_desc = query.value( 22 ).toString();
+        si->category = query.value( 23 ).toString();
+        si->creator = query.value( 24 ).toString();
+        si->row_id = query.value( 25 ).toString();
         
         if ( getBomgarQueue( query.value( 0 ).toString() ) == "NOCHAT" )
         {
@@ -194,9 +191,29 @@ QList< SiebelItem* > Database::getSrsForQueue( const QString& queue )
         else
         {
             si->isCr = false;
-        }
+        
+            QSqlQuery cquery( QSqlDatabase::database( "mysqlDB" ) );
+        
+            cquery.prepare( "SELECT CUSTOMER, CONTACT_PHONE, CONTACT_FIRSTNAME, CONTACT_LASTNAME, CONTACT_EMAIL, "
+                            "       CONTACT_TITLE, CONTACT_LANG, ONSITE_PHONE FROM qmon_customer WHERE ID = :id" );
+        
+            cquery.bindValue( ":id", si->id );
+        
+        cquery.exec();
+        qDebug() << cquery.lastError();
+        
+        if ( cquery.next() ) {
+        si->customer = cquery.value( 0 ).toString();
+        si->contact_phone = cquery.value( 1 ).toString();
+        si->contact_firstname = cquery.value( 2 ).toString();
+        si->contact_lastname = cquery.value( 3 ).toString();
+        si->contact_email = cquery.value( 4 ).toString();
+        si->contact_title = cquery.value( 5 ).toString();
+        si->contact_lang = cquery.value( 6 ).toString();
+        si->onsite_phone = cquery.value( 7 ).toString(); }
         
         list.append( si );
+        }
     }
         
     return list;

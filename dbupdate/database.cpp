@@ -74,7 +74,8 @@ Database::Database()
                       "CREATED TEXT, LAST_UPDATE TEXT, INQUEUE TEXT, SLA TEXT, SUPPORT_PROGRAM TEXT, "
                       "SUPPORT_PROGRAM_LONG TEXT, ROUTING_PRODUCT TEXT, SUPPORT_GROUP_ROUTING TEXT, "
                       "INT_TYPE TEXT, SUBTYPE TEXT, SERVICE_LEVEL TEXT, BRIEF_DESC TEXT, CRITSIT TINYINT, "
-                      "HIGH_VALUE TINYINT, CUSTOMER TEXT, CONTACT_PHONE TEXT, ONSITE_PHONE TEXT, "
+                      "HIGH_VALUE TINYINT, CUSTOMER TEXT, CONTACT_FIRSTNAME TEXT, CONTACT_LASTNAME TEXT, "
+                      "CONTACT_EMAIL TEXT, CONTACT_TITLE TEXT, CONTACT_LANG TEXT, CONTACT_PHONE TEXT, ONSITE_PHONE TEXT, "
                       "DETAILED_DESC TEXT, CATEGORY TEXT, CREATOR TEXT, ROW_ID TEXT ) ENGINE='NDB'" ) );
     {
         Debug::print( "database", "Error qmon_siebel: " + query.lastError().text() + query.executedQuery() );
@@ -102,13 +103,11 @@ void Database::insertSiebelItemIntoDB( SiebelItem* item )
     query.prepare( "INSERT INTO qmon_siebel( ID, QUEUE, GEO, HOURS, STATUS, SEVERITY, SOURCE, RESPOND_VIA, "
                    "                         CREATED, LAST_UPDATE, INQUEUE, SLA, SUPPORT_PROGRAM, SUPPORT_PROGRAM_LONG, "
                    "                         ROUTING_PRODUCT, SUPPORT_GROUP_ROUTING, INT_TYPE, SUBTYPE, SERVICE_LEVEL, "
-                   "                         BRIEF_DESC, CRITSIT, HIGH_VALUE, CUSTOMER, CONTACT_PHONE, ONSITE_PHONE, "
-                   "                         DETAILED_DESC, CATEGORY, CREATOR, ROW_ID ) "
+                   "                         BRIEF_DESC, CRITSIT, HIGH_VALUE, DETAILED_DESC, CATEGORY, CREATOR, ROW_ID ) "
                    " VALUES "
                    "( :id, :queue, :geo, :hours, :status, :severity, :source, :respond_via, :created, :last_update, :inqueue, "
                    "  :sla, :support_program, :support_program_long, :routing_product, :support_group_routing, :int_type, :subtype, "
-                   "  :service_level, :brief_desc, :critsit, :high_value, :customer, :contact_phone, :onsite_phone, :detailed_desc, "
-                   "  :category, :creator, :row_id )" );
+                   "  :service_level, :brief_desc, :critsit, :high_value,  :detailed_desc, :category, :creator, :row_id )" );
 
     query.bindValue( ":id", item->id );
     query.bindValue( ":queue", item->queue );
@@ -132,15 +131,32 @@ void Database::insertSiebelItemIntoDB( SiebelItem* item )
     query.bindValue( ":brief_desc", item->brief_desc );   
     query.bindValue( ":critsit", item->critsit );
     query.bindValue( ":high_value", item->high_value );    
-    query.bindValue( ":customer", item->customer );
-    query.bindValue( ":contact_phone", item->contact_phone );
-    query.bindValue( ":onsite_phone", item->onsite_phone );
     query.bindValue( ":detailed_desc", item->detailed_desc );
     query.bindValue( ":category", item->category );
     query.bindValue( ":creator", item->creator );
     query.bindValue( ":row_id", item->row_id );
     
     query.exec();
+    
+    QSqlQuery cquery( QSqlDatabase::database( "mysqlDB" ) );
+    
+    cquery.prepare( "INSERT INTO qmon_customer( ID, CUSTOMER, CONTACT_PHONE, CONTACT_FIRSTNAME, CONTACT_LASTNAME, "
+                   "                           CONTACT_EMAIL, CONTACT_TITLE, CONTACT_LANG, ONSITE_PHONE ) "
+                   "VALUES"
+                   "( :id, :customer, :contact_phone, :contact_firstname, :contact_lastname, :contact_email, "
+                   "  :contact_title, :contact_lang, :onsite_phone )" );
+    
+    cquery.bindValue( ":id", item->id );
+    cquery.bindValue( ":customer", item->customer );
+    cquery.bindValue( ":contact_phone", item->contact_phone );
+    cquery.bindValue( ":contact_firstname", item->contact_firstname );
+    cquery.bindValue( ":contact_lastname", item->contact_lastname );
+    cquery.bindValue( ":contact_email", item->contact_email );
+    cquery.bindValue( ":contact_title", item->contact_title );
+    cquery.bindValue( ":contact_lang", item->contact_lang );
+    cquery.bindValue( ":onsite_phone", item->onsite_phone );
+    
+    cquery.exec();                  
 }
 
 void Database::updateSiebelItem( SiebelItem* item )
@@ -154,7 +170,9 @@ void Database::updateSiebelItem( SiebelItem* item )
                    "                       SUPPORT_GROUP_ROUTING = :support_group_routing, INT_TYPE = :int_type,"
                    "                       SUBTYPE = :subtype, SERVICE_LEVEL = :service_level, BRIEF_DESC = :brief_desc,"
                    "                       CRITSIT = :critsit, HIGH_VALUE = :high_value, CUSTOMER = :customer, "
-                   "                       CONTACT_PHONE = :contact_phone, ONSITE_PHONE = :onsite_phone, "
+                   "                       CONTACT_PHONE = :contact_phone, CONTACT_FIRSTNAME = :contact_firstname, "
+                   "                       CONTACT_LASTNAME = :contact_lastname, CONTACT_EMAIL = :contact_email, "
+                   "                       CONTACT_TITLE = :contact_title, CONTACT_LANG = :contact_lang, ONSITE_PHONE = :onsite_phone, "
                    "                       DETAILED_DESC = :detailed_desc, CATEGORY = :category, CREATOR = :creator,"
                    "                       ROW_ID = :row_id WHERE ID = :id" );
     
@@ -179,6 +197,11 @@ void Database::updateSiebelItem( SiebelItem* item )
     query.bindValue( ":high_value", item->high_value );
     query.bindValue( ":customer", item->customer );
     query.bindValue( ":contact_phone", item->contact_phone );
+    query.bindValue( ":contact_firstname", item->contact_firstname );
+    query.bindValue( ":contact_lastname", item->contact_lastname );
+    query.bindValue( ":contact_email", item->contact_email );
+    query.bindValue( ":contact_title", item->contact_title );
+    query.bindValue( ":contact_lang", item->contact_lang );
     query.bindValue( ":onsite_phone", item->onsite_phone );
     query.bindValue( ":detailed_desc", item->detailed_desc );
     query.bindValue( ":category", item->category );
@@ -187,7 +210,25 @@ void Database::updateSiebelItem( SiebelItem* item )
     query.bindValue( ":id", item->id );
 
     query.exec();
-     qDebug() << query.lastError().text();
+    
+    QSqlQuery cquery( QSqlDatabase::database( "mysqlDB" ) );
+    
+    cquery.prepare( "UPDATE qmon_customer SET CUSTOMER = :customer, CONTACT_PHONE = :contact_phone, CONTACT_FIRSTNAME = :contact_firstname, "
+                   "                         CONTACT_LASTNAME = :contact_lastname, CONTACT_EMAIL = :contact_email, "
+                   "                         CONTACT_TITLE = :contact_title, CONTACT_LANG = :contact_lang, ONSITE_PHONE = :onsite_phone "
+                   "                         WHERE ID = :id" );
+    
+    cquery.bindValue( ":customer", item->customer );
+    cquery.bindValue( ":contact_phone", item->contact_phone );
+    cquery.bindValue( ":contact_firstname", item->contact_firstname );
+    cquery.bindValue( ":contact_lastname", item->contact_lastname );
+    cquery.bindValue( ":contact_email", item->contact_email );
+    cquery.bindValue( ":contact_title", item->contact_title );
+    cquery.bindValue( ":contact_lang", item->contact_lang );
+    cquery.bindValue( ":onsite_phone", item->onsite_phone );
+    cquery.bindValue( ":id", item->id );
+
+    cquery.exec();
 }
 
 void Database::updateSiebelQueue( SiebelItem* si )
@@ -399,15 +440,15 @@ QList< SiebelItem* > Database::getSrsForQueue( const QString& queue )
     {    
         query.prepare( "SELECT ID, QUEUE, GEO, HOURS, STATUS, SEVERITY, SOURCE, RESPOND_VIA, CREATED, LAST_UPDATE, "
                        "INQUEUE, SLA, SUPPORT_PROGRAM, SUPPORT_PROGRAM_LONG, ROUTING_PRODUCT, SUPPORT_GROUP_ROUTING, "
-                       "INT_TYPE, SUBTYPE, SERVICE_LEVEL, BRIEF_DESC, CRITSIT, HIGH_VALUE, CUSTOMER, CONTACT_PHONE, "
-                       "ONSITE_PHONE, DETAILED_DESC, CATEGORY, CREATOR, ROW_ID from qmon_siebel" );
+                       "INT_TYPE, SUBTYPE, SERVICE_LEVEL, BRIEF_DESC, CRITSIT, HIGH_VALUE, DETAILED_DESC, CATEGORY, "
+                       "CREATOR, ROW_ID from qmon_siebel" );
     }
     else
     {
         query.prepare( "SELECT ID, QUEUE, GEO, HOURS, STATUS, SEVERITY, SOURCE, RESPOND_VIA, CREATED, LAST_UPDATE, "
                        "INQUEUE, SLA, SUPPORT_PROGRAM, SUPPORT_PROGRAM_LONG, ROUTING_PRODUCT, SUPPORT_GROUP_ROUTING, "
-                       "INT_TYPE, SUBTYPE, SERVICE_LEVEL, BRIEF_DESC, CRITSIT, HIGH_VALUE, CUSTOMER, CONTACT_PHONE, "
-                       "ONSITE_PHONE, DETAILED_DESC, CATEGORY, CREATOR, ROW_ID from qmon_siebel WHERE ( QUEUE = :queue )" );
+                       "INT_TYPE, SUBTYPE, SERVICE_LEVEL, BRIEF_DESC, CRITSIT, HIGH_VALUE, DETAILED_DESC, CATEGORY, "
+                       "CREATOR, ROW_ID from qmon_siebel WHERE ( QUEUE = :queue )" );
         
         query.bindValue( ":queue", queue );
     }
@@ -440,13 +481,10 @@ QList< SiebelItem* > Database::getSrsForQueue( const QString& queue )
         si->brief_desc = query.value( 19 ).toString();
         si->critsit = query.value( 20 ).toBool();
         si->high_value = query.value( 21 ).toBool();
-        si->customer = query.value( 22 ).toString();
-        si->contact_phone = query.value( 23 ).toString();
-        si->onsite_phone = query.value( 24 ).toString();
-        si->detailed_desc = query.value( 25 ).toString();
-        si->category = query.value( 26 ).toString();
-        si->creator = query.value( 27 ).toString();
-        si->row_id = query.value( 28 ).toString();
+        si->detailed_desc = query.value( 22 ).toString();
+        si->category = query.value( 23 ).toString();
+        si->creator = query.value( 24 ).toString();
+        si->row_id = query.value( 25 ).toString();
         
         if ( getBomgarQueue( query.value( 0 ).toString() ) == "NOCHAT" )
         {
@@ -462,6 +500,24 @@ QList< SiebelItem* > Database::getSrsForQueue( const QString& queue )
         {
             si->isCr = true;
         }
+        
+        QSqlQuery cquery( QSqlDatabase::database( "mysqlDB" ) );
+        
+        cquery.prepare( "SELECT CUSTOMER, CONTACT_PHONE, CONTACT_FIRSTNAME, CONTACT_LASTNAME, CONTACT_EMAIL, "
+                        "       CONTACT_TITLE, CONTACT_LANG, ONSITE_PHONE FROM qmon_customer WHERE ( ID = :id )" );
+        
+        cquery.bindValue( ":id", si->id );
+        
+        cquery.exec();
+        
+        si->customer = cquery.value( 0 ).toString();
+        si->contact_phone = cquery.value( 1 ).toString();
+        si->contact_firstname = cquery.value( 2 ).toString();
+        si->contact_lastname = cquery.value( 3 ).toString();
+        si->contact_email = cquery.value( 4 ).toString();
+        si->contact_title = cquery.value( 5 ).toString();
+        si->contact_lang = cquery.value( 6 ).toString();
+        si->onsite_phone = cquery.value( 7 ).toString();
         
         list.append( si );
     }
@@ -585,69 +641,186 @@ QList< SiebelItem* > Database::getQmonSrs()
     QSqlQuery query( QSqlDatabase::database( "siebelDB" ) );
     QList< SiebelItem* > list;
     
-    query.prepare(  "select sr.sr_num as ID, u.login as QUEUE, "
-                    "case when sr.BU_ID = '0-R9NH' then 'Default Organization' "
-                    "when sr.BU_ID = '1-AHT' then 'EMEA' "
-                    "when sr.BU_ID = '1-AHV' then 'ASIAPAC' "
-                    "when sr.BU_ID = '1-AHX' then 'USA' "
-                    "when sr.BU_ID = '1-AHZ' then 'LATIN AMERICA' "
-                    "when sr.BU_ID = '1-AI1' then 'CANADA' "
-                    "else 'Undefined' end as GEO,  "
-                    "cal.NAME as HOURS, sr.SR_SUB_STAT_ID as STATUS, sr.SR_SEV_CD as SEVERITY, sr.SR_SUBTYPE_CD as SOURCE,  "
-                    "sr.X_RESPOND_VIA as RESPOND_VIA, sr.CREATED, sr.LAST_UPD as LAST_UPDATE,  "
-                    "case when sr.EXP_CLOSE_DT IS NULL then NVL(sr.EXP_CLOSE_DT, TO_DATE('01-01-1970', 'MM-DD-YYYY')) else sr.EXP_CLOSE_DT end as SLA, "
-                    "sr.X_SUPPORT_PROG as SUPPORT_PROGRAM, e.NAME as SUPPORT_PROGRAM_LONG,prd.name as ROUTING_PRODUCT, "
-                    "sr.X_SUPP_GRP_ROUTING AS SUPPORT_GROUP_ROUTING, sr.SR_TYPE_CD as INT_TYPE, sr.X_SR_SUB_TYPE as SUBTYPE, "
-                    "e.ENTL_PRIORITY_NUM as SERVICE_LEVEL, CAST(sr.SR_TITLE as varchar(99)) as BRIEF_DESC, flag.ATTRIB_11 as CRITSIT, "
-                    "flag.ATTRIB_56 as HIGH_VALUE, cast(ext.NAME as varchar(80)) as CUSTOMER, g.WORK_PH_NUM as CONTACT_PHONE, "
-                    "sr.X_ONSITE_PH_NUM as ONSITE_PHONE, sr.DESC_TEXT as DETAILED_DESC, sr.SR_CATEGORY_CD as CATEGORY, sr.ROW_ID "
-                    "from siebel.s_srv_req sr, siebel.s_user u, siebel.s_contact c, siebel.s_contact g, siebel.s_entlmnt e, siebel.s_sched_cal cal, siebel.s_org_ext ext, siebel.s_prod_int prd, siebel.s_org_ext_x flag "
-                    "where sr.owner_emp_id = u.row_id and u.row_id = c.row_id and g.row_id = sr.CST_CON_ID  "
-                    "and c.job_title LIKE('Pseudo Use%') and sr.sr_stat_id = 'Open' and sr.agree_id = e.row_id "
-                    "and e.svc_calendar_id = cal.row_id and sr.cst_ou_id = ext.row_id and sr.X_PROD_FEATURE_ID = prd.row_id "
-                    "and ext.row_id = flag.row_id  "
-                    "union "
-                    "select sr.sr_num as ID, u.login as QUEUE, "
-                    "case when sr.BU_ID = '0-R9NH' then 'Default Organization' "
-                    "when sr.BU_ID = '1-AHT' then 'EMEA' "
-                    "when sr.BU_ID = '1-AHZ' then 'ASIAPAC' "
-                    "when sr.BU_ID = '1-AHV' then 'ASIAPAC' "
-                    "when sr.BU_ID = '1-AHX' then 'USA' "
-                    "when sr.BU_ID = '1-AHZ' then 'LATIN AMERICA' "
-                    "when sr.BU_ID = '1-AI1' then 'CANADA' "
-                    "else 'Undefined' end as GEO, cal.NAME as HOURS, sr.SR_SUB_STAT_ID as STATUS, sr.SR_SEV_CD as SEVERITY, "
-                    "sr.SR_SUBTYPE_CD as SOURCE, sr.X_RESPOND_VIA as RESPOND_VIA, sr.CREATED, sr.LAST_UPD as LAST_UPDATE, "
-                    "case when sr.EXP_CLOSE_DT IS NULL then NVL(sr.EXP_CLOSE_DT, TO_DATE('01-01-1970', 'MM-DD-YYYY')) else sr.EXP_CLOSE_DT end as SLA, "
-                    "sr.X_SUPPORT_PROG as SUPPORT_PROGRAM, e.NAME as SUPPORT_PROGRAM_LONG, prd.name as ROUTING_PRODUCT, "
-                    "sr.X_SUPP_GRP_ROUTING AS SUPPORT_GROUP_ROUTING, sr.SR_TYPE_CD as INT_TYPE, sr.X_SR_SUB_TYPE as SUBTYPE, "
-                    "e.ENTL_PRIORITY_NUM as SERVICE_LEVEL, CAST(sr.SR_TITLE as varchar(99)) as BRIEF_DESC, flag.ATTRIB_11 as CRITSIT, "
-                    "flag.ATTRIB_56 as HIGH_VALUE, cast(ext.NAME as varchar(80)) as CUSTOMER, '1', '1', '1',  "
-                    "sr.SR_CATEGORY_CD as SR_CATEGORY, sr.ROW_ID  "
-                    "from siebel.s_srv_req sr, siebel.s_user u, siebel.s_entlmnt e, siebel.s_sched_cal cal, siebel.s_org_ext ext, siebel.s_prod_int prd, siebel.s_org_ext_x flag "
-                    "where sr.owner_emp_id = '0-1' and sr.owner_emp_id = u.row_id  and sr.sr_stat_id = 'Open' "
-                    "and sr.agree_id = e.row_id and e.svc_calendar_id = cal.row_id and sr.cst_ou_id = ext.row_id "
-                    "and sr.X_PROD_FEATURE_ID = prd.row_id and ext.row_id = flag.row_id "
-                    "union "
-                    "select  sr.sr_num, 'null', "
-                    "case when sr.BU_ID = '0-R9NH' then 'Default Organization' "
-                    "when sr.BU_ID = '1-AHT' then 'EMEA' "
-                    "when sr.BU_ID = '1-AHZ' then 'ASIAPAC' "
-                    "when sr.BU_ID = '1-AHV' then 'ASIAPAC' "
-                    "when sr.BU_ID = '1-AHX' then 'USA' "
-                    "when sr.BU_ID = '1-AHZ' then 'LATIN AMERICA' "
-                    "when sr.BU_ID = '1-AI1' then 'CANADA' "
-                    "else 'Undefined' end as GEO, cal.NAME as HOURS, sr.SR_SEV_CD as SEVERITY, sr.SR_SUB_STAT_ID as STATUS, "
-                    "sr.SR_SUBTYPE_CD as SOURCE, sr.X_RESPOND_VIA as RESPOND_VIA, sr.CREATED, sr.LAST_UPD as LAST_UPDATE, "
-                    "case when sr.EXP_CLOSE_DT IS NULL then NVL(sr.EXP_CLOSE_DT, TO_DATE('01-01-1970', 'MM-DD-YYYY')) else sr.EXP_CLOSE_DT end as SLA, "
-                    "sr.X_SUPPORT_PROG as SUPPORT_PROGRAM, e.NAME as SUPPORT_PROGRAM_LONG, prd.name as ROUTING_PRODUCT, "
-                    "sr.X_SUPP_GRP_ROUTING AS SUPPORT_GROUP_ROUTING, sr.SR_TYPE_CD as INT_TYPE, sr.X_SR_SUB_TYPE as SUBTYPE, "
-                    "e.ENTL_PRIORITY_NUM as SERVICE_LEVEL, CAST(sr.SR_TITLE as varchar(99)) as BRIEF_DESC, flag.ATTRIB_11 as CRITSIT, "
-                    "flag.ATTRIB_56 as HIGH_VALUE, cast(ext.NAME as varchar(80)) as CUSTOMER, '0', '0', '0', "
-                    "sr.SR_CATEGORY_CD as SR_CATEGORY, sr.ROW_ID "
-                    "from siebel.s_srv_req sr, siebel.s_entlmnt e, siebel.s_sched_cal cal, siebel.s_org_ext ext, siebel.s_prod_int prd, siebel.s_org_ext_x flag "
-                    "where sr.owner_emp_id is null and sr.sr_stat_id = 'Open' and sr.agree_id = e.row_id "
-                    "and e.svc_calendar_id = cal.row_id and sr.cst_ou_id = ext.row_id and sr.X_PROD_FEATURE_ID = prd.row_id "
-                    "and ext.row_id = flag.row_id" );
+    query.prepare(   "select "
+"  sr.sr_num as ID, "
+"  u.login as QUEUE, "
+"  case "
+"    when sr.BU_ID = '0-R9NH' then 'Default Organization' "
+"    when sr.BU_ID = '1-AHT' then 'EMEA' "
+"    when sr.BU_ID = '1-AHV' then 'ASIAPAC' "
+"    when sr.BU_ID = '1-AHX' then 'USA' "
+"    when sr.BU_ID = '1-AHZ' then 'LATIN AMERICA' "
+"    when sr.BU_ID = '1-AI1' then 'CANADA' "
+"  else 'Undefined' end as GEO,  "
+"  cal.NAME as HOURS, "
+"  sr.SR_SUB_STAT_ID as STATUS, "
+"  sr.SR_SEV_CD as SEVERITY, "
+"  sr.SR_SUBTYPE_CD as SOURCE,  "
+"  sr.X_RESPOND_VIA as RESPOND_VIA, "
+"  sr.CREATED, "
+"  sr.LAST_UPD as LAST_UPDATE,  "
+"  case when sr.EXP_CLOSE_DT IS NULL then NVL(sr.EXP_CLOSE_DT, TO_DATE('01-01-1970', 'MM-DD-YYYY')) "
+"  else sr.EXP_CLOSE_DT end as SLA, "
+"  sr.X_SUPPORT_PROG as SUPPORT_PROGRAM, "
+"  e.NAME as SUPPORT_PROGRAM_LONG,"
+"  prd.name as ROUTING_PRODUCT, "
+"  sr.X_SUPP_GRP_ROUTING AS SUPPORT_GROUP_ROUTING, "
+"  sr.SR_TYPE_CD as INT_TYPE, "
+"  sr.X_SR_SUB_TYPE as SUBTYPE, "
+"  e.ENTL_PRIORITY_NUM as SERVICE_LEVEL, "
+"  SR_TITLE as BRIEF_DESC, "
+"  flag.ATTRIB_11 as CRITSIT, "
+"  flag.ATTRIB_56 as HIGH_VALUE, "
+"  ext.NAME as CUSTOMER, "
+"  g.WORK_PH_NUM as CONTACT_PHONE, "
+"  g.FST_NAME as CONTACT_FIRSTNAME, "
+"  g.LAST_NAME as CONTACT_LASTNAME, "
+"  g.EMAIL_ADDR as CONTACT_EMAIL, "
+"  g.JOB_TITLE as CONTACT_TITLE, "
+"  g.PREF_LANG_ID as CONTACT_LANG,"
+"  sr.X_ONSITE_PH_NUM as ONSITE_PHONE, "
+"  sr.DESC_TEXT as DETAILED_DESC, "
+"  sr.SR_CATEGORY_CD as CATEGORY, "
+"  sr.ROW_ID "
+"from "
+"  siebel.s_srv_req sr, "
+"  siebel.s_user u, "
+"  siebel.s_contact c, "
+"  siebel.s_contact g, "
+"  siebel.s_entlmnt e, "
+"  siebel.s_sched_cal cal, "
+"  siebel.s_org_ext ext, "
+"  siebel.s_prod_int prd, "
+"  siebel.s_org_ext_x flag "
+"where "
+"  sr.owner_emp_id = u.row_id "
+"  and u.row_id = c.row_id "
+"  and g.row_id = sr.CST_CON_ID  "
+"  and c.job_title LIKE('Pseudo Use%') "
+"  and sr.sr_stat_id = 'Open' "
+"  and sr.agree_id = e.row_id "
+"  and e.svc_calendar_id = cal.row_id "
+"  and sr.cst_ou_id = ext.row_id "
+"  and sr.X_PROD_FEATURE_ID = prd.row_id "
+"  and ext.row_id = flag.row_id  "
+"union "
+"select "
+"  sr.sr_num as ID, "
+"  u.login as QUEUE, "
+"  case "
+"    when sr.BU_ID = '0-R9NH' then 'Default Organization' "
+"    when sr.BU_ID = '1-AHT' then 'EMEA' "
+"    when sr.BU_ID = '1-AHZ' then 'ASIAPAC' "
+"    when sr.BU_ID = '1-AHV' then 'ASIAPAC' "
+"    when sr.BU_ID = '1-AHX' then 'USA' "
+"    when sr.BU_ID = '1-AHZ' then 'LATIN AMERICA' "
+"    when sr.BU_ID = '1-AI1' then 'CANADA' "
+"  else 'Undefined' end as GEO, "
+"  cal.NAME as HOURS, "
+"  sr.SR_SUB_STAT_ID as STATUS, "
+"  sr.SR_SEV_CD as SEVERITY, "
+"  sr.SR_SUBTYPE_CD as SOURCE, "
+"  sr.X_RESPOND_VIA as RESPOND_VIA, "
+"  sr.CREATED, sr.LAST_UPD as LAST_UPDATE, "
+"  case when sr.EXP_CLOSE_DT IS NULL then NVL(sr.EXP_CLOSE_DT, TO_DATE('01-01-1970', 'MM-DD-YYYY')) "
+"  else sr.EXP_CLOSE_DT end as SLA, "
+"  sr.X_SUPPORT_PROG as SUPPORT_PROGRAM, "
+"  e.NAME as SUPPORT_PROGRAM_LONG, "
+"  prd.name as ROUTING_PRODUCT, "
+"  sr.X_SUPP_GRP_ROUTING AS SUPPORT_GROUP_ROUTING, "
+"  sr.SR_TYPE_CD as INT_TYPE, "
+"  sr.X_SR_SUB_TYPE as SUBTYPE, "
+"  e.ENTL_PRIORITY_NUM as SERVICE_LEVEL, "
+"  sr.SR_TITLE as BRIEF_DESC, "
+"  flag.ATTRIB_11 as CRITSIT, "
+"  flag.ATTRIB_56 as HIGH_VALUE, "
+"  ext.NAME as CUSTOMER, "
+"  '1', "
+"  '1', "
+"  '1',  "
+"  '1', "
+"  '1', "
+"  '1', "
+"  '1', "
+"  '1',"
+"  sr.SR_CATEGORY_CD as SR_CATEGORY, "
+"  sr.ROW_ID  "
+"from "
+"  siebel.s_srv_req sr, "
+"  siebel.s_user u, "
+"  siebel.s_entlmnt e, "
+"  siebel.s_sched_cal cal,"
+"  siebel.s_org_ext ext, "
+"  siebel.s_prod_int prd, "
+"  siebel.s_org_ext_x flag "
+"where "
+"  sr.owner_emp_id = '0-1' "
+"  and sr.owner_emp_id = u.row_id  "
+"  and sr.sr_stat_id = 'Open' "
+"  and sr.agree_id = e.row_id "
+"  and e.svc_calendar_id = cal.row_id "
+"  and sr.cst_ou_id = ext.row_id "
+"  and sr.X_PROD_FEATURE_ID = prd.row_id "
+"  and ext.row_id = flag.row_id "
+"union "
+"select  "
+"  sr.sr_num, "
+"  'null', "
+"  case "
+"    when sr.BU_ID = '0-R9NH' then 'Default Organization' "
+"    when sr.BU_ID = '1-AHT' then 'EMEA' "
+"    when sr.BU_ID = '1-AHZ' then 'ASIAPAC' "
+"    when sr.BU_ID = '1-AHV' then 'ASIAPAC' "
+"    when sr.BU_ID = '1-AHX' then 'USA' "
+"    when sr.BU_ID = '1-AHZ' then 'LATIN AMERICA' "
+"    when sr.BU_ID = '1-AI1' then 'CANADA' "
+"  else 'Undefined' end as GEO, "
+"  cal.NAME as HOURS, "
+"  sr.SR_SEV_CD as SEVERITY, "
+"  sr.SR_SUB_STAT_ID as STATUS, "
+"  sr.SR_SUBTYPE_CD as SOURCE, "
+"  sr.X_RESPOND_VIA as RESPOND_VIA, "
+"  sr.CREATED, sr.LAST_UPD as LAST_UPDATE, "
+"  case when sr.EXP_CLOSE_DT IS NULL then NVL(sr.EXP_CLOSE_DT, TO_DATE('01-01-1970', 'MM-DD-YYYY')) "
+"  else sr.EXP_CLOSE_DT end as SLA, "
+"  sr.X_SUPPORT_PROG as SUPPORT_PROGRAM, "
+"  e.NAME as SUPPORT_PROGRAM_LONG, "
+"  prd.name as ROUTING_PRODUCT, "
+"  sr.X_SUPP_GRP_ROUTING AS SUPPORT_GROUP_ROUTING, "
+"  sr.SR_TYPE_CD as INT_TYPE, "
+"  sr.X_SR_SUB_TYPE as SUBTYPE, "
+"  e.ENTL_PRIORITY_NUM as SERVICE_LEVEL, "
+"  sr.SR_TITLE BRIEF_DESC, "
+"  flag.ATTRIB_11 as CRITSIT, "
+"  flag.ATTRIB_56 as HIGH_VALUE, "
+"  ext.NAME as CUSTOMER, "
+"  '0', "
+"  '0', "
+"  '0', "
+"  '0', "
+"  '0', "
+"  '0', "
+"  '0', "
+"  '0',"
+"  sr.SR_CATEGORY_CD as SR_CATEGORY, "
+"  sr.ROW_ID "
+"from "
+"  siebel.s_srv_req sr, "
+"  siebel.s_entlmnt e, "
+"  siebel.s_sched_cal cal, "
+"  siebel.s_org_ext ext,"
+"  siebel.s_prod_int prd, "
+"  siebel.s_org_ext_x flag "
+"where "
+"  sr.owner_emp_id is null "
+"  and sr.sr_stat_id = 'Open' "
+"  and sr.agree_id = e.row_id "
+"  and e.svc_calendar_id = cal.row_id "
+"  and sr.cst_ou_id = ext.row_id "
+"  and sr.X_PROD_FEATURE_ID = prd.row_id "
+"  and ext.row_id = flag.row_id" );
+
+
     
     query.exec();
     qDebug() << query.lastError();
@@ -705,10 +878,15 @@ QList< SiebelItem* > Database::getQmonSrs()
         
         si->customer = query.value( 21 ).toString();
         si->contact_phone = query.value( 22 ).toString();
-        si->onsite_phone = query.value( 23 ).toString();
-        si->detailed_desc = query.value( 24 ).toString();
-        si->category = query.value( 25 ).toString();
-        si->row_id = query.value( 26 ).toString();
+        si->contact_firstname = query.value( 23 ).toString();
+        si->contact_lastname = query.value( 24 ).toString();
+        si->contact_email = query.value( 25 ).toString();
+        si->contact_title = query.value( 26 ).toString();
+        si->contact_lang = query.value( 27 ).toString();
+        si->onsite_phone = query.value( 28 ).toString();
+        si->detailed_desc = query.value( 29 ).toString();
+        si->category = query.value( 30 ).toString();
+        si->row_id = query.value( 31 ).toString();
         
         list.append( si );
     }
