@@ -77,7 +77,7 @@ Database::Database()
                       "HIGH_VALUE TINYINT, CUSTOMER TEXT, CONTACT_PHONE TEXT, ONSITE_PHONE TEXT, "
                       "DETAILED_DESC TEXT, CATEGORY TEXT, CREATOR TEXT, ROW_ID TEXT ) ENGINE='NDB'" ) );
     {
-        Debug::print( "database", "Error qmon_siebel: " + query. query.lastError().text() + query.executedQuery() );
+        Debug::print( "database", "Error qmon_siebel: " + query.lastError().text() + query.executedQuery() );
     }
     
     if ( !query.exec( "CREATE TABLE IF NOT EXISTS qmon_chat( ID VARCHAR(40) PRIMARY KEY UNIQUE, SR VARCHAR(15), "
