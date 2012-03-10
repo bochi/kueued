@@ -44,6 +44,8 @@ KueuedDbUpdate::~KueuedDbUpdate()
 
 void KueuedDbUpdate::updateBomgar()
 {
+    QTime myTimer;
+    myTimer.start();
     Debug::log( "kueued-dbupdate", "Starting Bomgar update..." );
     
     QList< BomgarItem* > list = Database::getChats();
@@ -75,7 +77,7 @@ void KueuedDbUpdate::updateBomgar()
         }
     }
     
-    Debug::log( "kueued-dbupdate", "Bomgar update finished" );
+    Debug::log( "kueued-dbupdate", "Bomgar update finished, took " +  QString::number( myTimer.elapsed() / 1000 ) + " sec" );
     
     mBomgarDone = true;
     finished();
@@ -83,6 +85,8 @@ void KueuedDbUpdate::updateBomgar()
 
 void KueuedDbUpdate::updateUnity()
 {
+    QTime myTimer;
+    myTimer.start();
     Debug::log( "kueued-dbupdate", "Starting Unity update..." );
     
     QList<SiebelItem*> l = Database::getQmonSrs();
@@ -119,7 +123,7 @@ void KueuedDbUpdate::updateUnity()
         }
     }
     
-    Debug::log( "kueued-dbupdate", "Unity update finished" );
+    Debug::log( "kueued-dbupdate", "Unity update finished, took " + QString::number( myTimer.elapsed() / 1000 ) + " sec" );
     
     mSiebelDone = true;
     finished();
