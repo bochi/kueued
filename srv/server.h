@@ -51,6 +51,9 @@ class SiebelItem;
  private slots:
      void readClient();
      void discardClient();
+     void closeSocket( QTcpSocket* );
+     void deleteSocket();
+     void deleteThread();
 
  private:
      bool disabled;

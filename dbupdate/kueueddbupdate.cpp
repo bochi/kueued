@@ -44,7 +44,7 @@ KueuedDbUpdate::~KueuedDbUpdate()
 
 void KueuedDbUpdate::updateBomgar()
 {
-    Debug::print( "kueued-dbupdate", "Starting Bomgar update..." );
+    Debug::log( "kueued-dbupdate", "Starting Bomgar update..." );
     
     QList< BomgarItem* > list = Database::getChats();
     QStringList l;
@@ -75,7 +75,7 @@ void KueuedDbUpdate::updateBomgar()
         }
     }
     
-    Debug::print( "kueued-dbupdate", "Bomgar update finished" );
+    Debug::log( "kueued-dbupdate", "Bomgar update finished" );
     
     mBomgarDone = true;
     finished();
@@ -83,7 +83,7 @@ void KueuedDbUpdate::updateBomgar()
 
 void KueuedDbUpdate::updateUnity()
 {
-    Debug::print( "kueued-dbupdate", "Starting Unity update..." );
+    Debug::log( "kueued-dbupdate", "Starting Unity update..." );
     
     QList<SiebelItem*> l = Database::getQmonSrs();
     QStringList newList;
@@ -119,7 +119,7 @@ void KueuedDbUpdate::updateUnity()
         }
     }
     
-    Debug::print( "kueued-dbupdate", "Unity update finished" );
+    Debug::log( "kueued-dbupdate", "Unity update finished" );
     
     mSiebelDone = true;
     finished();
@@ -129,7 +129,7 @@ void KueuedDbUpdate::finished()
 {
     if ( ( mBomgarDone ) && ( mSiebelDone ) )
     {
-        Debug::print( "kueued-dbupdate", "Exiting" );
+        Debug::log( "kueued-dbupdate", "Exiting" );
         exit( 0 );
     }
 }

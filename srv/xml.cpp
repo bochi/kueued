@@ -27,121 +27,240 @@
 #include "settings.h"
 #include "debug.h"
 
-QString XML::sr( SiebelItem* si )
-{
+QString XML::qmon( QList<SiebelItem> list )
+{   
     QDateTime now = QDateTime::currentDateTime();
-    QDateTime odate = QDateTime::fromString( si->created, "yyyy-MM-dd hh:mm:ss" );
-    QDateTime adate = QDateTime::fromString( si->last_update, "yyyy-MM-dd hh:mm:ss" );
-    QDateTime sladate = QDateTime::fromString( si->sla, "yyyy-MM-dd hh:mm:ss" );
-    QDateTime qdate = QDateTime::fromString( si->inqueue, "yyyy-MM-dd hh:mm:ss" );
+    QString xml;
+    
+    xml += "<qmon>\n";
+    
+    for ( int i = 0; i < list.size(); ++i ) 
+    {
+        SiebelItem si = list.at( i );
+            
+        QDateTime odate = QDateTime::fromString( si.created, "yyyy-MM-dd hh:mm:ss" );
+        QDateTime adate = QDateTime::fromString( si.last_update, "yyyy-MM-dd hh:mm:ss" );
+        QDateTime sladate = QDateTime::fromString( si.sla, "yyyy-MM-dd hh:mm:ss" );
+        QDateTime qdate = QDateTime::fromString( si.inqueue, "yyyy-MM-dd hh:mm:ss" );
+
+        qint64 age = ( odate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 ) );
+        qint64 lu = ( adate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 ));
+        qint64 qt = ( qdate.secsTo( now ) );
+        qint64 sla = ( now.secsTo( sladate ) );
+
+        xml += "  <sr>\n";
+        xml += "    <id><![CDATA[" + si.id + "]]></id>\n";
+        xml += "    <queue><![CDATA[" + si.queue + "]]></queue>\n";
+    
+        if ( si.isChat )
+        {
+            xml += "    <bomgarQ>" + si.bomgarQ + "</bomgarQ>\n";
+        }
+
+        if ( si.isCr )
+        {
+            xml += "    <srtype>cr</srtype>\n";
+            xml += "    <creator>" + si.creator + "</creator>\n";
+            
+        }
+        else
+        {
+            xml += "    <srtype>sr</srtype>\n";
+            xml += "    <customer>\n";
+            xml += "      <account><![CDATA[" + si.customer + "]]></account>\n";
+            
+            if ( ( !si.contact_firstname.isEmpty() ) && ( si.contact_firstname != "1" ) && ( si.contact_firstname != "0" ) )
+            {
+                xml += "      <firstname><![CDATA[" + si.contact_firstname + "]]></firstname>\n";
+            }
+            
+            if ( ( !si.contact_lastname.isEmpty() ) && ( si.contact_lastname != "1" )&& ( si.contact_lastname != "0" )   )
+            {
+                xml += "      <lastname><![CDATA[" + si.contact_lastname + "]]></lastname>\n";
+            }
+            
+            if ( ( !si.contact_title.isEmpty() ) && ( si.contact_title != "1" ) && ( si.contact_title != "0" ) )
+            {
+                xml += "      <title><![CDATA[" + si.contact_title + "]]></title>\n";
+            }
+            
+            if ( ( !si.contact_email.isEmpty() ) && ( si.contact_email != "1" ) && ( si.contact_email != "0" ) )
+            {
+                xml += "      <email><![CDATA[" + si.contact_email + "]]></email>\n";  
+            }
+            
+            if ( ( !si.contact_phone.isEmpty() ) && ( si.contact_phone != "1" ) && ( si.contact_phone != "0" ) )
+            {
+                xml += "      <phone><![CDATA[" + si.contact_phone + "]]></phone>\n";
+            }
+            
+            if ( ( !si.onsite_phone.isEmpty() ) && ( si.onsite_phone != "1" ) && ( si.onsite_phone != "0" ) )
+            {
+                xml += "      <onsitephone><![CDATA[" + si.onsite_phone + "]]></onsitephone>\n";
+            }
+            
+            if ( ( !si.contact_lang.isEmpty() ) && ( si.contact_lang != "1" ) && ( si.contact_lang != "0" ) )
+            {
+                xml += "      <lang><![CDATA[" + si.contact_lang + "]]></lang>\n";
+            }
+            
+            xml += "    </customer>\n";
+        }
+
+        xml += "    <severity><![CDATA[" + si.severity + "]]></severity>\n";
+        xml += "    <status><![CDATA[" + si.status + "]]></status>\n";
+        xml += "    <bdesc><![CDATA[" + si.brief_desc + "]]></bdesc>\n";
+        
+        if ( ( !si.detailed_desc.isEmpty() ) && ( si.detailed_desc != "1" ) && ( si.detailed_desc != "0" ) )
+        {
+            xml += "    <ddesc><![CDATA[" + si.detailed_desc + "]]></ddesc>\n";        
+        }
+        
+        xml += "    <geo><![CDATA[" + si.geo + "]]></geo>\n";
+        xml += "    <hours><![CDATA[" + si.hours + "]]></hours>\n";
+        xml += "    <source><![CDATA[" + si.source + "]]></source>\n";
+        xml += "    <support_program><![CDATA[" + si.support_program + "]]></support_program>\n";
+        xml += "    <support_program_long><![CDATA[" + si.support_program_long + "]]></support_program_long>\n";
+        xml += "    <routing_product><![CDATA[" + si.routing_product + "]]></routing_product>\n";
+        xml += "    <support_group_routing><![CDATA[" + si.support_group_routing + "]]></support_group_routing>\n";
+        xml += "    <int_type><![CDATA[" + si.int_type + "]]></int_type>\n";
+        xml += "    <subtype><![CDATA[" + si.subtype + "]]></subtype>\n";
+        xml += "    <service_level><![CDATA[" + si.service_level + "]]></service_level>\n";
+        xml += "    <category><![CDATA[" + si.category + "]]></category>\n";
+        
+        if ( !si.respond_via.isEmpty() )
+        {
+            xml += "    <respond_via><![CDATA[" + si.respond_via + "]]></respond_via>\n";      
+        }
+        
+        xml += "    <age>" + QString::number( age ) + "</age>\n";
+        xml += "    <lastupdate>" + QString::number( lu ) + "</lastupdate>\n";
+        xml += "    <timeinQ>" + QString::number( qt ) + "</timeinQ>\n";
+
+        if ( sla > 0 )      
+        {
+            xml += "    <sla>" + QString::number( sla ) + "</sla>\n";
+        }
+        
+        if ( si.high_value )
+        {
+            xml += "    <highvalue>yes</highvalue>\n";
+        }
+        
+        if ( si.critsit )
+        {
+            xml += "    <critsit>yes</critsit>\n";
+        }
+        
+        xml += "  </sr>\n";
+    }
+    
+    xml += "</qmon>\n";
+  
+    return xml;
+}
+
+QString XML::queue( QList<QueueItem> list )
+{
+    /*QDateTime now = QDateTime::currentDateTime();
+    QDateTime odate = QDateTime::fromString( qi.created, "yyyy-MM-dd hh:mm:ss" );
+    QDateTime adate = QDateTime::fromString( qi.last_update, "yyyy-MM-dd hh:mm:ss" );
+    */
+    
     
     QString xml;
     
-    qint64 age = ( odate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 ) );
-    qint64 lu = ( adate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 ));
-    qint64 qt = ( qdate.secsTo( now ) );
-    qint64 sla = ( now.secsTo( sladate ) );
+    //qint64 age = ( odate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 ) );
+    //qint64 lu = ( adate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 ));
 
-    xml += "  <sr>\n";
-    xml += "    <id><![CDATA[" + si->id + "]]></id>\n";
-    xml += "    <queue><![CDATA[" + si->queue + "]]></queue>\n";
-   
-    if ( si->isChat )
+    xml += "<queue>\n";
+        
+    for ( int i = 0; i < list.size(); ++i ) 
     {
-        xml += "    <bomgarQ>" + si->bomgarQ + "</bomgarQ>\n";
-    }
+        QueueItem qi = list.at( i );
+    
+        xml += "  <sr>\n";
+        xml += "    <id><![CDATA[" + qi.id + "]]></id>\n";
+        
+        if ( qi.isCr )
+        {
+            xml += "    <srtype>cr</srtype>\n";
+            xml += "    <creator>" + qi.creator + "</creator>\n";
+        }
+        else
+        {
+            xml += "    <srtype>sr</srtype>\n";
+            xml += "    <customer>\n";
+            xml += "      <account><![CDATA[" + qi.customer + "]]></account>\n";
+            
+            if ( ( !qi.contact_firstname.isEmpty() ) && ( qi.contact_firstname != "1" ) && ( qi.contact_firstname != "0" ) )
+            {
+                xml += "      <firstname><![CDATA[" + qi.contact_firstname + "]]></firstname>\n";
+            }
+            
+            if ( ( !qi.contact_lastname.isEmpty() ) && ( qi.contact_lastname != "1" )&& ( qi.contact_lastname != "0" )   )
+            {
+                xml += "      <lastname><![CDATA[" + qi.contact_lastname + "]]></lastname>\n";
+            }
+            
+            if ( ( !qi.contact_title.isEmpty() ) && ( qi.contact_title != "1" ) && ( qi.contact_title != "0" ) )
+            {
+                xml += "      <title><![CDATA[" + qi.contact_title + "]]></title>\n";
+            }
+            
+            if ( ( !qi.contact_email.isEmpty() ) && ( qi.contact_email != "1" ) && ( qi.contact_email != "0" ) )
+            {
+                xml += "      <email><![CDATA[" + qi.contact_email + "]]></email>\n";  
+            }
+            
+            if ( ( !qi.contact_phone.isEmpty() ) && ( qi.contact_phone != "1" ) && ( qi.contact_phone != "0" ) )
+            {
+                xml += "      <phone><![CDATA[" + qi.contact_phone + "]]></phone>\n";
+            }
+            
+            if ( ( !qi.onsite_phone.isEmpty() ) && ( qi.onsite_phone != "1" ) && ( qi.onsite_phone != "0" ) )
+            {
+                xml += "      <onsitephone><![CDATA[" + qi.onsite_phone + "]]></onsitephone>\n";
+            }
+            
+            if ( ( !qi.contact_lang.isEmpty() ) && ( qi.contact_lang != "1" ) && ( qi.contact_lang != "0" ) )
+            {
+                xml += "      <lang><![CDATA[" + qi.contact_lang + "]]></lang>\n";
+            }
+            
+            xml += "    </customer>\n";
+        }
 
-    if ( si->isCr )
-    {
-        xml += "    <srtype>cr</srtype>\n";
-        xml += "    <creator>" + si->creator + "</creator>\n";
+        xml += "    <severity><![CDATA[" + qi.severity + "]]></severity>\n";
+        xml += "    <status><![CDATA[" + qi.status + "]]></status>\n";
+        xml += "    <bdesc><![CDATA[" + qi.brief_desc + "]]></bdesc>\n";
         
-    }
-    else
-    {
-        xml += "    <srtype>sr</srtype>\n";
-        xml += "    <customer>\n";
-        xml += "      <account><![CDATA[" + si->customer + "]]></account>\n";
-        
-        if ( ( !si->contact_firstname.isEmpty() ) && ( si->contact_firstname != "1" ) && ( si->contact_firstname != "0" ) )
+        if ( ( !qi.detailed_desc.isEmpty() ) && ( qi.detailed_desc != "1" ) && ( qi.detailed_desc != "0" ) )
         {
-            xml += "      <firstname><![CDATA[" + si->contact_firstname + "]]></firstname>\n";
+            xml += "    <ddesc><![CDATA[" + qi.detailed_desc + "]]></ddesc>\n";        
         }
         
-        if ( ( !si->contact_lastname.isEmpty() ) && ( si->contact_lastname != "1" )&& ( si->contact_lastname != "0" )   )
+        xml += "    <geo><![CDATA[" + qi.geo + "]]></geo>\n";
+        xml += "    <hours><![CDATA[" + qi.hours + "]]></hours>\n";
+        xml += "    <contract><![CDATA[" + qi.support_program + "]]></contract>\n";
+        xml += "    <service_level><![CDATA[" + QString::number( qi.service_level ) + "]]></service_level>\n";
+        xml += "    <created>" + qi.created + "</created>\n";
+        xml += "    <lastupdate>" + qi.last_update + "</lastupdate>\n";
+        
+        if ( qi.high_value )
         {
-            xml += "      <lastname><![CDATA[" + si->contact_lastname + "]]></lastname>\n";
+            xml += "    <highvalue>yes</highvalue>\n";
         }
         
-        if ( ( !si->contact_title.isEmpty() ) && ( si->contact_title != "1" ) && ( si->contact_title != "0" ) )
+        if ( qi.critsit )
         {
-            xml += "      <title><![CDATA[" + si->contact_title + "]]></title>\n";
+            xml += "    <critsit>yes</critsit>\n";
         }
         
-        if ( ( !si->contact_email.isEmpty() ) && ( si->contact_email != "1" ) && ( si->contact_email != "0" ) )
-        {
-            xml += "      <email><![CDATA[" + si->contact_email + "]]></email>\n";  
-        }
-        
-        if ( ( !si->contact_phone.isEmpty() ) && ( si->contact_phone != "1" ) && ( si->contact_phone != "0" ) )
-        {
-            xml += "      <phone><![CDATA[" + si->contact_phone + "]]></phone>\n";
-        }
-        
-        if ( ( !si->onsite_phone.isEmpty() ) && ( si->onsite_phone != "1" ) && ( si->onsite_phone != "0" ) )
-        {
-            xml += "      <onsitephone><![CDATA[" + si->onsite_phone + "]]></onsitephone>\n";
-        }
-        
-        if ( ( !si->contact_lang.isEmpty() ) && ( si->contact_lang != "1" ) && ( si->contact_lang != "0" ) )
-        {
-            xml += "      <lang><![CDATA[" + si->contact_lang + "]]></lang>\n";
-        }
-        
-        xml += "    </customer>\n";
-    }
-
-    xml += "    <severity><![CDATA[" + si->severity + "]]></severity>\n";
-    xml += "    <status><![CDATA[" + si->status + "]]></status>\n";
-    xml += "    <bdesc><![CDATA[" + si->brief_desc + "]]></bdesc>\n";
-    
-    if ( ( !si->detailed_desc.isEmpty() ) && ( si->detailed_desc != "1" ) && ( si->detailed_desc != "0" ) )
-    {
-        xml += "    <ddesc><![CDATA[" + si->detailed_desc + "]]></ddesc>\n";        
+        xml += "  </sr>\n";
     }
     
-    xml += "    <geo><![CDATA[" + si->geo + "]]></geo>\n";
-    xml += "    <hours><![CDATA[" + si->hours + "]]></hours>\n";
-    xml += "    <source><![CDATA[" + si->source + "]]></source>\n";
-    xml += "    <support_program><![CDATA[" + si->support_program + "]]></support_program>\n";
-    xml += "    <support_program_long><![CDATA[" + si->support_program_long + "]]></support_program_long>\n";
-    xml += "    <routing_product><![CDATA[" + si->routing_product + "]]></routing_product>\n";
-    xml += "    <support_group_routing><![CDATA[" + si->support_group_routing + "]]></support_group_routing>\n";
-    xml += "    <int_type><![CDATA[" + si->int_type + "]]></int_type>\n";
-    xml += "    <subtype><![CDATA[" + si->subtype + "]]></subtype>\n";
-    xml += "    <service_level><![CDATA[" + si->service_level + "]]></service_level>\n";
-    xml += "    <category><![CDATA[" + si->category + "]]></category>\n";
-    xml += "    <respond_via><![CDATA[" + si->respond_via + "]]></respond_via>\n";
-    xml += "    <age>" + QString::number( age ) + "</age>\n";
-    xml += "    <lastupdate>" + QString::number( lu ) + "</lastupdate>\n";
-    xml += "    <timeinQ>" + QString::number( qt ) + "</timeinQ>\n";
-
-    if ( sla > 0 )      
-    {
-         xml += "    <sla>" + QString::number( sla ) + "</sla>\n";
-    }
+    xml += "</queue>\n";
     
-    if ( si->high_value )
-    {
-        xml += "    <highvalue>yes</highvalue>\n";
-    }
-    
-    if ( si->critsit )
-    {
-        xml += "    <critsit>yes</critsit>\n";
-    }
-    
-    xml += "  </sr>\n";
-  
     return xml;
 }

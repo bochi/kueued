@@ -27,11 +27,12 @@
 #include "database.h"
 #include "settings.h"
 #include "debug.h"
+#include "queuethread.h"
 
 Server::Server( quint16 port, QObject* parent )
     : QTcpServer( parent ), disabled( false )
 {
-    Debug::print( "server", "Constructing" );
+    Debug::log( "server", "Constructing" );
     listen( QHostAddress::Any, port );
 }
 
@@ -55,13 +56,13 @@ void Server::incomingConnection( int socket )
 
 void Server::pause()
 {
-    Debug::print( "server", "Paused" );
+    Debug::log( "server", "Paused" );
     disabled = true;
 }
 
 void Server::resume()
 {
-    Debug::print( "server", "Resumed" );
+    Debug::log( "server", "Resumed" );
     disabled = false;
 }
 
@@ -73,6 +74,10 @@ void Server::readClient()
     }
     
     QTcpSocket* socket = ( QTcpSocket* )sender();
+    
+    connect( socket, SIGNAL( disconnected() ),
+             this, SLOT( deleteSocket() ) );
+    
     QString dm;
     dm += socket->peerAddress().toString();
     
@@ -92,11 +97,11 @@ void Server::readClient()
         
         if ( dm.isEmpty() )
         {
-            Debug::print( "server", " - " + r.trimmed() );
+            Debug::log( "server", " - " + r.trimmed() );
         }
         else
         {
-            Debug::print( "server", dm + r.trimmed() );
+            Debug::log( "server", dm + r.trimmed() );
         }
 
         QStringList tokens = r.split( QRegExp( "[ \r\n][ \r\n]*" ) );
@@ -114,48 +119,24 @@ void Server::readClient()
         {
             if ( cmd.startsWith( "/qmon" ) )
             {
-                QList< SiebelItem* > l;
+                QString xml;
                 QString q = cmd.remove( "/qmon" );
                 
                 if ( !q.remove( "/" ).isEmpty() )
                 {
-                    l = Database::getSrsForQueue( q.remove( "/" ) );
+                    xml = XML::qmon( Database::getSrsForQueue( q.remove( "/" ) ) );
                 }
                 else
                 {
-                    l = Database::getSrsForQueue();
+                    xml = XML::qmon( Database::getSrsForQueue() );
                 }
-                    os << "Content-Type: text/xml; charset=\"utf-8\"\r\n";
-                    os << "\r\n";
-                    os << "<?xml version='1.0'?>\n\n";
-                    os << "<qmon>\n";
+                os << "Content-Type: text/xml; charset=\"utf-8\"\r\n";
+                os << "\r\n";
+                os << "<?xml version='1.0'?>\n\n";
+                os << xml;
                 
-                for ( int i = 0; i < l.size(); ++i ) 
-                {
-                    os << XML::sr( l.at( i ) );
-                    delete l.at( i );
-                }
-                
-                os << "</qmon>";
+                closeSocket( socket );
             }
-            /*else if ( cmd.startsWith( "/testqmon" ) )
-            {
-                QList< SiebelItem* > l = Database::getQmonSrs();
-                QString q = cmd.remove( "/testqmon/" );
-                
-                    os << "Content-Type: text/xml; charset=\"utf-8\"\r\n";
-                    os << "\r\n";
-                    os << "<?xml version='1.0'?>\n\n";
-                    os << "<qmon>\n";
-                
-                for ( int i = 0; i < l.size(); ++i ) 
-                {
-                    os << XML::sr( l.at( i ) );
-                    delete l.at( i );
-                }
-                
-                os << "</qmon>";
-            }*/
             else if ( cmd.startsWith( "/srnrs" ) )
             {  
                 QString q = cmd.remove( "/srnrs" );
@@ -180,49 +161,31 @@ void Server::readClient()
                         os << l.at( i ) + "\n";
                     }
                 }
+                
+                closeSocket( socket );
             }
-            /*else if ( cmd.startsWith( "/bug" ) )
+            else if ( cmd.startsWith( "/phone" ) )
             {
-                QString q = cmd.remove( "/bug/" );
+                QString q = cmd.remove( "/phone/" );
                 
                 os << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
                 os << "\r\n";
                                 
-                os << Database::getBugForSr( q );
+                os << Database::getPhoneNumber( q );
+                
+                closeSocket( socket );
             }
-            else if ( cmd.startsWith( "/critsit" ) )
-            {
-                QString q = cmd.remove( "/critsit/" );
-                
-                os << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
-                os << "\r\n";
-                                
-                os << Database::critSitFlagForSr( q );
-            }
-            else if ( cmd.startsWith( "/highvaluecritsit" ) )
-            {
-                QString q = cmd.remove( "/highvaluecritsit/" );
-                
-                os << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
-                os << "\r\n";
-                                
-                os << Database::highValueCritSitFlagForSr( q );
-            }
-            else if ( ( cmd.startsWith( "/highvalue" ) ) && !( cmd.startsWith( "/highvaluecritsit" ) ) )
-            {
-                QString q = cmd.remove( "/highvalue/" );
-                
-                os << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
-                os << "\r\n";
-                
-                os << Database::highValueFlagForSr( q );
-            }*/
             else if ( cmd.startsWith( "/latestkueue" ) )
             {
                 os << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
                 os << "\r\n";
                                 
                 os << Settings::latestVersion();
+                
+                socket->close();
+                socket->waitForDisconnected();
+                
+                closeSocket( socket );
             }
             else if ( cmd.startsWith( "/chat" ) )
             {
@@ -242,89 +205,76 @@ void Server::readClient()
                 }
                 
                 os << "</chat>";
-            }
-            /*else if ( cmd.startsWith( "/pseudoQ" ) )
-            {
-                QList< PseudoQueueItem* > l = Database::getPseudoQueues();
-              
-                os << "Content-Type: text/xml; charset=\"utf-8\"\r\n";
-                os << "\r\n";
-                os << "<?xml version='1.0'?>\n\n";
-                os << "<pseudoqueues>\n";
                 
-                for ( int i = 0; i < l.size(); ++i )
-                {
-                    os << "  <queue>\n";
-                    os << "    <DisplayName>" + l.at( i )->display + "</DisplayName>\n";
-                    os << "    <QueueName>" + l.at( i )->name + "</QueueName>\n";
-                    os << "  </queue>\n";
-                    
-                    delete l.at( i );
-                }
-                
-                os << "</pseudoqueues>";
+                closeSocket( socket );
             }
             else if ( cmd.startsWith( "/userqueue" ) )
             {
-                QString q = cmd.remove( "/userqueue/" );
-                QStringList l = Database::getSrsForUser( q );
-              
-                os << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
-                os << "\r\n";
-                os << "TOTAL:" + QString::number( l.size() ) + "\n";
+                QString q = cmd.remove( "/userqueue/" ).toUpper();
                 
-                for ( int i = 0; i < l.size(); ++i )
-                {
-                    os << l.at( i ) + "\n";
-                } 
+                QueueThread* t = new QueueThread( socket->socketDescriptor(), q, this );
+                
+                connect( t, SIGNAL( finished() ),
+                         this, SLOT( deleteThread() ) );
+                
+                t->start();
             }
-	    else if ( cmd.startsWith( "/test" ) )
-	    {
-		QStringList l = Database::getOracleSrList();
-		
-                for ( int i = 0; i < l.size(); ++i )
-		{
-			os << l.at(i) << "\n";
-		}
-	    }*/
             else
             {
                 os << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
                 os << "\r\n";
-                
-                os << "Welcome to kueue.hwlab.suse.de!\n\n";
+                os << "Welcome to kueued\n\n";
                 os << "Usage:\n\n";
                 os << "  * http://kueue.hwlab.suse.de:8080/qmon\n    Get a list of all SRs in all pseudo queues\n\n";
                 os << "  * http://kueue.hwlab.suse.de:8080/qmon/$QUEUE-NAME\n    Get a list of all SRs in $QUEUE-NAME\n\n";
-                os << "    The output will contain the following xml elements:\n\n";
-                os << "      id              SR Number\n";
-                os << "      queue           Current Queue\n";
-                os << "      severity        Severity\n";
-                os << "      geo             GEO\n";
-                os << "      type            Type (SR/CR)\n";
-                os << "      bomgarQ         Current Bomgar Queue (only available if the customer is in chat)\n";
-                os << "      age             SR age in seconds\n";
-                os << "      timeinqueue     Time in queue in seconds\n";
-                os << "      sla             SLA left in seconds (only available if there is SLA left)\n";
-                os << "      lastupdate      Last activity in SR (only available if SR is not new)\n";
-                os << "      description     Brief description\n";
-                os << "      status          Status\n";
-                os << "      contract        Customer's contract\n";
-                os << "      contact         Preferred contact method\n\n";
-                os << "  * http://kueue.hwlab.suse.de:8080/critsit/$SRNR\n    Is there a critsit with this customer? (Y/N)\n\n";
-                os << "  * http://kueue.hwlab.suse.de:8080/highvalue/$SRNR\n    Is $SRNR considered high value? (Y/N)\n\n";
-                os << "  * http://kueue.hwlab.suse.de:8080/highvaluecritsit/$SRNR\n    The last two queries combined (sample output: YN)\n\n";
+                os << "    This is the qmon xml output.\n";
+                os << "\n";
+                os << "    Please note that not all fields are available for each SR, if they are not, they aren't shown at all.\n";
+                os << "\n";
+                os << "    <sr>\n";
+                os << "      <id>SR number</id>\n";
+                os << "      <queue>Queue</queue>\n";
+                os << "      <bomgarQ>Bomgar Queue (if in chat)</bomgarQ>\n";
+                os << "      <srtype>sr/cr</srtype>\n";
+                os << "      <creator>Only for CRs: who created it?</creator>\n";
+                os << "      <customer>\n";
+                os << "        <account>Company name</account>\n";
+                os << "        <firstname>Customer's first name</firstname>\n";
+                os << "        <lastname>Customer's last name</lastname>\n";
+                os << "        <title>Customer's title (ie. job)</title>\n";
+                os << "        <email>Customer's email</email>\n";
+                os << "        <phone>Customer's phone number</phone>\n";
+                os << "        <onsitephone>Customer's onsite phone number</onsitephone>\n";
+                os << "        <lang>Customer's preferred language</lang>\n";
+                os << "      </customer>\n";
+                os << "      <severity>SR severity</severity>\n";
+                os << "      <status>Current status</status>\n";
+                os << "      <bdesc>Brief description</bdesc>\n";
+                os << "      <ddesc>Detailed description</ddesc>\n";
+                os << "      <geo>Geo</geo>\n";
+                os << "      <hours>Support hours</hours>\n";
+                os << "      <source>How was the SR opened (web, phone..)</source>\n";
+                os << "      <support_program>Customer's contract</support_program>\n";
+                os << "      <support_program_long>A slightly more detailed version of the above</support_program_long>\n";
+                os << "      <routing_product>Routing product</routing_product>\n";
+                os << "      <support_group_routing>What group it is routed to internally</support_group_routing>\n";
+                os << "      <int_type>Internal type</int_type>\n";
+                os << "      <subtype>Subtype</subtype>\n";
+                os << "      <servce_level>Some number indicating something</service_level>\n";
+                os << "      <category>SR category (Adv/Knowledge)</category>\n";
+                os << "      <respond_via>How the customer would like to be contacted</respond_via>\n";
+                os << "      <age>SR age in seconds</age>\n";
+                os << "      <lastupdate>Time to last update in seconds</lastupdate>\n";
+                os << "      <timeinQ>Time in the current queue in seconds</timeinQ>\n";
+                os << "      <sla>SLA left in seconds</sla>\n";
+                os << "      <highvalue>Is the customer considered high value?</highvalue>\n";
+                os << "      <critsit>Is there a critsit going on with the customer?</critsit>\n";
+                os << "    </sr>   \n\n";
                 os << "  * http://kueue.hwlab.suse.de:8080/bug/$SRNR\n    Get the bugreport for $SRNR (if any)\n\n";
                 os << "Stay tuned for more features!";
+                
+                closeSocket( socket );
             }
-        }
-
-        socket->close();
-        socket->waitForDisconnected();
-        
-        if ( socket->state() == QTcpSocket::UnconnectedState ) 
-        {
-            delete socket;
         }
     }
 }
@@ -334,5 +284,29 @@ void Server::discardClient()
     QTcpSocket* socket = ( QTcpSocket* )sender();
     socket->deleteLater();
 }
+
+void Server::closeSocket( QTcpSocket* socket )
+{
+    socket->close();
+    socket->waitForDisconnected();
+}
+
+void Server::deleteSocket()
+{
+    QTcpSocket* socket = ( QTcpSocket* )sender();
+qDebug() << "deleting socket";
+    if ( socket->state() == QTcpSocket::UnconnectedState ) 
+    {
+        socket->deleteLater();
+    }
+}
+
+
+void Server::deleteThread()
+{
+    QThread* t = qobject_cast<QThread*>( sender() );
+    delete t;
+}
+
 
 #include "server.moc"

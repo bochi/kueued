@@ -35,8 +35,8 @@ class SiebelItem;
 class XML
 {
     public:
-        static QString sr( SiebelItem* );
-        //static QString srNew( SiebelItem* );
+        static QString qmon( QList<SiebelItem> );
+        static QString queue( QList<QueueItem> );
     
 };
 

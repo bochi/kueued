@@ -23,22 +23,29 @@
 
 */
 
-#ifndef DEBUG_H
-#define DEBUG_H
+#ifndef QUEUETHREAD_H
+#define QUEUETHREAD_H
 
-#include <iostream>
+#include <QThread>
+#include <QTcpSocket>
 
-namespace Debug
+class QueueThread : public QThread
 {
-    static void print( const QString& c, const QString& msg )
-    {   
-        char hostname[ 1024 ];
-        gethostname( hostname, sizeof( hostname ) );
-        QString host = hostname;
+    Q_OBJECT
 
-        QString t = "[" + QDateTime::currentDateTime().toString( "MM/dd hh:mm:ss" ) + "] [" + host.toUpper() + "] [" + c.toUpper() + "] ";
-        std::cout << t.toStdString() << msg.toStdString() << std::endl;
-    }
-}
+    public:
+        QueueThread( int sd, const QString& eng, QObject *parent );
+        
+        void run();
+
+    signals:
+        void done();
+
+    private:
+        int mSocket;
+        QString mDbName;
+        QString mEngineer;
+};
+
 
 #endif

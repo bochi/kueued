@@ -31,6 +31,7 @@
 class SiebelItem;
 class BomgarItem;
 class PseudoQueueItem;
+class QueueItem;
 
 class Database : public QObject
 {
@@ -49,13 +50,17 @@ class Database : public QObject
         
         static void updateBomgarItemInDB( BomgarItem* );
         static void deleteBomgarItemFromDB( const QString& );
-        static QList< SiebelItem* > getSrsForQueue( const QString& = "NONE" );
+        static QList< SiebelItem > getSrsForQueue( const QString& = "NONE" );
         static QStringList getQmonBomgarList();
         static bool bomgarExistsInDB( const QString& );
         static QString getBomgarQueue( const QString& );
         
         static QStringList getSrNumsForQueue( const QString&, const QString& );
         static QStringList getCurrentBomgars();
+        static QList< QueueItem > getUserQueue( const QString&, QSqlDatabase = 0L );
+        static QString getCreator( const QString& );
+        
+        static QString getPhoneNumber( const QString& );
         
         static QString convertTime( const QString& );
 };
@@ -99,6 +104,35 @@ class SiebelItem
         QString bomgarQ;
         bool isCr;
         bool isChat;
+        bool critsit;
+        bool high_value;
+};
+
+class QueueItem
+{
+    public:
+        QString id;
+        QString status;
+        QString geo;
+        QString hours;
+        QString severity;
+        QString created;
+        QString last_update;
+        QString support_program;
+        QString subtype;
+        int service_level;
+        QString brief_desc;
+        QString detailed_desc;
+        QString customer;
+        QString contact_phone;
+        QString contact_firstname;
+        QString contact_lastname;
+        QString contact_email;
+        QString contact_title;
+        QString contact_lang;
+        QString onsite_phone;
+        QString creator;
+        bool isCr;
         bool critsit;
         bool high_value;
 };

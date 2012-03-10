@@ -1,0 +1,52 @@
+CREATE TABLE `QMON_CHAT` (
+  `ID` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
+  `SR` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `NAME` text COLLATE utf8_unicode_ci,
+  `DATE` text COLLATE utf8_unicode_ci,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `ID` (`ID`)
+) ENGINE=ndbcluster DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_c
+
+CREATE TABLE `QMON_SIEBEL` (
+  `ID` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `QUEUE` text COLLATE utf8_unicode_ci,
+  `GEO` text COLLATE utf8_unicode_ci,
+  `HOURS` text COLLATE utf8_unicode_ci,
+  `STATUS` text COLLATE utf8_unicode_ci,
+  `SEVERITY` text COLLATE utf8_unicode_ci,
+  `SOURCE` text COLLATE utf8_unicode_ci,
+  `RESPOND_VIA` text COLLATE utf8_unicode_ci,
+  `CREATED` text COLLATE utf8_unicode_ci,
+  `LAST_UPDATE` text COLLATE utf8_unicode_ci,
+  `INQUEUE` text COLLATE utf8_unicode_ci,
+  `SLA` text COLLATE utf8_unicode_ci,
+  `SUPPORT_PROGRAM` text COLLATE utf8_unicode_ci,
+  `SUPPORT_PROGRAM_LONG` text COLLATE utf8_unicode_ci,
+  `ROUTING_PRODUCT` text COLLATE utf8_unicode_ci,
+  `SUPPORT_GROUP_ROUTING` text COLLATE utf8_unicode_ci,
+  `INT_TYPE` text COLLATE utf8_unicode_ci,
+  `SUBTYPE` text COLLATE utf8_unicode_ci,
+  `SERVICE_LEVEL` text COLLATE utf8_unicode_ci,
+  `BRIEF_DESC` text COLLATE utf8_unicode_ci,
+  `CRITSIT` tinyint(4) DEFAULT NULL,
+  `HIGH_VALUE` tinyint(4) DEFAULT NULL,
+  `DETAILED_DESC` text COLLATE utf8_unicode_ci,
+  `CATEGORY` text COLLATE utf8_unicode_ci,
+  `CREATOR` text COLLATE utf8_unicode_ci,
+  `ROW_ID` text COLLATE utf8_unicode_ci,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `ID` (`ID`)
+) ENGINE=ndbcluster DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
+
+CREATE TABLE `CUSTOMER` (
+  `ID` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `CUSTOMER` text COLLATE utf8_unicode_ci,
+  `CONTACT_FIRSTNAME` text COLLATE utf8_unicode_ci,
+  `CONTACT_LASTNAME` text COLLATE utf8_unicode_ci,
+  `CONTACT_EMAIL` text COLLATE utf8_unicode_ci,
+  `CONTACT_TITLE` text COLLATE utf8_unicode_ci,
+  `CONTACT_LANG` text COLLATE utf8_unicode_ci,
+  `CONTACT_PHONE` text COLLATE utf8_unicode_ci,
+  `ONSITE_PHONE` text COLLATE utf8_unicode_ci,
+  PRIMARY KEY (`ID`)
+) ENGINE=ndbcluster DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci

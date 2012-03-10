@@ -40,23 +40,21 @@ Database::Database()
     
     if ( !mysqlDB.open() )
     {
-        Debug::print( "database", "Failed to open the database " + mysqlDB.lastError().text() );
-    }
-
-    /*QSqlQuery query( mysqlDB );
-       
-    if ( !query.exec( "CREATE TABLE IF NOT EXISTS qmon_siebel( ID VARCHAR(20) PRIMARY KEY UNIQUE, QUEUE TEXT, "
-                      "HOURS TEXT, GEO TEXT, ODATE TEXT, ADATE TEXT, QDATE TEXT, STATUS TEXT, SEVERITY TEXT, "
-                      "CONTRACT TEXT, SLA TEXT, CRSR TEXT, CRSROWN TEXT BDESC TEXT, CUSTOMER TEXT, CONTACTVIA TEXT )" ) )
-    {
-        Debug::print( "database", "Error: " + query.lastError().text() );
+        Debug::log( "database", "Failed to open the database " + mysqlDB.lastError().text() );
     }
     
-    if ( !query.exec( "CREATE TABLE IF NOT EXISTS qmon_chat( ID VARCHAR(40) PRIMARY KEY UNIQUE, SR VARCHAR(15), "
-                      "NAME TEXT, DATE TEXT )" ) ) 
+    QSqlDatabase siebelDB = QSqlDatabase::addDatabase( "QOCI", "siebelDB" );
+
+    siebelDB.setDatabaseName( Settings::siebelDatabase() );
+    siebelDB.setHostName( Settings::siebelHost() );
+    siebelDB.setPort( 1521 );
+    siebelDB.setUserName( Settings::siebelUser() );
+    siebelDB.setPassword( Settings::siebelPassword() );
+
+    if ( !siebelDB.open() )
     {
-        Debug::print( "database", "Error: " + query.lastError().text() );
-    }*/
+        Debug::log( "database", "Failed to open the Siebel DB " + siebelDB.lastError().text() );
+    }
 }
 
 Database::~Database()
@@ -69,7 +67,7 @@ QStringList Database::getQmonSiebelList()
     QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
     QStringList l;
     
-    query.prepare( "SELECT ID FROM qmon_siebel" );
+    query.prepare( "SELECT ID FROM QMON_SIEBEL" );
     
     query.exec();
     
@@ -85,7 +83,7 @@ bool Database::siebelExistsInDB( const QString& id )
 {
     QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
     
-    query.prepare( "SELECT ID FROM qmon_siebel WHERE ( ID = :id )" );
+    query.prepare( "SELECT ID FROM QMON_SIEBEL WHERE ( ID = :id )" );
     query.bindValue( ":id", id );
     
     query.exec();
@@ -104,7 +102,7 @@ bool Database::isChat( const QString& id )
 {
     QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
     
-    query.prepare( "SELECT ID FROM qmon_chat WHERE ( SR = :id )" );
+    query.prepare( "SELECT ID FROM QMON_CHAT WHERE ( SR = :id )" );
     query.bindValue( ":id", id );
     
     query.exec();
@@ -119,24 +117,24 @@ bool Database::isChat( const QString& id )
     }
 }
 
-QList< SiebelItem* > Database::getSrsForQueue( const QString& queue )
+QList< SiebelItem > Database::getSrsForQueue( const QString& queue )
 {
     QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
-    QList< SiebelItem* > list;
+    QList< SiebelItem > list;
     
     if (  queue == "NONE" )
     {    
         query.prepare( "SELECT ID, QUEUE, GEO, HOURS, STATUS, SEVERITY, SOURCE, RESPOND_VIA, CREATED, LAST_UPDATE, "
                        "INQUEUE, SLA, SUPPORT_PROGRAM, SUPPORT_PROGRAM_LONG, ROUTING_PRODUCT, SUPPORT_GROUP_ROUTING, "
                        "INT_TYPE, SUBTYPE, SERVICE_LEVEL, BRIEF_DESC, CRITSIT, HIGH_VALUE, DETAILED_DESC, CATEGORY, "
-                       "CREATOR, ROW_ID from qmon_siebel" );
+                       "CREATOR, ROW_ID from QMON_SIEBEL" );
     }
     else
     {
         query.prepare( "SELECT ID, QUEUE, GEO, HOURS, STATUS, SEVERITY, SOURCE, RESPOND_VIA, CREATED, LAST_UPDATE, "
                        "INQUEUE, SLA, SUPPORT_PROGRAM, SUPPORT_PROGRAM_LONG, ROUTING_PRODUCT, SUPPORT_GROUP_ROUTING, "
                        "INT_TYPE, SUBTYPE, SERVICE_LEVEL, BRIEF_DESC, CRITSIT, HIGH_VALUE, DETAILED_DESC, CATEGORY, "
-                       "CREATOR, ROW_ID from qmon_siebel WHERE ( QUEUE = :queue )" );
+                       "CREATOR, ROW_ID from QMON_SIEBEL WHERE ( QUEUE = :queue )" );
         
         query.bindValue( ":queue", queue );
     }
@@ -145,75 +143,76 @@ QList< SiebelItem* > Database::getSrsForQueue( const QString& queue )
     
     while ( query.next() ) 
     {
-        SiebelItem* si = new SiebelItem;
+        SiebelItem si;
         
-        si->id = query.value( 0 ).toString();
-        si->queue = query.value( 1 ).toString();
-        si->geo = query.value( 2 ).toString();
-        si->hours = query.value( 3 ).toString();
-        si->status = query.value( 4 ).toString();
-        si->severity = query.value( 5 ).toString();
-        si->source = query.value( 6 ).toString();
-        si->respond_via = query.value( 7 ).toString();
-        si->created = query.value( 8 ).toString();
-        si->last_update = query.value( 9 ).toString();
-        si->inqueue = query.value( 10 ).toString();
-        si->sla = query.value( 11 ).toString();
-        si->support_program = query.value( 12 ).toString();
-        si->support_program_long = query.value( 13 ).toString();
-        si->routing_product = query.value( 14 ).toString();
-        si->support_group_routing = query.value( 15 ).toString();
-        si->int_type = query.value( 16 ).toString();
-        si->subtype = query.value( 17 ).toString();
-        si->service_level = query.value( 18 ).toString();
-        si->brief_desc = query.value( 19 ).toString();
-        si->critsit = query.value( 20 ).toBool();
-        si->high_value = query.value( 21 ).toBool();
-        si->detailed_desc = query.value( 22 ).toString();
-        si->category = query.value( 23 ).toString();
-        si->creator = query.value( 24 ).toString();
-        si->row_id = query.value( 25 ).toString();
+        si.id = query.value( 0 ).toString();
+        si.queue = query.value( 1 ).toString();
+        si.geo = query.value( 2 ).toString();
+        si.hours = query.value( 3 ).toString();
+        si.status = query.value( 4 ).toString();
+        si.severity = query.value( 5 ).toString();
+        si.source = query.value( 6 ).toString();
+        si.respond_via = query.value( 7 ).toString();
+        si.created = query.value( 8 ).toString();
+        si.last_update = query.value( 9 ).toString();
+        si.inqueue = query.value( 10 ).toString();
+        si.sla = query.value( 11 ).toString();
+        si.support_program = query.value( 12 ).toString();
+        si.support_program_long = query.value( 13 ).toString();
+        si.routing_product = query.value( 14 ).toString();
+        si.support_group_routing = query.value( 15 ).toString();
+        si.int_type = query.value( 16 ).toString();
+        si.subtype = query.value( 17 ).toString();
+        si.service_level = query.value( 18 ).toString();
+        si.brief_desc = query.value( 19 ).toString();
+        si.critsit = query.value( 20 ).toBool();
+        si.high_value = query.value( 21 ).toBool();
+        si.detailed_desc = query.value( 22 ).toString();
+        si.category = query.value( 23 ).toString();
+        si.creator = query.value( 24 ).toString();
+        si.row_id = query.value( 25 ).toString();
         
         if ( getBomgarQueue( query.value( 0 ).toString() ) == "NOCHAT" )
         {
-            si->isChat = false;
+            si.isChat = false;
         }
         else
         {
-            si->isChat = true;
-            si->bomgarQ = getBomgarQueue( query.value( 0 ).toString() );
+            si.isChat = true;
+            si.bomgarQ = getBomgarQueue( query.value( 0 ).toString() );
         }
         
-        if ( si->creator != "" )
+        if ( si.creator != "" )
         {
-            si->isCr = true;
+            si.isCr = true;
         }
         else
         {
-            si->isCr = false;
+            si.isCr = false;
         
             QSqlQuery cquery( QSqlDatabase::database( "mysqlDB" ) );
         
             cquery.prepare( "SELECT CUSTOMER, CONTACT_PHONE, CONTACT_FIRSTNAME, CONTACT_LASTNAME, CONTACT_EMAIL, "
-                            "       CONTACT_TITLE, CONTACT_LANG, ONSITE_PHONE FROM qmon_customer WHERE ID = :id" );
+                            "       CONTACT_TITLE, CONTACT_LANG, ONSITE_PHONE FROM CUSTOMER WHERE ID = :id" );
         
-            cquery.bindValue( ":id", si->id );
+            cquery.bindValue( ":id", si.id );
         
-        cquery.exec();
-        qDebug() << cquery.lastError();
+            cquery.exec();
         
-        if ( cquery.next() ) {
-        si->customer = cquery.value( 0 ).toString();
-        si->contact_phone = cquery.value( 1 ).toString();
-        si->contact_firstname = cquery.value( 2 ).toString();
-        si->contact_lastname = cquery.value( 3 ).toString();
-        si->contact_email = cquery.value( 4 ).toString();
-        si->contact_title = cquery.value( 5 ).toString();
-        si->contact_lang = cquery.value( 6 ).toString();
-        si->onsite_phone = cquery.value( 7 ).toString(); }
-        
-        list.append( si );
+            if ( cquery.next() ) 
+            {
+                si.customer = cquery.value( 0 ).toString();
+                si.contact_phone = cquery.value( 1 ).toString();
+                si.contact_firstname = cquery.value( 2 ).toString();
+                si.contact_lastname = cquery.value( 3 ).toString();
+                si.contact_email = cquery.value( 4 ).toString();
+                si.contact_title = cquery.value( 5 ).toString();
+                si.contact_lang = cquery.value( 6 ).toString();
+                si.onsite_phone = cquery.value( 7 ).toString(); 
+            }
         }
+       
+        list.append( si );        
     }
         
     return list;
@@ -224,7 +223,7 @@ QStringList Database::getCurrentBomgars()
     QStringList list;
     QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
 
-    query.prepare( "SELECT SR, NAME FROM qmon_chat" );
+    query.prepare( "SELECT SR, NAME FROM QMON_CHAT" );
     
     query.exec();
     
@@ -241,7 +240,7 @@ QString Database::getBomgarQueue( const QString& id )
 {
     QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
     
-    query.prepare( "SELECT NAME FROM qmon_chat WHERE ( SR = :id )" );
+    query.prepare( "SELECT NAME FROM QMON_CHAT WHERE ( SR = :id )" );
     query.bindValue( ":id", id );
     
     query.exec();
@@ -259,6 +258,12 @@ QString Database::getBomgarQueue( const QString& id )
 QString Database::convertTime( const QString& dt )
 {
     QDateTime d = QDateTime::fromString( dt, "M/d/yyyy h:mm:ss AP" );
+    
+    if ( !d.isValid() )
+    {
+        d = QDateTime::fromString( dt, "yyyy-MM-ddThh:mm:ss" );
+    }
+    
     return ( d.toString("yyyy-MM-dd hh:mm:ss") );
 }
 
@@ -267,7 +272,7 @@ QStringList Database::getSrNumsForQueue( const QString& queue, const QString& ge
     QSqlQuery query( QSqlDatabase::database( "mysqlDB" ) );
     QStringList list;
 
-    query.prepare( "SELECT ID FROM qmon_siebel WHERE ( QUEUE = :queue ) AND ( GEO = :geo )" );
+    query.prepare( "SELECT ID FROM QMON_SIEBEL WHERE ( QUEUE = :queue ) AND ( GEO = :geo )" );
     query.bindValue( ":queue", queue );
     query.bindValue( ":geo", geo );
 
@@ -281,100 +286,154 @@ QStringList Database::getSrNumsForQueue( const QString& queue, const QString& ge
     return list;
 }
 
-/*QList< PseudoQueueItem* > Database::getPseudoQueues()
+QString Database::getPhoneNumber( const QString& engineer )
 {
-    QSqlQuery query( QSqlDatabase::database( "qmonDB" ) );
-    QList< PseudoQueueItem* > list;
+    QString e = engineer;
+    QSqlQuery query( QSqlDatabase::database( "siebelDB" ) );
+    query.prepare( "select CTI_ACD_USERID from siebel.s_user where login = :engineer" );
+    query.bindValue( ":engineer", e.toUpper() );
+    query.exec();
     
-    query.prepare( "SELECT DisplayName, PseudoQueue from _NovQueuePseudoQueue" );
+    if ( query.next() )
+    {
+        return query.value(0).toString();
+    }
+    
+    return QString::Null();
+}
+
+QList< QueueItem > Database::getUserQueue( const QString& engineer, QSqlDatabase db )
+{
+    if ( !db.isValid() ) db = QSqlDatabase::database( "siebelDB" );
+    
+    QSqlQuery query( db );
+    QList< QueueItem > list;
+
+    query.prepare( "select "
+                    "  sr.sr_num as ID, "
+                    "  case "
+                    "    when sr.BU_ID = '0-R9NH' then 'Default Organization' "
+                    "    when sr.BU_ID = '1-AHT' then 'EMEA' "
+                    "    when sr.BU_ID = '1-AHV' then 'ASIAPAC' "
+                    "    when sr.BU_ID = '1-AHX' then 'USA' "
+                    "    when sr.BU_ID = '1-AHZ' then 'LATIN AMERICA' "
+                    "    when sr.BU_ID = '1-AI1' then 'CANADA' "
+                    "  else 'Undefined' end as GEO,  "
+                    "  cal.NAME as HOURS, "
+                    "  sr.SR_SUB_STAT_ID as STATUS, "
+                    "  sr.SR_SEV_CD as SEVERITY, "
+                    "  sr.CREATED, "
+                    "  sr.CREATED_BY, "
+                    "  sr.LAST_UPD as LAST_UPDATE,  "
+                    "  e.NAME as SUPPORT_PROGRAM,"
+                    "  sr.X_SR_SUB_TYPE as SUBTYPE, "
+                    "  e.ENTL_PRIORITY_NUM as SERVICE_LEVEL, "
+                    "  SR_TITLE as BRIEF_DESC, "
+                    "  flag.ATTRIB_11 as CRITSIT, "
+                    "  flag.ATTRIB_56 as HIGH_VALUE, "
+                    "  ext.NAME as CUSTOMER, "
+                    "  g.WORK_PH_NUM as CONTACT_PHONE, "
+                    "  g.FST_NAME as CONTACT_FIRSTNAME, "
+                    "  g.LAST_NAME as CONTACT_LASTNAME, "
+                    "  g.EMAIL_ADDR as CONTACT_EMAIL, "
+                    "  g.JOB_TITLE as CONTACT_TITLE, "
+                    "  g.PREF_LANG_ID as CONTACT_LANG,"
+                    "  sr.X_ONSITE_PH_NUM as ONSITE_PHONE, "
+                    "  sr.DESC_TEXT as DETAILED_DESC "
+                    "from "
+                    "  siebel.s_srv_req sr, "
+                    "  siebel.s_user u, "
+                    "  siebel.s_contact c, "
+                    "  siebel.s_contact g, "
+                    "  siebel.s_entlmnt e, "
+                    "  siebel.s_sched_cal cal, "
+                    "  siebel.s_org_ext ext, "
+                    "  siebel.s_prod_int prd, "
+                    "  siebel.s_org_ext_x flag "
+                    "where "
+                    "  sr.owner_emp_id = u.row_id "
+                    "  and u.row_id = c.row_id "
+                    "  and g.row_id = sr.CST_CON_ID  "
+                    "  and u.login = :engineer "
+                    "  and sr.sr_stat_id = 'Open' "
+                    "  and sr.agree_id = e.row_id "
+                    "  and e.svc_calendar_id = cal.row_id "
+                    "  and sr.cst_ou_id = ext.row_id "
+                    "  and sr.X_PROD_FEATURE_ID = prd.row_id "
+                    "  and ext.row_id = flag.row_id" );
+        
+    query.bindValue( ":engineer", engineer );
     query.exec();
 
     while ( query.next() )
     {
-        PseudoQueueItem* i = new PseudoQueueItem;
-        i->display = query.value( 0 ).toString();
-        i->name = query.value( 1 ).toString();
+        QueueItem i;
+        
+        i.id = query.value( 0 ).toString();
+        i.geo = query.value( 1 ).toString();
+        i.hours = query.value( 2 ).toString();
+        i.status = query.value( 3 ).toString();
+        i.severity = query.value( 4 ).toString();
+        i.created = convertTime( query.value( 5 ).toString() );
+        i.last_update = convertTime( query.value( 7 ).toString() );
+        i.support_program = query.value( 8 ).toString();
+        i.subtype = query.value( 9 ).toString();
+        
+        if ( query.value( 9 ).toString() == "Collaboration" )
+        {
+            i.isCr = true;
+            i.creator = getCreator( i.id );
+        }
+        else
+        {
+            i.isCr = false;
+            i.customer = query.value( 14 ).toString();
+            i.contact_phone = query.value( 15 ).toString();
+            i.contact_firstname = query.value( 16 ).toString();
+            i.contact_lastname = query.value( 17 ).toString();
+            i.contact_email = query.value( 18 ).toString();
+            i.contact_title = query.value( 19 ).toString();
+            i.contact_lang = query.value( 20 ).toString();
+            i.onsite_phone = query.value( 21 ).toString();
+        }
+            
+        i.service_level = query.value( 10 ).toInt();
+        i.brief_desc = query.value( 11 ).toString();
+        
+        if ( query.value( 12 ).toString() == "Y" )
+        {
+            i.critsit = true;
+        }
+        else
+        {
+            i.critsit = false;
+        }
+        
+        if ( query.value( 13 ).toString() == "Y" )
+        {
+            i.high_value = true;
+        }
+        else
+        {
+            i.high_value = false;
+        }
+        
+        i.detailed_desc = query.value( 22 ).toString();
+        
         list.append( i );
     }
-    
+        
     return list;
 }
 
-QString Database::critSitFlagForSr( const QString& sr )
+QString Database::getCreator(const QString& sr )
 {
-    QSqlQuery query( QSqlDatabase::database( "oracleDB" ) );
-    query.prepare("SELECT CRITSIT_FLAG from NTSDM.OLAP_SR_DX2 WHERE SR_NUM = :srnum");
-    query.bindValue( ":srnum", sr );
-    query.exec();
-
-    if ( query.next() )
-    {
-        return query.value( 0 ).toString();
-    }
-    else
-    {
-        return "ERROR";
-    }
-}
-
-QString Database::highValueFlagForSr( const QString& sr )
-{
-    QSqlQuery query( QSqlDatabase::database( "oracleDB" ) );
-    query.prepare("SELECT HIGHVALUE_FLAG from NTSDM.OLAP_SR_DX2 WHERE SR_NUM = :srnum");
-    query.bindValue( ":srnum", sr );
-    query.exec();
-
-    if ( query.next() )
-    {
-        return query.value( 0 ).toString();
-    }
-    else
-    {
-        return "ERROR";
-    }
-}
-
-QString Database::highValueCritSitFlagForSr( const QString& sr )
-{
-    QSqlQuery query( "SELECT HIGHVALUE_FLAG, CRITSIT_FLAG from NTSDM.OLAP_SR_DX2 WHERE SR_NUM = :srnum", QSqlDatabase::database( "oracleDB" ) );
-    query.bindValue( ":srnum", sr );
-    query.exec();
-
-    if ( query.next() )
-    {
-        return query.value( 0 ).toString() + query.value( 1 ).toString();
-    }
-    else
-    {
-        return "ERROR";
-    }
-}
-
-QStringList Database::getSrsForUser( const QString& user )
-{
-    QStringList list;
     
     QSqlQuery query( QSqlDatabase::database( "siebelDB" ) );
-    query.prepare( "SELECT SR_NUM FROM SIEBEL.S_SRV_REQ WHERE OWNER_EMP_ID = ( SELECT PAR_ROW_ID FROM SIEBEL.S_USER WHERE LOGIN = :login ) AND SR_STAT_ID = 'Open'" );
-    //query.prepare( "SELECT * FROM ALL_TABLES" );
-    query.bindValue( ":login", user.toUpper() );
-    query.exec();
-    
-    qDebug() << query.lastError().text();
+    query.prepare( "SELECT LOGIN FROM SIEBEL.S_USER WHERE PAR_ROW_ID = ( SELECT CREATED_BY FROM SIEBEL.S_SRV_REQ WHERE SR_NUM = :sr )" );
 
-    while ( query.next() )
-    {
-        list.append( query.value( 0 ).toString() );
-    }
+    query.bindValue( ":sr", sr );
     
-    return list;
-}
-
-QString Database::getBugForSr( const QString& sr )
-{
-    QSqlQuery query( QSqlDatabase::database( "oracleDB" ) );
-    query.prepare( "SELECT DEFECT_ID from NTSDM.OLAP_SR_DX2 WHERE SR_NUM = :srnum" );
-    query.bindValue( ":srnum", sr );
     query.exec();
 
     if ( query.next() )
@@ -383,24 +442,7 @@ QString Database::getBugForSr( const QString& sr )
     }
     else
     {
-        return "NOBUG";
+        return "ERROR";
     }
 }
-
-QStringList Database::getOracleSrList()
-{
-    QSqlQuery query( QSqlDatabase::database( "oracleDB" ) );
-    QStringList l;
-    query.prepare( "SELECT SR_NUM FROM NTSDM.NTS_OPEN_SR WHERE OWNER='SBOGNER'" );
-    query.exec();
-
-    while( query.next() ) 
-    {
-            l.append( query.value( 0 ).toString() );
-            qDebug() << "append";
-    }
-
-    return l;
-}*/
-
 #include "database.moc"

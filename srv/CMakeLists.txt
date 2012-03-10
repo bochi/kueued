@@ -29,6 +29,7 @@ SET( kueued_CPP main.cpp
                     kueued.cpp
                     database.cpp
 		    ../settings.cpp
+		    queuethread.cpp
                     server.cpp
                     xml.cpp)
 
