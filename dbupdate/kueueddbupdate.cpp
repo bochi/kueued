@@ -133,7 +133,6 @@ void KueuedDbUpdate::finished()
 {
     if ( ( mBomgarDone ) && ( mSiebelDone ) )
     {
-        Debug::log( "kueued-dbupdate", "Exiting" );
         exit( 0 );
     }
 }
