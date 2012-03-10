@@ -57,7 +57,7 @@ class Database : public QObject
         
         static QStringList getSrNumsForQueue( const QString&, const QString& );
         static QStringList getCurrentBomgars();
-        static QList< QueueItem > getUserQueue( const QString&, QSqlDatabase = 0L );
+        static QList< QueueItem > getUserQueue( const QString&, QSqlDatabase );
         static QString getCreator( const QString& );
         
         static QString getPhoneNumber( const QString& );
