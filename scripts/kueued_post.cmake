@@ -10,16 +10,17 @@ ENDIF( NOT EXISTS "/var/log/kueued/" )
 
 IF( NOT EXISTS "/var/log/kueued/kueued.log" )
 
-    EXECUTE_PROCESS( COMMAND touch /var/log/kueued/kueued.log
-                     COMMAND chown kueued /var/log/kueued/kueued.log )
+    EXECUTE_PROCESS( COMMAND touch /var/log/kueued/kueued.log )
 		 
 ENDIF( NOT EXISTS "/var/log/kueued/kueued.log" )
                  
 IF( NOT EXISTS "/var/log/kueued/kueued-dbupdate.log" )
 
-    EXECUTE_PROCESS( COMMAND touch /var/log/kueued/kueued-dbupdate.log
-		     COMMAND chown kueued /var/log/kueued/kueued-dbupdate.log )
+    EXECUTE_PROCESS( COMMAND touch /var/log/kueued/kueued-dbupdate.log )
 
 ENDIF( NOT EXISTS "/var/log/kueued/kueued-dbupdate.log" ) 
+
+EXECUTE_PROCESS( COMMAND chown kueued /var/log/kueued/kueued-dbupdate.log 
+	         COMMAND chown kueued /var/log/kueued/kueued.log )
 
 
