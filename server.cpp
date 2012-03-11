@@ -190,6 +190,7 @@ void Server::readClient()
             }
             else if ( cmd.startsWith( "/updateDB" ) )
             {
+                qDebug() << thread()->currentThreadId();
                 mUpdateThread->update( socket );
             }
             else if ( cmd.startsWith( "/chat" ) )
