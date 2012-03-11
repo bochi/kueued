@@ -38,6 +38,9 @@ Server::Server( quint16 port, QObject* parent )
     mUpdateThread = new UpdateThread( this );
     mUpdateThread->start();
     
+    connect( mUpdateThread, SIGNAL( done( QTcpSocket* ) ),
+             this, SLOT( updateThreadDone( QTcpSocket* ) ) );
+    
     listen( QHostAddress::Any, port );
     
     char hostname[ 1024 ];
@@ -88,6 +91,7 @@ void Server::readClient()
     connect( socket, SIGNAL( disconnected() ),
              this, SLOT( deleteSocket() ) );
     
+   
     QString dm;
     dm += socket->peerAddress().toString();
     
@@ -281,7 +285,6 @@ void Server::readClient()
         }
         else if ( req == "updateDB" )
         {
-            socket->moveToThread( mUpdateThread );
             mUpdateThread->update( socket );
         }
     }
@@ -301,20 +304,13 @@ void Server::closeSocket( QTcpSocket* socket )
 
 void Server::deleteSocket()
 {
-    QTcpSocket* socket = ( QTcpSocket* )sender();
 
-    if ( socket->state() == QTcpSocket::UnconnectedState ) 
-    {
-        socket->deleteLater();
-    }
 }
-
 
 void Server::deleteThread()
 {
     QThread* t = qobject_cast<QThread*>( sender() );
     delete t;
 }
-
 
 #include "server.moc"

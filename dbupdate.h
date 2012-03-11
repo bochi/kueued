@@ -69,6 +69,7 @@ class UpdateThread : public QThread
 
     signals:
         void hobbeds( QTcpSocket* );
+        void done( QTcpSocket* );
         
     private:        
         UpdateWorker* mWorker;

@@ -200,8 +200,7 @@ void UpdateThread::update( QTcpSocket* socket )
     {
         out << "Already updating, please try again later.\n";
         Debug::log( "sd", QString::number( socket->socketDescriptor() ) );
-        socket->close();
-        socket->waitForDisconnected();
+
     }
 }
 
