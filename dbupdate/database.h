@@ -30,6 +30,7 @@
 
 class SiebelItem;
 class BomgarItem;
+class QueueItem;
 
 class Database : public QObject
 {
@@ -39,35 +40,36 @@ class Database : public QObject
         Database();
         ~Database();
     
-        static void insertSiebelItemIntoDB( SiebelItem* );
-        static void updateSiebelQueue( SiebelItem* );
-        static void updateSiebelItem( SiebelItem* );
-        static void deleteSiebelItemFromDB( const QString& );
-        static QStringList getQmonSiebelList();
-	static QStringList getOracleSrList();
-        static bool siebelExistsInDB( const QString& );
-        static bool siebelQueueChanged( SiebelItem* );
-        static bool siebelSeverityChanged( SiebelItem* );
-        static bool isChat( const QString& );
-        static QString getQmonBdesc( const QString& );
-        static QString getDetDesc( const QString& );
-        static QString getCreator( const QString& );
+        static void insertSiebelItemIntoDB( SiebelItem, const QString& = QString::Null() );
+        static void updateSiebelQueue( SiebelItem, const QString& = QString::Null() );
+        static void updateSiebelItem( SiebelItem, const QString& = QString::Null() );
+        static void deleteSiebelItemFromDB( const QString&, const QString& = QString::Null() );
+        static QStringList getQmonSiebelList( const QString& = QString::Null());
+	static QStringList getOracleSrList( const QString& = QString::Null() );
+        static bool siebelExistsInDB( const QString&, const QString& = QString::Null() );
+        static bool siebelQueueChanged( SiebelItem, const QString& = QString::Null() );
+        static bool siebelSeverityChanged( SiebelItem, const QString& = QString::Null() );
+        static bool isChat( const QString&, const QString& = QString::Null() );
+        static QString getQmonBdesc( const QString&, const QString& = QString::Null() );
+        static QString getDetDesc( const QString&, const QString& = QString::Null() );
+        static QString getCreator( const QString&, const QString& = QString::Null() );
         
-        static void updateBomgarItemInDB( BomgarItem* );
-        static void deleteBomgarItemFromDB( const QString& );
-        static QList< SiebelItem* > getSrsForQueue( const QString& = "NONE" );
-        static QStringList getQmonBomgarList();
-        static bool bomgarExistsInDB( const QString& );
-        static QString getBomgarQueue( const QString& );
-        static QString getBomgarQueueById( const QString& );
-        static void updateBomgarQueue( BomgarItem* );
+        static void updateBomgarItemInDB( BomgarItem*, const QString& = QString::Null() );
+        static void deleteBomgarItemFromDB( const QString&, const QString& = QString::Null() );
+        static QList< SiebelItem > getSrsForQueue( const QString& = "NONE", const QString& = QString::Null() );
+        static QStringList getQmonBomgarList( const QString& = QString::Null() );
+        static bool bomgarExistsInDB( const QString&, const QString& = QString::Null() );
+        static QString getBomgarQueue( const QString&, const QString& = QString::Null() );
+        static QString getBomgarQueueById( const QString&, const QString& = QString::Null() );
+        static void updateBomgarQueue( BomgarItem*, const QString& = QString::Null() );
         
-        static QStringList getCurrentBomgars();
+        static QStringList getCurrentBomgars( const QString& = QString::Null() );
         
         static QString convertTime( const QString& );
         
-        static QList< SiebelItem* > getQmonSrs();
-        static QList< BomgarItem* > getChats();  
+        static QList< QueueItem > getUserQueue( const QString&, const QString& = QString::Null() );
+        static QList< SiebelItem > getQmonSrs( const QString& = QString::Null() );
+        static QList< BomgarItem* > getChats( const QString& = QString::Null() );  
 };
 
 class SiebelItem 
@@ -109,6 +111,35 @@ class SiebelItem
         QString bomgarQ;
         bool isCr;
         bool isChat;
+        bool critsit;
+        bool high_value;
+};
+
+class QueueItem
+{
+    public:
+        QString id;
+        QString status;
+        QString geo;
+        QString hours;
+        QString severity;
+        QString created;
+        QString last_update;
+        QString support_program;
+        QString subtype;
+        int service_level;
+        QString brief_desc;
+        QString detailed_desc;
+        QString customer;
+        QString contact_phone;
+        QString contact_firstname;
+        QString contact_lastname;
+        QString contact_email;
+        QString contact_title;
+        QString contact_lang;
+        QString onsite_phone;
+        QString creator;
+        bool isCr;
         bool critsit;
         bool high_value;
 };

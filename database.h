@@ -30,7 +30,6 @@
 
 class SiebelItem;
 class BomgarItem;
-class PseudoQueueItem;
 class QueueItem;
 
 class Database : public QObject
@@ -41,28 +40,36 @@ class Database : public QObject
         Database();
         ~Database();
     
-        static QStringList getQmonSiebelList();
-        static bool siebelExistsInDB( const QString& );
-        static bool siebelQueueChanged( SiebelItem* );
-        static bool siebelSeverityChanged( SiebelItem* );
-        static bool isChat( const QString& );
-        static QString getQmonBdesc( const QString& );
+        static void insertSiebelItemIntoDB( SiebelItem, const QString& = QString::Null() );
+        static void updateSiebelQueue( SiebelItem, const QString& = QString::Null() );
+        static void updateSiebelItem( SiebelItem, const QString& = QString::Null() );
+        static void deleteSiebelItemFromDB( const QString&, const QString& = QString::Null() );
+        static QStringList getQmonSiebelList( const QString& = QString::Null());
+        static QStringList getOracleSrList( const QString& = QString::Null() );
+        static bool siebelExistsInDB( const QString&, const QString& = QString::Null() );
+        static bool siebelQueueChanged( SiebelItem, const QString& = QString::Null() );
+        static bool siebelSeverityChanged( SiebelItem, const QString& = QString::Null() );
+        static bool isChat( const QString&, const QString& = QString::Null() );
+        static QString getQmonBdesc( const QString&, const QString& = QString::Null() );
+        static QString getDetDesc( const QString&, const QString& = QString::Null() );
+        static QString getCreator( const QString&, const QString& = QString::Null() );
         
-        static void updateBomgarItemInDB( BomgarItem* );
-        static void deleteBomgarItemFromDB( const QString& );
-        static QList< SiebelItem > getSrsForQueue( const QString& = "NONE" );
-        static QStringList getQmonBomgarList();
-        static bool bomgarExistsInDB( const QString& );
-        static QString getBomgarQueue( const QString& );
+        static void updateBomgarItemInDB( BomgarItem, const QString& = QString::Null() );
+        static void deleteBomgarItemFromDB( const QString&, const QString& = QString::Null() );
+        static QList< SiebelItem > getSrsForQueue( const QString& = "NONE", const QString& = QString::Null() );
+        static QStringList getQmonBomgarList( const QString& = QString::Null() );
+        static bool bomgarExistsInDB( const QString&, const QString& = QString::Null() );
+        static QString getBomgarQueue( const QString&, const QString& = QString::Null() );
+        static QString getBomgarQueueById( const QString&, const QString& = QString::Null() );
+        static void updateBomgarQueue( BomgarItem, const QString& = QString::Null() );
         
-        static QStringList getSrNumsForQueue( const QString&, const QString& );
-        static QStringList getCurrentBomgars();
-        static QList< QueueItem > getUserQueue( const QString&, QSqlDatabase );
-        static QString getCreator( const QString& );
-        
-        static QString getPhoneNumber( const QString& );
+        static QStringList getCurrentBomgars( const QString& = QString::Null() );
         
         static QString convertTime( const QString& );
+        
+        static QList< QueueItem > getUserQueue( const QString&, const QString& = QString::Null() );
+        static QList< SiebelItem > getQmonSrs( const QString& = QString::Null() );
+        static QList< BomgarItem > getChats( const QString& = QString::Null() );  
 };
 
 class SiebelItem 
@@ -144,13 +151,6 @@ class BomgarItem
         QString sr;
         QString name;
         QString date;
-};
-
-class PseudoQueueItem
-{
-    public:
-        QString display;
-        QString name;
 };
 
 #endif

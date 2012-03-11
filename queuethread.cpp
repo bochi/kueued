@@ -76,7 +76,7 @@ void QueueThread::run()
     out << "\r\n";
     out << "<?xml version='1.0'?>\n\n";
 
-    out << XML::queue( Database::getUserQueue( mEngineer, QSqlDatabase::database( mDbName ) ) );
+    out << XML::queue( Database::getUserQueue( mEngineer, mDbName ) );
 
     out.device()->seek(0);
     out << (quint16)(block.size() - sizeof(quint16));

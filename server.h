@@ -28,6 +28,7 @@
 
 #include "qtservice/qtservice.h"
 #include "xml.h"
+#include "dbupdate.h"
 
 #include <QObject>
 #include <QString>
@@ -57,6 +58,8 @@ class SiebelItem;
 
  private:
      bool disabled;
+     UpdateThread* mUpdateThread;
+     QString mHostName;
  };
 
 

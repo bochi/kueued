@@ -74,9 +74,9 @@ Database::~Database()
     QSqlDatabase::removeDatabase( "qmonDB" );
 }
 
-void Database::insertSiebelItemIntoDB( SiebelItem* item, const QString& dbname )
+void Database::insertSiebelItemIntoDB( SiebelItem item, const QString& dbname )
 {
-    Debug::log( "database", "Inserting SiebelItem for " + item->id + " " + item->queue );
+    Debug::log( "database", "Inserting SiebelItem for " + item.id + " " + item.queue );
 
     QSqlDatabase db;
     
@@ -100,36 +100,36 @@ void Database::insertSiebelItemIntoDB( SiebelItem* item, const QString& dbname )
                    "  :sla, :support_program, :support_program_long, :routing_product, :support_group_routing, :int_type, :subtype, "
                    "  :service_level, :brief_desc, :critsit, :high_value,  :detailed_desc, :category, :creator, :row_id )" );
 
-    query.bindValue( ":id", item->id );
-    query.bindValue( ":queue", item->queue );
-    query.bindValue( ":geo", item->geo );
-    query.bindValue( ":hours", item->hours );
-    query.bindValue( ":status", item->status );
-    query.bindValue( ":severity", item->severity );
-    query.bindValue( ":source", item->source );
-    query.bindValue( ":respond_via", item->respond_via );
-    query.bindValue( ":created", convertTime( item->created ) );
-    query.bindValue( ":last_update", convertTime( item->last_update ) );
+    query.bindValue( ":id", item.id );
+    query.bindValue( ":queue", item.queue );
+    query.bindValue( ":geo", item.geo );
+    query.bindValue( ":hours", item.hours );
+    query.bindValue( ":status", item.status );
+    query.bindValue( ":severity", item.severity );
+    query.bindValue( ":source", item.source );
+    query.bindValue( ":respond_via", item.respond_via );
+    query.bindValue( ":created", convertTime( item.created ) );
+    query.bindValue( ":last_update", convertTime( item.last_update ) );
     query.bindValue( ":inqueue", QDateTime::currentDateTime().toString( "yyyy-MM-dd hh:mm:ss" ) );
-    query.bindValue( ":sla", convertTime( item->sla ) );
-    query.bindValue( ":support_program", item->support_program );
-    query.bindValue( ":support_program_long", item->support_program_long );
-    query.bindValue( ":routing_product", item->routing_product );
-    query.bindValue( ":support_group_routing", item->support_group_routing );
-    query.bindValue( ":int_type", item->int_type );
-    query.bindValue( ":subtype", item->subtype );
-    query.bindValue( ":service_level", item->service_level );
-    query.bindValue( ":brief_desc", item->brief_desc );   
-    query.bindValue( ":critsit", item->critsit );
-    query.bindValue( ":high_value", item->high_value );    
-    query.bindValue( ":detailed_desc", item->detailed_desc );
-    query.bindValue( ":category", item->category );
-    query.bindValue( ":creator", item->creator );
-    query.bindValue( ":row_id", item->row_id );
+    query.bindValue( ":sla", convertTime( item.sla ) );
+    query.bindValue( ":support_program", item.support_program );
+    query.bindValue( ":support_program_long", item.support_program_long );
+    query.bindValue( ":routing_product", item.routing_product );
+    query.bindValue( ":support_group_routing", item.support_group_routing );
+    query.bindValue( ":int_type", item.int_type );
+    query.bindValue( ":subtype", item.subtype );
+    query.bindValue( ":service_level", item.service_level );
+    query.bindValue( ":brief_desc", item.brief_desc );   
+    query.bindValue( ":critsit", item.critsit );
+    query.bindValue( ":high_value", item.high_value );    
+    query.bindValue( ":detailed_desc", item.detailed_desc );
+    query.bindValue( ":category", item.category );
+    query.bindValue( ":creator", item.creator );
+    query.bindValue( ":row_id", item.row_id );
     
     query.exec();
     
-    QSqlQuery cquery( QSqlDatabase::database( "mysqlDB" ) );
+    QSqlQuery cquery( db );
     
     cquery.prepare( "INSERT INTO CUSTOMER( ID, CUSTOMER, CONTACT_PHONE, CONTACT_FIRSTNAME, CONTACT_LASTNAME, "
                    "                           CONTACT_EMAIL, CONTACT_TITLE, CONTACT_LANG, ONSITE_PHONE ) "
@@ -137,20 +137,20 @@ void Database::insertSiebelItemIntoDB( SiebelItem* item, const QString& dbname )
                    "( :id, :customer, :contact_phone, :contact_firstname, :contact_lastname, :contact_email, "
                    "  :contact_title, :contact_lang, :onsite_phone )" );
     
-    cquery.bindValue( ":id", item->id );
-    cquery.bindValue( ":customer", item->customer );
-    cquery.bindValue( ":contact_phone", item->contact_phone );
-    cquery.bindValue( ":contact_firstname", item->contact_firstname );
-    cquery.bindValue( ":contact_lastname", item->contact_lastname );
-    cquery.bindValue( ":contact_email", item->contact_email );
-    cquery.bindValue( ":contact_title", item->contact_title );
-    cquery.bindValue( ":contact_lang", item->contact_lang );
-    cquery.bindValue( ":onsite_phone", item->onsite_phone );
+    cquery.bindValue( ":id", item.id );
+    cquery.bindValue( ":customer", item.customer );
+    cquery.bindValue( ":contact_phone", item.contact_phone );
+    cquery.bindValue( ":contact_firstname", item.contact_firstname );
+    cquery.bindValue( ":contact_lastname", item.contact_lastname );
+    cquery.bindValue( ":contact_email", item.contact_email );
+    cquery.bindValue( ":contact_title", item.contact_title );
+    cquery.bindValue( ":contact_lang", item.contact_lang );
+    cquery.bindValue( ":onsite_phone", item.onsite_phone );
     
     cquery.exec();                  
 }
 
-void Database::updateSiebelItem( SiebelItem* item, const QString& dbname )
+void Database::updateSiebelItem( SiebelItem item, const QString& dbname )
 {
     QSqlDatabase db;
     
@@ -174,56 +174,56 @@ void Database::updateSiebelItem( SiebelItem* item, const QString& dbname )
                    "                       CRITSIT = :critsit, HIGH_VALUE = :high_value, DETAILED_DESC = :detailed_desc, "
                    "                       CATEGORY = :category, CREATOR = :creator, ROW_ID = :row_id WHERE ID = :id" );
     
-    query.bindValue( ":geo", item->geo );
-    query.bindValue( ":hours", item->hours );
-    query.bindValue( ":status", item->status );
-    query.bindValue( ":severity", item->severity );
-    query.bindValue( ":source", item->source );
-    query.bindValue( ":respond_via", item->respond_via );
-    query.bindValue( ":created", convertTime( item->created ) );
-    query.bindValue( ":last_update", convertTime( item->last_update ) );
-    query.bindValue( ":sla", convertTime( item->sla ) );
-    query.bindValue( ":support_program", item->support_program );
-    query.bindValue( ":support_program_long", item->support_program_long );
-    query.bindValue( ":routing_product", item->routing_product );
-    query.bindValue( ":support_group_routing", item->support_group_routing );
-    query.bindValue( ":int_type", item->int_type );
-    query.bindValue( ":subtype", item->subtype );
-    query.bindValue( ":service_level", item->service_level );
-    query.bindValue( ":brief_desc", item->brief_desc );
-    query.bindValue( ":critsit", item->critsit );
-    query.bindValue( ":high_value", item->high_value );
-    query.bindValue( ":detailed_desc", item->detailed_desc );
-    query.bindValue( ":category", item->category );
-    query.bindValue( ":creator", getCreator( item->id ) );
-    query.bindValue( ":row_id", item->row_id );
-    query.bindValue( ":id", item->id );
+    query.bindValue( ":geo", item.geo );
+    query.bindValue( ":hours", item.hours );
+    query.bindValue( ":status", item.status );
+    query.bindValue( ":severity", item.severity );
+    query.bindValue( ":source", item.source );
+    query.bindValue( ":respond_via", item.respond_via );
+    query.bindValue( ":created", convertTime( item.created ) );
+    query.bindValue( ":last_update", convertTime( item.last_update ) );
+    query.bindValue( ":sla", convertTime( item.sla ) );
+    query.bindValue( ":support_program", item.support_program );
+    query.bindValue( ":support_program_long", item.support_program_long );
+    query.bindValue( ":routing_product", item.routing_product );
+    query.bindValue( ":support_group_routing", item.support_group_routing );
+    query.bindValue( ":int_type", item.int_type );
+    query.bindValue( ":subtype", item.subtype );
+    query.bindValue( ":service_level", item.service_level );
+    query.bindValue( ":brief_desc", item.brief_desc );
+    query.bindValue( ":critsit", item.critsit );
+    query.bindValue( ":high_value", item.high_value );
+    query.bindValue( ":detailed_desc", item.detailed_desc );
+    query.bindValue( ":category", item.category );
+    query.bindValue( ":creator", getCreator( item.id ) );
+    query.bindValue( ":row_id", item.row_id );
+    query.bindValue( ":id", item.id );
 
     query.exec();
 
-    QSqlQuery cquery( QSqlDatabase::database( "mysqlDB" ) );
+    QSqlQuery cquery( db );
     
     cquery.prepare( "UPDATE CUSTOMER SET CUSTOMER = :customer, CONTACT_PHONE = :contact_phone, CONTACT_FIRSTNAME = :contact_firstname, "
                    "                          CONTACT_LASTNAME = :contact_lastname, CONTACT_EMAIL = :contact_email, "
                    "                          CONTACT_TITLE = :contact_title, CONTACT_LANG = :contact_lang, ONSITE_PHONE = :onsite_phone "
                    "                          WHERE ID = :id" );
     
-    cquery.bindValue( ":customer", item->customer );
-    cquery.bindValue( ":contact_phone", item->contact_phone );
-    cquery.bindValue( ":contact_firstname", item->contact_firstname );
-    cquery.bindValue( ":contact_lastname", item->contact_lastname );
-    cquery.bindValue( ":contact_email", item->contact_email );
-    cquery.bindValue( ":contact_title", item->contact_title );
-    cquery.bindValue( ":contact_lang", item->contact_lang );
-    cquery.bindValue( ":onsite_phone", item->onsite_phone );
-    cquery.bindValue( ":id", item->id );
+    cquery.bindValue( ":customer", item.customer );
+    cquery.bindValue( ":contact_phone", item.contact_phone );
+    cquery.bindValue( ":contact_firstname", item.contact_firstname );
+    cquery.bindValue( ":contact_lastname", item.contact_lastname );
+    cquery.bindValue( ":contact_email", item.contact_email );
+    cquery.bindValue( ":contact_title", item.contact_title );
+    cquery.bindValue( ":contact_lang", item.contact_lang );
+    cquery.bindValue( ":onsite_phone", item.onsite_phone );
+    cquery.bindValue( ":id", item.id );
 
     cquery.exec();
 }
 
-void Database::updateSiebelQueue( SiebelItem* si, const QString& dbname )
+void Database::updateSiebelQueue( SiebelItem si, const QString& dbname )
 {
-    Debug::log( "database", "Updating Siebel queue for " + si->id + " to " + si->queue );
+    Debug::log( "database", "Updating Siebel queue for " + si.id + " to " + si.queue );
     
     QSqlDatabase db;
     
@@ -240,9 +240,9 @@ void Database::updateSiebelQueue( SiebelItem* si, const QString& dbname )
     
     query.prepare( "UPDATE QMON_SIEBEL SET QUEUE = :queue, INQUEUE = :inqueue WHERE id = :id" );
                 
-    query.bindValue( ":queue", si->queue );
+    query.bindValue( ":queue", si.queue );
     query.bindValue( ":inqueue", QDateTime::currentDateTime().toString( "yyyy-MM-dd hh:mm:ss" ) );
-    query.bindValue( ":id", si->id );
+    query.bindValue( ":id", si.id );
                 
     query.exec();
 }
@@ -500,7 +500,7 @@ bool Database::siebelExistsInDB( const QString& id, const QString& dbname )
     }
 }
 
-bool Database::siebelQueueChanged( SiebelItem* si, const QString& dbname )
+bool Database::siebelQueueChanged( SiebelItem si, const QString& dbname )
 {
     QSqlDatabase db;
     
@@ -516,13 +516,13 @@ bool Database::siebelQueueChanged( SiebelItem* si, const QString& dbname )
     QSqlQuery query( db );
     
     query.prepare( "SELECT QUEUE FROM QMON_SIEBEL WHERE ( ID = :id )" );
-    query.bindValue( ":id", si->id );
+    query.bindValue( ":id", si.id );
     
     query.exec();
 
     if ( query.next() )
     {
-        if ( query.value( 0 ).toString() == si->queue )
+        if ( query.value( 0 ).toString() == si.queue )
         {
             return false;
         }
@@ -537,7 +537,7 @@ bool Database::siebelQueueChanged( SiebelItem* si, const QString& dbname )
     }
 }
 
-bool Database::siebelSeverityChanged( SiebelItem* si, const QString& dbname )
+bool Database::siebelSeverityChanged( SiebelItem si, const QString& dbname )
 {
     QSqlDatabase db;
     
@@ -553,13 +553,13 @@ bool Database::siebelSeverityChanged( SiebelItem* si, const QString& dbname )
     QSqlQuery query( db );
     
     query.prepare( "SELECT SEVERITY FROM QMON_SIEBEL WHERE ( ID = :id )" );
-    query.bindValue( ":id", si->id );
+    query.bindValue( ":id", si.id );
     
     query.exec();
 
     if ( query.next() )
     {
-        if ( query.value( 0 ).toString() == si->severity )
+        if ( query.value( 0 ).toString() == si.severity )
         {
             return false;
         }
@@ -634,9 +634,9 @@ QString Database::getQmonBdesc( const QString& id, const QString& dbname )
     }
 }
 
-void Database::updateBomgarItemInDB( BomgarItem* bi, const QString& dbname )
+void Database::updateBomgarItemInDB( BomgarItem bi, const QString& dbname )
 {
-    Debug::log( "database", "Inserting BomgarItem " + bi->id + " " + bi->sr );
+    Debug::log( "database", "Inserting BomgarItem " + bi.id + " " + bi.sr );
         
     QSqlDatabase db;
     
@@ -653,10 +653,10 @@ void Database::updateBomgarItemInDB( BomgarItem* bi, const QString& dbname )
     
     query.prepare( "INSERT INTO QMON_CHAT( ID, SR, NAME, DATE ) VALUES ( :id, :sr, :name, :date )" );
                      
-    query.bindValue( ":id", bi->id );
-    query.bindValue( ":sr", bi->sr );
-    query.bindValue( ":name", bi->name );
-    query.bindValue( ":date", bi->date );
+    query.bindValue( ":id", bi.id );
+    query.bindValue( ":sr", bi.sr );
+    query.bindValue( ":name", bi.name );
+    query.bindValue( ":date", bi.date );
     
     query.exec();
 }
@@ -758,7 +758,7 @@ QList< SiebelItem > Database::getSrsForQueue( const QString& queue, const QStrin
         else
         {
             si.isChat = true;
-            si.bomgarQ = getBomgarQueue( query.value( 0 ).toString() );
+            si.bomgarQ = getBomgarQueue( query.value( 0 ).toString(), dbname );
         }
         
         if ( si.creator != "" )
@@ -769,7 +769,7 @@ QList< SiebelItem > Database::getSrsForQueue( const QString& queue, const QStrin
         {
             si.isCr = false;
         
-            QSqlQuery cquery( QSqlDatabase::database( "mysqlDB" ) );
+            QSqlQuery cquery( db );
         
             cquery.prepare( "SELECT CUSTOMER, CONTACT_PHONE, CONTACT_FIRSTNAME, CONTACT_LASTNAME, CONTACT_EMAIL, "
                             "       CONTACT_TITLE, CONTACT_LANG, ONSITE_PHONE FROM CUSTOMER WHERE ID = :id" );
@@ -884,9 +884,9 @@ bool Database::bomgarExistsInDB( const QString& id, const QString& dbname )
     }
 }
 
-void Database::updateBomgarQueue( BomgarItem* bi, const QString& dbname )
+void Database::updateBomgarQueue( BomgarItem bi, const QString& dbname )
 {
-    Debug::log( "database", "Updating BomgarQueue for " + bi->id + " " + bi->sr + " to " + bi->name );
+    Debug::log( "database", "Updating BomgarQueue for " + bi.id + " " + bi.sr + " to " + bi.name );
     
     QSqlDatabase db;
     
@@ -902,8 +902,8 @@ void Database::updateBomgarQueue( BomgarItem* bi, const QString& dbname )
     QSqlQuery query( db );
     
     query.prepare( "UPDATE QMON_CHAT SET NAME = :name WHERE ID = :id" );
-    query.bindValue( ":name", bi->name );
-    query.bindValue( ":id", bi->id );
+    query.bindValue( ":name", bi.name );
+    query.bindValue( ":id", bi.id );
     
     query.exec();
 }
@@ -968,13 +968,13 @@ QString Database::getBomgarQueueById( const QString& id, const QString& dbname )
     }
 }
 
-QString Database::convertTime( const QString& dt, const QString& dbname )
+QString Database::convertTime( const QString& dt )
 {
     QDateTime d = QDateTime::fromString( dt, "yyyy-MM-ddThh:mm:ss" );
     return ( d.toString("yyyy-MM-dd hh:mm:ss") );
 }
 
-QList< SiebelItem* > Database::getQmonSrs( const QString& dbname )
+QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
 {
     QSqlDatabase db;
     
@@ -989,7 +989,7 @@ QList< SiebelItem* > Database::getQmonSrs( const QString& dbname )
     
     QSqlQuery query( db );
     
-    QList< SiebelItem* > list;
+    QList< SiebelItem > list;
     
     query.prepare(  "select "
                     "  sr.sr_num as ID, "
@@ -1174,67 +1174,67 @@ QList< SiebelItem* > Database::getQmonSrs( const QString& dbname )
     
     while ( query.next() ) 
     {
-        SiebelItem* si = new SiebelItem;
+        SiebelItem si;
                 
-        si->id = query.value( 0 ).toString();
-        si->queue = query.value( 1 ).toString();
-        si->geo = query.value( 2 ).toString();
-        si->hours = query.value( 3 ).toString();
-        si->status = query.value( 4 ).toString();
-        si->severity = query.value( 5 ).toString();
-        si->source = query.value( 6 ).toString();
-        si->respond_via = query.value( 7 ).toString();
-        si->created = query.value( 8 ).toString();
-        si->last_update = query.value( 9 ).toString();
-        si->sla = query.value( 10 ).toString();
-        si->support_program = query.value( 11 ).toString();
-        si->support_program_long = query.value( 12 ).toString();
-        si->routing_product = query.value( 13 ).toString();
-        si->support_group_routing = query.value( 14 ).toString();
-        si->int_type = query.value( 15 ).toString();
-        si->subtype = query.value( 16 ).toString();
-        si->service_level = query.value( 17 ).toString();
-        si->brief_desc = query.value( 18 ).toString();
+        si.id = query.value( 0 ).toString();
+        si.queue = query.value( 1 ).toString();
+        si.geo = query.value( 2 ).toString();
+        si.hours = query.value( 3 ).toString();
+        si.status = query.value( 4 ).toString();
+        si.severity = query.value( 5 ).toString();
+        si.source = query.value( 6 ).toString();
+        si.respond_via = query.value( 7 ).toString();
+        si.created = query.value( 8 ).toString();
+        si.last_update = query.value( 9 ).toString();
+        si.sla = query.value( 10 ).toString();
+        si.support_program = query.value( 11 ).toString();
+        si.support_program_long = query.value( 12 ).toString();
+        si.routing_product = query.value( 13 ).toString();
+        si.support_group_routing = query.value( 14 ).toString();
+        si.int_type = query.value( 15 ).toString();
+        si.subtype = query.value( 16 ).toString();
+        si.service_level = query.value( 17 ).toString();
+        si.brief_desc = query.value( 18 ).toString();
         
-        if ( si->subtype == "Collaboration" )
+        if ( si.subtype == "Collaboration" )
         {
-            si->isCr = true;
-            si->creator = getCreator( si->id );
+            si.isCr = true;
+            si.creator = getCreator( si.id, dbname );
         }
         else
         {
-            si->isCr = false;
+            si.isCr = false;
         }
         
         if ( query.value( 19 ).toString() == "Y" )
         {
-            si->critsit = true;
+            si.critsit = true;
         }
         else
         {
-            si->critsit = false;
+            si.critsit = false;
         }
         
         if ( query.value( 20 ).toString() == "Y" )
         {
-            si->high_value = true;
+            si.high_value = true;
         }
         else
         {
-            si->high_value = false;
+            si.high_value = false;
         }
         
-        si->customer = query.value( 21 ).toString();
-        si->contact_phone = query.value( 22 ).toString();
-        si->contact_firstname = query.value( 23 ).toString();
-        si->contact_lastname = query.value( 24 ).toString();
-        si->contact_email = query.value( 25 ).toString();
-        si->contact_title = query.value( 26 ).toString();
-        si->contact_lang = query.value( 27 ).toString();
-        si->onsite_phone = query.value( 28 ).toString();
-        si->detailed_desc = query.value( 29 ).toString();
-        si->category = query.value( 30 ).toString();
-        si->row_id = query.value( 31 ).toString();
+        si.customer = query.value( 21 ).toString();
+        si.contact_phone = query.value( 22 ).toString();
+        si.contact_firstname = query.value( 23 ).toString();
+        si.contact_lastname = query.value( 24 ).toString();
+        si.contact_email = query.value( 25 ).toString();
+        si.contact_title = query.value( 26 ).toString();
+        si.contact_lang = query.value( 27 ).toString();
+        si.onsite_phone = query.value( 28 ).toString();
+        si.detailed_desc = query.value( 29 ).toString();
+        si.category = query.value( 30 ).toString();
+        si.row_id = query.value( 31 ).toString();
         
         list.append( si );
     }
@@ -1242,7 +1242,7 @@ QList< SiebelItem* > Database::getQmonSrs( const QString& dbname )
     return list;
 }
 
-QList< BomgarItem* > Database::getChats( const QString& dbname )
+QList< BomgarItem > Database::getChats( const QString& dbname )
 {
     QSqlDatabase db;
     
@@ -1257,19 +1257,19 @@ QList< BomgarItem* > Database::getChats( const QString& dbname )
     
     QSqlQuery query( db );
     
-    QList< BomgarItem* > list;
+    QList< BomgarItem > list;
     
     query.prepare( "SELECT LSID, EXTERNAL_KEY, CONFERENCE_NAME, TIMESTAMP FROM Collector_ODBC_NTSCHAT" );
     query.exec();
     
     while ( query.next() ) 
     {
-        BomgarItem* bi = new BomgarItem;
+        BomgarItem bi;
         
-        bi->id = query.value( 0 ).toString();
-        bi->sr = query.value( 1 ).toString();
-        bi->name = query.value( 2 ).toString();
-        bi->date = query.value( 3 ).toString();
+        bi.id = query.value( 0 ).toString();
+        bi.sr = query.value( 1 ).toString();
+        bi.name = query.value( 2 ).toString();
+        bi.date = query.value( 3 ).toString();
      
         list.append( bi );
     }

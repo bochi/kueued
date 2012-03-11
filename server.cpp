@@ -28,12 +28,21 @@
 #include "settings.h"
 #include "debug.h"
 #include "queuethread.h"
+#include <iostream>
 
 Server::Server( quint16 port, QObject* parent )
     : QTcpServer( parent ), disabled( false )
 {
-    Debug::log( "server", "Constructing" );
+    Debug::log( "server", "Constructing " + QString::number( thread()->currentThreadId() ) );
+    
+    mUpdateThread = new UpdateThread( this );
+    mUpdateThread->start();
+    
     listen( QHostAddress::Any, port );
+    
+    char hostname[ 1024 ];
+    gethostname( hostname, sizeof( hostname ) );
+    mHostName = hostname;
 }
 
 void Server::incomingConnection( int socket )
@@ -74,6 +83,7 @@ void Server::readClient()
     }
     
     QTcpSocket* socket = ( QTcpSocket* )sender();
+    Debug::log( "readClient", QString::number( socket->socketDescriptor() ) );
     
     connect( socket, SIGNAL( disconnected() ),
              this, SLOT( deleteSocket() ) );
@@ -111,12 +121,13 @@ void Server::readClient()
         
         QString req = tokens[ 0 ];
         QString cmd = tokens[ 1 ];
-                       
-        os << "HTTP/1.1 200 OK\r\n";
-        os << "Server: kueued (Linux)\r\n";     
+
+        os << "Server: kueued @ " + mHostName + " (Linux)\r\n";     
         
         if ( req == "GET" )
         {
+            os << "HTTP/1.1 200 OK\r\n";
+        
             if ( cmd.startsWith( "/qmon" ) )
             {
                 QString xml;
@@ -154,24 +165,13 @@ void Server::readClient()
                 }
                 else
                 {  
-                    QStringList l = Database::getSrNumsForQueue( q.remove( "/" ).split( "|" ).at( 0 ), q.remove( "/" ).split( "|" ).at( 1 ) );
+                    /*QStringList l = Database::getSrNumsForQueue( q.remove( "/" ).split( "|" ).at( 0 ), q.remove( "/" ).split( "|" ).at( 1 ) );
 
                     for ( int i = 0; i < l.size(); ++i )
                     {  
-                        os << l.at( i ) + "\n";
-                    }
+                       // os << l.at( i ) + "\n";
+                    }*/
                 }
-                
-                closeSocket( socket );
-            }
-            else if ( cmd.startsWith( "/phone" ) )
-            {
-                QString q = cmd.remove( "/phone/" );
-                
-                os << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
-                os << "\r\n";
-                                
-                os << Database::getPhoneNumber( q );
                 
                 closeSocket( socket );
             }
@@ -186,6 +186,9 @@ void Server::readClient()
                 socket->waitForDisconnected();
                 
                 closeSocket( socket );
+            }
+            else if ( cmd.startsWith( "/updateDB" ) )
+            {
             }
             else if ( cmd.startsWith( "/chat" ) )
             {
@@ -276,6 +279,11 @@ void Server::readClient()
                 closeSocket( socket );
             }
         }
+        else if ( req == "updateDB" )
+        {
+            socket->moveToThread( mUpdateThread );
+            mUpdateThread->update( socket );
+        }
     }
 }
 
@@ -294,7 +302,7 @@ void Server::closeSocket( QTcpSocket* socket )
 void Server::deleteSocket()
 {
     QTcpSocket* socket = ( QTcpSocket* )sender();
-qDebug() << "deleting socket";
+
     if ( socket->state() == QTcpSocket::UnconnectedState ) 
     {
         socket->deleteLater();

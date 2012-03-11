@@ -23,45 +23,55 @@
 
 */
 
-#include "kueueddbupdate.h"
-#include "debug.h"
+#ifndef DBUPDATE_H
+#define DBUPDATE_H
 
-KueuedDbUpdate::KueuedDbUpdate()
+#include <QObject>
+#include <QString>
+#include <QStringList>
+#include <QtNetwork>
+#include <QIODevice>
+#include <QtSql>
+
+
+class UpdateWorker : public QObject
 {
-    mBomgarDone = false;
-    mSiebelDone = false;
+  Q_OBJECT
+
+    public:
+        UpdateWorker( QObject* parent = 0);
+        ~UpdateWorker();
     
-    mDB = new Database();
-    
-    updateBomgar();
-    updateUnity();
-}
+        bool erbert() { return mErbert; }
 
-KueuedDbUpdate::~KueuedDbUpdate()
+    public slots:
+        void update( QTcpSocket* );
+ 
+    private:
+        QString mMysqlDB;
+        QString mSiebelDB;
+        QString mQmonDB;
+        QTcpSocket mSocket;
+        bool mErbert;
+};
+
+class UpdateThread : public QThread
 {
-    delete mDB;
-}
+    Q_OBJECT
 
-void KueuedDbUpdate::updateBomgar()
-{
-    mBomgarDone = true;
-    finished();
-}
+    public:
+        UpdateThread( QObject* parent = 0 );
+        
+        void run();
 
-void KueuedDbUpdate::updateUnity()
-{
+    public slots:
+        void update( QTcpSocket* );
 
-    
-    mSiebelDone = true;
-    finished();
-}
-
-void KueuedDbUpdate::finished()
-{
-    if ( ( mBomgarDone ) && ( mSiebelDone ) )
-    {
-        exit( 0 );
-    }
-}
-
-#include "kueueddbupdate.moc"
+    signals:
+        void hobbeds( QTcpSocket* );
+        
+    private:        
+        UpdateWorker* mWorker;
+};
+ 
+#endif
