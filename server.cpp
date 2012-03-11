@@ -283,6 +283,7 @@ void Server::readClient()
         }
         else if ( req == "updateDB" )
         {
+            qDebug() << thread()->currentThreadId();
             mUpdateThread->update( socket );
         }
     }
