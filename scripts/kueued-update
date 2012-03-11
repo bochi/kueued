@@ -1,0 +1,24 @@
+#!/bin/bash
+
+if [ "$1" == "" ]; then
+
+    echo "Usage: kueued-update hostname"
+    exit
+
+fi
+
+RESULT=$(curl --silent -A "kueued-update @ $HOSTNAME" http://$1:8080/updateDB | tail -1)
+
+if [ "$RESULT" == "UPDATE FINISHED" ]; then
+
+    echo "Done :)"
+    exit 0
+
+else
+
+    echo $RESULT
+    echo "Something went wrong :("
+    exit 1
+
+fi
+
