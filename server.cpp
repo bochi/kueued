@@ -193,6 +193,7 @@ void Server::readClient()
             }
             else if ( cmd.startsWith( "/updateDB" ) )
             {
+                mUpdateThread->update( socket );
             }
             else if ( cmd.startsWith( "/chat" ) )
             {
@@ -303,9 +304,7 @@ void Server::closeSocket( QTcpSocket* socket )
 }
 
 void Server::deleteSocket()
-{
-
-}
+{}
 
 void Server::deleteThread()
 {
