@@ -86,6 +86,7 @@ UpdateWorker::~UpdateWorker()
 
 void UpdateWorker::update( QTcpSocket* socket )
 {
+    qDebug() << thread()->currentThreadId();
     QTextStream out( socket );
 
     mErbert = true;
@@ -179,7 +180,7 @@ UpdateThread::UpdateThread( QObject *parent ) : QThread(parent)
 
 void UpdateThread::run()
 {
-    mWorker = new UpdateWorker( this );
+    mWorker = new UpdateWorker();
     
     connect( this, SIGNAL( hobbeds( QTcpSocket* ) ),
              mWorker, SLOT( update( QTcpSocket* ) ) );

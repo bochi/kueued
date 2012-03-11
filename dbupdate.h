@@ -72,7 +72,7 @@ class UpdateThread : public QThread
         void done( QTcpSocket* );
         
     private:        
-        UpdateWorker* mWorker;
+        UpdateWorker mWorker;
 };
  
 #endif

@@ -38,9 +38,6 @@ Server::Server( quint16 port, QObject* parent )
     mUpdateThread = new UpdateThread( this );
     mUpdateThread->start();
     
-    connect( mUpdateThread, SIGNAL( done( QTcpSocket* ) ),
-             this, SLOT( updateThreadDone( QTcpSocket* ) ) );
-    
     listen( QHostAddress::Any, port );
     
     char hostname[ 1024 ];
