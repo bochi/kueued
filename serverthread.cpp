@@ -42,13 +42,13 @@ ServerThread::ServerThread( int sd, QObject *parent ) : QThread(parent)
 
 void ServerThread::run()
 {
-    QTime threadTime;
-    threadTime.start();
+    //QTime threadTime;
+    //threadTime.start();
     
     QString cmd;
     QString dm;
 
-    Debug::log( "srvthread", "New Server Thread " + QString::number( currentThreadId() ) );
+    //Debug::log( "srvthread", "New Server Thread " + QString::number( currentThreadId() ) );
     
     char hostname[ 1024 ];
     gethostname( hostname, sizeof( hostname ) );
@@ -423,7 +423,7 @@ void ServerThread::run()
         }
     }
     
-    Debug::log( "srvthread", "SrvThread " + QString::number( currentThreadId() ) + " finished after " + QString::number(threadTime.elapsed() / 1000) + " sec" );
+    //Debug::log( "srvthread", "SrvThread " + QString::number( currentThreadId() ) + " finished after " + QString::number(threadTime.elapsed() / 1000) + " sec" );
 }
 
 #include "serverthread.moc"

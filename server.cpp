@@ -65,7 +65,7 @@ void Server::incomingConnection( int socket )
 void Server::deleteThread()
 {
     QThread* t = qobject_cast<QThread*>( sender() );
-    Debug::log( "server", "Deleting SrvThread " + QString::number( t->currentThreadId() ) );
+    //Debug::log( "server", "Deleting SrvThread " + QString::number( t->currentThreadId() ) );
     delete t;
 }
 
