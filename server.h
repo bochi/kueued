@@ -28,8 +28,6 @@
 
 #include "qtservice/qtservice.h"
 #include "xml.h"
-#include "dbupdate.h"
-#include "dbthread.h"
 
 #include <QObject>
 #include <QString>

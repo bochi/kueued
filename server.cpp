@@ -25,8 +25,6 @@
 
 #include "server.h"
 #include "database.h"
-#include "qmon.h"
-#include "dbthread.h"
 #include "settings.h"
 #include "debug.h"
 #include "serverthread.h"
