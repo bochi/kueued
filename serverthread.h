@@ -23,28 +23,28 @@
 
 */
 
-#ifndef QUEUETHREAD_H
-#define QUEUETHREAD_H
+#ifndef SERVERTHREAD_H
+#define SERVERTHREAD_H
 
 #include <QThread>
 #include <QTcpSocket>
 
-class QueueThread : public QThread
+class ServerThread : public QThread
 {
     Q_OBJECT
 
     public:
-        QueueThread( int sd, const QString& eng, QObject *parent );
+        ServerThread( int sd = 0, QObject *parent = 0L );
         
         void run();
 
-    signals:
-        void done();
-
     private:
         int mSocket;
-        QString mDbName;
+                      QString mMysqlDB;
+        QString mSiebelDB;
+        QString mQmonDB;
         QString mEngineer;
+        QString mHostname;
 };
 
 

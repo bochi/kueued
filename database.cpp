@@ -280,6 +280,7 @@ QString Database::getCreator(const QString& sr, const QString& dbname )
 
 QList< QueueItem > Database::getUserQueue( const QString& engineer, const QString& dbname )
 {
+    qDebug() << "getuserqueue";
     QSqlDatabase db;
     
     if ( dbname.isNull() ) 
@@ -349,6 +350,7 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
         
     query.bindValue( ":engineer", engineer );
     query.exec();
+    qDebug() << "query done" << query.lastError().text();
 
     while ( query.next() )
     {
@@ -408,6 +410,7 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
         list.append( i );
     }
         
+        qDebug() << "userqueue done";
     return list;
 }
 
@@ -751,7 +754,7 @@ QList< SiebelItem > Database::getSrsForQueue( const QString& queue, const QStrin
         si.creator = query.value( 24 ).toString();
         si.row_id = query.value( 25 ).toString();
         
-        if ( getBomgarQueue( query.value( 0 ).toString() ) == "NOCHAT" )
+        if ( getBomgarQueue( query.value( 0 ).toString(), dbname ) == "NOCHAT" )
         {
             si.isChat = false;
         }
@@ -976,6 +979,7 @@ QString Database::convertTime( const QString& dt )
 
 QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
 {
+    qDebug() << "getQmonSrs";
     QSqlDatabase db;
     
     if ( dbname.isNull() ) 
@@ -1238,7 +1242,7 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
         
         list.append( si );
     }
-    
+    qDebug() << "getQmonSrsdone";
     return list;
 }
 

@@ -56,10 +56,9 @@ SET( kueued_CPP     main.cpp
                     kueued.cpp
                     database.cpp
                     settings.cpp
-                    queuethread.cpp
-                    dbupdate.cpp
+		    serverthread.cpp
                     server.cpp
-                    xml.cpp)
+		    xml.cpp)
 
 QT4_AUTOMOC( ${kueued_CPP} )
 

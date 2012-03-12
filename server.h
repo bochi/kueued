@@ -29,6 +29,7 @@
 #include "qtservice/qtservice.h"
 #include "xml.h"
 #include "dbupdate.h"
+#include "dbthread.h"
 
 #include <QObject>
 #include <QString>
@@ -36,31 +37,17 @@
 #include <QtNetwork>
 #include <QIODevice>
 
-
-class SiebelItem;
-
- // Server is the the class that implements the simple HTTP server.
- class Server : public QTcpServer
+class Server : public QTcpServer
  {
-     Q_OBJECT
- public:
-     Server(quint16 port, QObject* parent = 0);
-     void incomingConnection(int socket);
-    void pause();
-    void resume();
+    Q_OBJECT
+    
+    public:
+        Server(quint16 port, QObject* parent = 0);
+        void incomingConnection(int socket);
 
- private slots:
-     void readClient();
-     void discardClient();
-     void closeSocket( QTcpSocket* );
-     void deleteSocket();
-     void deleteThread();
-
- private:
-     bool disabled;
-     UpdateThread* mUpdateThread;
-     QString mHostName;
- };
+    private slots:
+        void deleteThread();
+};
 
 
  

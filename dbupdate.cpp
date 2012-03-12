@@ -86,9 +86,9 @@ UpdateWorker::~UpdateWorker()
 
 void UpdateWorker::update( QTcpSocket* socket )
 {
-    qDebug() << thread()->currentThreadId();
     QTextStream out( socket );
 
+    qDebug() << "UpdateWorker::update in thread" << thread()->currentThreadId();
     mErbert = true;
 
     QTime myTimer;
@@ -168,9 +168,7 @@ void UpdateWorker::update( QTcpSocket* socket )
     
     mErbert = false;
     
-    Debug::log( "sd", QString::number( socket->socketDescriptor() ) );
     socket->close();
-    socket->waitForDisconnected();
 }
 
 UpdateThread::UpdateThread( QObject *parent ) : QThread(parent)
@@ -190,6 +188,7 @@ void UpdateThread::run()
 
 void UpdateThread::update( QTcpSocket* socket )
 {
+    qDebug() << "UpdateThread::update";
     QTextStream out( socket );
     
     if ( !mWorker->erbert() )
