@@ -133,9 +133,10 @@ void ServerThread::run()
             QByteArray block;
             QTextStream out( socket );
             
-            out << "Server: kueued @ " + mHostname + " (Linux)\r\n";     
             out << "HTTP/1.1 200 OK\r\n";
-        
+            out << "Server: kueued @ " + mHostname + " (Linux)\r\n";     
+            out << "Connection: close\r\n";
+            
             if ( cmd.startsWith( "/qmon" ) )
             {
                 openMysqlDB();
