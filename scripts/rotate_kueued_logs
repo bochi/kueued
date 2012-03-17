@@ -5,8 +5,7 @@
 
 DATE=$(date +%Y%m%d)
 
-/etc/init.d/kueued-srv stop
-/etc/init.d/kueued-db stop
+/etc/init.d/kueued stop
 
 cd /var/log/kueued
 
@@ -18,8 +17,7 @@ for i in *.log; do
 
 done
 
-/etc/init.d/kueued-db start
-/etc/init.d/kueued-srv start
+/etc/init.d/kueued start
 
 for i in *.$DATE; do
 

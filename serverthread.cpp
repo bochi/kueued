@@ -38,6 +38,7 @@
 ServerThread::ServerThread( int sd, QObject *parent ) : QThread(parent)
 {
     mSocket = sd;
+    mTime.start();
 }
 
 ServerThread::~ServerThread()
@@ -60,15 +61,12 @@ ServerThread::~ServerThread()
         QSqlDatabase::removeDatabase( mSiebelDB );
     }
     
-    qDebug() << "[SERVERTHREAD] Destroying";
+    qDebug() << "[SERVERTHREAD] Destroying, took " + QString::number( mTime.elapsed() / 1000 ) + " sec";
 }
 
 
 void ServerThread::run()
 {
-    //QTime threadTime;
-    //threadTime.start();
-    
     QString cmd;
     QString dm;
 
@@ -195,29 +193,6 @@ void ServerThread::run()
                 openSiebelDB();
                 openQmonDB();
                 
-                if ( !QSqlDatabase::database( mSiebelDB ).isOpen() )
-                {
-                    QSqlDatabase siebelDB = QSqlDatabase::addDatabase( "QOCI", mSiebelDB );
-
-                    siebelDB.setDatabaseName( Settings::siebelDatabase() );
-                    siebelDB.setHostName( Settings::siebelHost() );
-                    siebelDB.setPort( 1521 );
-                    siebelDB.setUserName( Settings::siebelUser() );
-                    siebelDB.setPassword( Settings::siebelPassword() );
-
-                    if ( !siebelDB.open() )
-                    {
-                        Debug::log( "database", "Failed to open the Siebel DB " + siebelDB.lastError().text() );
-                    }
-                    else
-                    {
-                        qDebug() << "DB open" << siebelDB.connectionName();
-                    }
-                }
-                else
-                {
-                    qDebug() << "Database already open in this thread:" << mSiebelDB;
-                }
                 QTime timer;
                 timer.start();
               

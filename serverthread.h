@@ -28,6 +28,7 @@
 
 #include <QThread>
 #include <QTcpSocket>
+#include <QTime>
 
 class ServerThread : public QThread
 {
@@ -46,6 +47,7 @@ class ServerThread : public QThread
         QString mQmonDB;
         QString mEngineer;
         QString mHostname;
+        QTime mTime;
         
     private slots:
         void openMysqlDB();
