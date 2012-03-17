@@ -35,16 +35,22 @@ class ServerThread : public QThread
 
     public:
         ServerThread( int sd = 0, QObject *parent = 0L );
+        ~ServerThread();
         
         void run();
 
     private:
         int mSocket;
-                      QString mMysqlDB;
+        QString mMysqlDB;
         QString mSiebelDB;
         QString mQmonDB;
         QString mEngineer;
         QString mHostname;
+        
+    private slots:
+        void openMysqlDB();
+        void openSiebelDB();
+        void openQmonDB();
 };
 
 

@@ -773,6 +773,8 @@ QList< SiebelItem > Database::getSrsForQueue( const QString& queue, const QStrin
         query.bindValue( ":queue", queue );
     }
     
+    
+    
     query.exec();
     
     qDebug() << query.executedQuery();

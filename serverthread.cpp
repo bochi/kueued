@@ -40,6 +40,30 @@ ServerThread::ServerThread( int sd, QObject *parent ) : QThread(parent)
     mSocket = sd;
 }
 
+ServerThread::~ServerThread()
+{
+    if ( QSqlDatabase::database( mMysqlDB ).isOpen() )
+    {
+        QSqlDatabase::database( mMysqlDB ).close();
+        QSqlDatabase::removeDatabase( mMysqlDB );
+    }
+    
+    if ( QSqlDatabase::database( mQmonDB ).isOpen() )
+    {
+        QSqlDatabase::database( mQmonDB ).close();
+        QSqlDatabase::removeDatabase( mQmonDB );
+    }
+     
+    if ( QSqlDatabase::database( mSiebelDB ).isOpen() )
+    {
+        QSqlDatabase::database( mSiebelDB ).close();
+        QSqlDatabase::removeDatabase( mSiebelDB );
+    }
+    
+    qDebug() << "[SERVERTHREAD] Destroying";
+}
+
+
 void ServerThread::run()
 {
     //QTime threadTime;
@@ -60,75 +84,8 @@ void ServerThread::run()
     mSiebelDB = "siebelDB-" + tid;
     mQmonDB = "qmonDB-" + tid;
     
-    if ( !QSqlDatabase::database( mMysqlDB ).isOpen() )
-    {
-        QSqlDatabase mysqlDB = QSqlDatabase::addDatabase( "QMYSQL", mMysqlDB );
-       
-        mysqlDB.setHostName( Settings::mysqlHost() );
-        mysqlDB.setDatabaseName( Settings::mysqlDatabase() );
-        mysqlDB.setUserName( Settings::mysqlUser() );
-        mysqlDB.setPassword( Settings::mysqlPassword() );
-        
-        if ( !mysqlDB.open() )
-        {
-            Debug::log( "database", "Failed to open the database " + mysqlDB.lastError().text() );
-        }
-        else
-        {
-            qDebug() << "DB open" << mysqlDB.connectionName();
-        }
-    }
-    else
-    {
-        qDebug() << "Database already open in this thread:" << mMysqlDB ;
-    }
     
-    if ( !QSqlDatabase::database( mQmonDB ).isOpen() )
-    {
-        
-        QSqlDatabase qmonDB = QSqlDatabase::addDatabase( "QODBC", mQmonDB );
-        
-        qmonDB.setDatabaseName( Settings::qmonDbDatabase() );
-        qmonDB.setUserName( Settings::qmonDbUser() );
-        qmonDB.setPassword( Settings::qmonDbPassword() );
-        
-        if ( !qmonDB.open() )
-        {
-            Debug::log( "database", "Failed to open the Qmon DB " + qmonDB.lastError().text() );
-        }
-        else
-        {
-            qDebug() << "DB open" << qmonDB.connectionName();
-        }
-    }
-    else
-    {
-        qDebug() << "Database already open in this thread:" << mQmonDB;
-    }
-    
-    if ( !QSqlDatabase::database( mSiebelDB ).isOpen() )
-    {
-        QSqlDatabase siebelDB = QSqlDatabase::addDatabase( "QOCI", mSiebelDB );
 
-        siebelDB.setDatabaseName( Settings::siebelDatabase() );
-        siebelDB.setHostName( Settings::siebelHost() );
-        siebelDB.setPort( 1521 );
-        siebelDB.setUserName( Settings::siebelUser() );
-        siebelDB.setPassword( Settings::siebelPassword() );
-
-        if ( !siebelDB.open() )
-        {
-            Debug::log( "database", "Failed to open the Siebel DB " + siebelDB.lastError().text() );
-        }
-        else
-        {
-            qDebug() << "DB open" << siebelDB.connectionName();
-        }
-    }
-    else
-    {
-        qDebug() << "Database already open in this thread:" << mSiebelDB;
-    }
     
     QTcpSocket* socket= new QTcpSocket;
     
@@ -186,6 +143,8 @@ void ServerThread::run()
         
             if ( cmd.startsWith( "/qmon" ) )
             {
+                openMysqlDB();
+                
                 QString xml = XML::qmon( Database::getSrsForQueue( "NONE", mMysqlDB ) );
 
                 out << "Content-Type: text/xml; charset=\"utf-8\"\r\n";
@@ -197,6 +156,8 @@ void ServerThread::run()
             }
             else if ( cmd.startsWith( "/srnrs" ) )
             {  
+                openMysqlDB();
+                
                 QString q = cmd.remove( "/srnrs" );
 
                 out << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
@@ -230,6 +191,33 @@ void ServerThread::run()
             }
             else if ( cmd.startsWith( "/updateDB" ) )
             {
+                openMysqlDB();
+                openSiebelDB();
+                openQmonDB();
+                
+                if ( !QSqlDatabase::database( mSiebelDB ).isOpen() )
+                {
+                    QSqlDatabase siebelDB = QSqlDatabase::addDatabase( "QOCI", mSiebelDB );
+
+                    siebelDB.setDatabaseName( Settings::siebelDatabase() );
+                    siebelDB.setHostName( Settings::siebelHost() );
+                    siebelDB.setPort( 1521 );
+                    siebelDB.setUserName( Settings::siebelUser() );
+                    siebelDB.setPassword( Settings::siebelPassword() );
+
+                    if ( !siebelDB.open() )
+                    {
+                        Debug::log( "database", "Failed to open the Siebel DB " + siebelDB.lastError().text() );
+                    }
+                    else
+                    {
+                        qDebug() << "DB open" << siebelDB.connectionName();
+                    }
+                }
+                else
+                {
+                    qDebug() << "Database already open in this thread:" << mSiebelDB;
+                }
                 QTime timer;
                 timer.start();
               
@@ -313,6 +301,8 @@ void ServerThread::run()
             }
             else if ( cmd.startsWith( "/chat" ) )
             {
+                openMysqlDB();
+                
                 QStringList l = Database::getCurrentBomgars();
               
                 out << "Content-Type: text/xml; charset=\"utf-8\"\r\n";
@@ -332,7 +322,9 @@ void ServerThread::run()
                 
             }
             else if ( cmd.startsWith( "/userqueue" ) )
-            {
+            {    
+                openSiebelDB();
+                
                 QTime uqTimer;
                 uqTimer.start();
                 
@@ -423,6 +415,85 @@ void ServerThread::run()
         }
     }    
     //Debug::log( "srvthread", "SrvThread " + QString::number( currentThreadId() ) + " finished after " + QString::number(threadTime.elapsed() / 1000) + " sec" );
+}
+
+void ServerThread::openMysqlDB()
+{
+    if ( !QSqlDatabase::database( mMysqlDB ).isOpen() )
+    {
+        QSqlDatabase mysqlDB = QSqlDatabase::addDatabase( "QMYSQL", mMysqlDB );
+       
+        mysqlDB.setHostName( Settings::mysqlHost() );
+        mysqlDB.setDatabaseName( Settings::mysqlDatabase() );
+        mysqlDB.setUserName( Settings::mysqlUser() );
+        mysqlDB.setPassword( Settings::mysqlPassword() );
+        
+        if ( !mysqlDB.open() )
+        {
+            Debug::log( "database", "Failed to open the database " + mysqlDB.lastError().text() );
+        }
+        else
+        {
+            qDebug() << "DB open" << mysqlDB.connectionName();
+        }
+    }
+    else
+    {
+        qDebug() << "Database already open in this thread:" << mMysqlDB ;
+    }
+}
+
+void ServerThread::openQmonDB()
+{
+    if ( !QSqlDatabase::database( mQmonDB ).isOpen() )
+    {
+        
+        QSqlDatabase qmonDB = QSqlDatabase::addDatabase( "QODBC", mQmonDB );
+        
+        qmonDB.setDatabaseName( Settings::qmonDbDatabase() );
+        qmonDB.setUserName( Settings::qmonDbUser() );
+        qmonDB.setPassword( Settings::qmonDbPassword() );
+        
+        if ( !qmonDB.open() )
+        {
+            Debug::log( "database", "Failed to open the Qmon DB " + qmonDB.lastError().text() );
+        }
+        else
+        {
+            qDebug() << "DB open" << qmonDB.connectionName();
+        }
+    }
+    else
+    {
+        qDebug() << "Database already open in this thread:" << mQmonDB;
+    }
+}
+
+void ServerThread::openSiebelDB()
+{
+    if ( !QSqlDatabase::database( mSiebelDB ).isOpen() )
+    {
+        QSqlDatabase siebelDB = QSqlDatabase::addDatabase( "QOCI", mSiebelDB );
+
+        siebelDB.setDatabaseName( Settings::siebelDatabase() );
+        siebelDB.setHostName( Settings::siebelHost() );
+        siebelDB.setPort( 1521 );
+        siebelDB.setUserName( Settings::siebelUser() );
+        siebelDB.setPassword( Settings::siebelPassword() );
+
+        if ( !siebelDB.open() )
+        {
+            Debug::log( "database", "Failed to open the Siebel DB " + siebelDB.lastError().text() );
+        }
+        else
+        {
+            qDebug() << "DB open" << siebelDB.connectionName();
+        }
+    }
+    else
+    {
+        qDebug() << "Database already open in this thread:" << mSiebelDB;
+    }
 }
 
 #include "serverthread.moc"
