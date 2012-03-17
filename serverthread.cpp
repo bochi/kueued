@@ -251,7 +251,7 @@ void ServerThread::run()
                             Database::updateSiebelQueue( ql.at( i ), mMysqlDB );
                         }
                                 
-                        Database::updateSiebelItem( ql.at( i ), mMysqlDB );
+                        Database::updateSiebelItem( ql.at( i ), mMysqlDB, mSiebelDB );
                     }
                 }
                 

@@ -42,7 +42,7 @@ class Database : public QObject
     
         static void insertSiebelItemIntoDB( SiebelItem, const QString& = QString::Null() );
         static void updateSiebelQueue( SiebelItem, const QString& = QString::Null() );
-        static void updateSiebelItem( SiebelItem, const QString& = QString::Null() );
+        static void updateSiebelItem( SiebelItem, const QString& = QString::Null(), const QString& = QString::Null() );
         static void deleteSiebelItemFromDB( const QString&, const QString& = QString::Null() );
         static QStringList getQmonSiebelList( const QString& = QString::Null());
         static QStringList getOracleSrList( const QString& = QString::Null() );

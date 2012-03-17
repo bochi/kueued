@@ -171,9 +171,10 @@ void Database::insertSiebelItemIntoDB( SiebelItem item, const QString& dbname )
     Debug::logQuery( cquery, db.connectionName() );
 }
 
-void Database::updateSiebelItem( SiebelItem item, const QString& dbname )
+void Database::updateSiebelItem( SiebelItem item, const QString& dbname, const QString& dbname1 )
 {
     QSqlDatabase db;
+    QSqlDatabase db1;
     
     if ( dbname.isNull() ) 
     {
@@ -182,6 +183,15 @@ void Database::updateSiebelItem( SiebelItem item, const QString& dbname )
     else
     {
         db = QSqlDatabase::database( dbname );
+    }
+    
+    if ( dbname1.isNull() ) 
+    {
+        db1 = QSqlDatabase::database( "siebelDB" );
+    }
+    else
+    {
+        db1 = QSqlDatabase::database( dbname1 );
     }
     
     QSqlQuery query( db );
@@ -216,7 +226,7 @@ void Database::updateSiebelItem( SiebelItem item, const QString& dbname )
     query.bindValue( ":high_value", item.high_value );
     query.bindValue( ":detailed_desc", item.detailed_desc );
     query.bindValue( ":category", item.category );
-    query.bindValue( ":creator", getCreator( item.id ) );
+    query.bindValue( ":creator", getCreator( item.id, db1 ) );
     query.bindValue( ":row_id", item.row_id );
     query.bindValue( ":id", item.id );
 
