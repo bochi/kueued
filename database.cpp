@@ -129,8 +129,7 @@ void Database::insertSiebelItemIntoDB( SiebelItem item, const QString& dbname )
     
     query.exec();
     
-Debug::logQuery( query, db.connectionName() );
-
+    Debug::logQuery( query, db.connectionName() );
     
     QSqlQuery cquery( db );
     
@@ -151,6 +150,8 @@ Debug::logQuery( query, db.connectionName() );
     cquery.bindValue( ":onsite_phone", item.onsite_phone );
     
     cquery.exec();                  
+    
+    Debug::logQuery( cquery, db.connectionName() );
 }
 
 void Database::updateSiebelItem( SiebelItem item, const QString& dbname )
@@ -204,8 +205,7 @@ void Database::updateSiebelItem( SiebelItem item, const QString& dbname )
 
     query.exec();
 
-Debug::logQuery( query, db.connectionName() );
-
+    Debug::logQuery( query, db.connectionName() );
     
     QSqlQuery cquery( db );
     
@@ -226,9 +226,7 @@ Debug::logQuery( query, db.connectionName() );
 
     cquery.exec();
     
-    qDebug() << cquery.executedQuery();
-    qDebug() << cquery.lastError().text();
-    
+    Debug::logQuery( cquery, db.connectionName() );
 }
 
 void Database::updateSiebelQueue( SiebelItem si, const QString& dbname )
@@ -256,9 +254,7 @@ void Database::updateSiebelQueue( SiebelItem si, const QString& dbname )
                 
     query.exec();
     
-Debug::logQuery( query, db.connectionName() );
-
-    
+    Debug::logQuery( query, db.connectionName() );
 }
 
 QString Database::getCreator(const QString& sr, const QString& dbname )
@@ -282,8 +278,7 @@ QString Database::getCreator(const QString& sr, const QString& dbname )
     
     query.exec();
 
-Debug::logQuery( query, db.connectionName() );
-
+    Debug::logQuery( query, db.connectionName() );
     
     if ( query.next() )
     {
@@ -367,8 +362,8 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
         
     query.bindValue( ":engineer", engineer );
     query.exec();
-Debug::logQuery( query, db.connectionName() );
-
+    
+    Debug::logQuery( query, db.connectionName() );
     
     while ( query.next() )
     {
@@ -428,7 +423,6 @@ Debug::logQuery( query, db.connectionName() );
         list.append( i );
     }
         
-        qDebug() << "userqueue done";
     return list;
 }
 
@@ -454,18 +448,16 @@ void Database::deleteSiebelItemFromDB( const QString& id, const QString& dbname 
     
     query.exec();
     
-Debug::logQuery( query, db.connectionName() );
+    Debug::logQuery( query, db.connectionName() );
 
-    
-    QSqlQuery cquery( QSqlDatabase::database( "mysqlDB" ) );
+    QSqlQuery cquery( db );
     
     cquery.prepare( "DELETE FROM CUSTOMER WHERE ID = :id" );
     cquery.bindValue( ":id", id );
     
     cquery.exec();
-    qDebug() << cquery.executedQuery();
-    qDebug() <<  cquery.lastError().text();
     
+    Debug::logQuery( cquery, db.connectionName() );
 }
 
 QStringList Database::getQmonSiebelList( const QString& dbname)
@@ -489,10 +481,8 @@ QStringList Database::getQmonSiebelList( const QString& dbname)
     
     query.exec();
     
-Debug::logQuery( query, db.connectionName() );
+    Debug::logQuery( query, db.connectionName() );
 
-    
-    
     while( query.next() )
     {
         l.append( query.value( 0 ).toString() );
@@ -521,9 +511,7 @@ bool Database::siebelExistsInDB( const QString& id, const QString& dbname )
        
     query.exec();
     
-Debug::logQuery( query, db.connectionName() );
-
-    
+    Debug::logQuery( query, db.connectionName() );
     
     if ( query.next() )
     {
@@ -555,8 +543,7 @@ bool Database::siebelQueueChanged( SiebelItem si, const QString& dbname )
     
     query.exec();
 
-Debug::logQuery( query, db.connectionName() );
-
+    Debug::logQuery( query, db.connectionName() );
     
     if ( query.next() )
     {
@@ -595,8 +582,7 @@ bool Database::siebelSeverityChanged( SiebelItem si, const QString& dbname )
     
     query.exec();
 
-Debug::logQuery( query, db.connectionName() );
-
+    Debug::logQuery( query, db.connectionName() );
     
     if ( query.next() )
     {
@@ -630,14 +616,12 @@ bool Database::isChat( const QString& id, const QString& dbname )
     
     QSqlQuery query( db );
     
-    
     query.prepare( "SELECT ID FROM QMON_CHAT WHERE ( SR = :id )" );
     query.bindValue( ":id", id );
     
     query.exec();
     
-Debug::logQuery( query, db.connectionName() );
-
+    Debug::logQuery( query, db.connectionName() );
     
     if ( query.next() )
     {
@@ -668,8 +652,8 @@ QString Database::getQmonBdesc( const QString& id, const QString& dbname )
     query.bindValue( ":id", id );
     
     query.exec();
-Debug::logQuery( query, db.connectionName() );
-
+    
+    Debug::logQuery( query, db.connectionName() );
     
     if ( query.next() )
     {
@@ -707,9 +691,7 @@ void Database::updateBomgarItemInDB( BomgarItem bi, const QString& dbname )
     
     query.exec();
     
-Debug::logQuery( query, db.connectionName() );
-
-    
+    Debug::logQuery( query, db.connectionName() );   
 }
 
 void Database::deleteBomgarItemFromDB( const QString& id, const QString& dbname )
@@ -734,10 +716,9 @@ void Database::deleteBomgarItemFromDB( const QString& id, const QString& dbname 
     
     query.exec();
     
-Debug::logQuery( query, db.connectionName() );
-
-    
+    Debug::logQuery( query, db.connectionName() );    
 }
+
 
 QList< SiebelItem > Database::getSrsForQueue( const QString& queue, const QString& dbname )
 {
@@ -775,8 +756,7 @@ QList< SiebelItem > Database::getSrsForQueue( const QString& queue, const QStrin
     
     query.exec();
     
-Debug::logQuery( query, db.connectionName() );
-
+    Debug::logQuery( query, db.connectionName() );
     
     while ( query.next() ) 
     {
@@ -875,9 +855,8 @@ QStringList Database::getCurrentBomgars( const QString& dbname )
     
     query.exec();
     
-Debug::logQuery( query, db.connectionName() );
-
-    
+    Debug::logQuery( query, db.connectionName() );
+        
     while( query.next() )
     {
         QString tmp = query.value( 0 ).toString() + "|||" + query.value( 1 ).toString();
@@ -907,8 +886,7 @@ QStringList Database::getQmonBomgarList( const QString& dbname )
     
     query.exec();
     
-Debug::logQuery( query, db.connectionName() );
-
+    Debug::logQuery( query, db.connectionName() );
     
     while( query.next() ) 
     {
@@ -938,8 +916,7 @@ bool Database::bomgarExistsInDB( const QString& id, const QString& dbname )
     
     query.exec();
     
-Debug::logQuery( query, db.connectionName() );
-
+    Debug::logQuery( query, db.connectionName() );
     
     if ( query.next() )
     {
@@ -974,9 +951,7 @@ void Database::updateBomgarQueue( BomgarItem bi, const QString& dbname )
     
     query.exec();
     
-Debug::logQuery( query, db.connectionName() );
-
-    
+    Debug::logQuery( query, db.connectionName() );   
 }
 
 QString Database::getBomgarQueue( const QString& id, const QString& dbname )
@@ -999,8 +974,7 @@ QString Database::getBomgarQueue( const QString& id, const QString& dbname )
     
     query.exec();
     
-Debug::logQuery( query, db.connectionName() );
-
+    Debug::logQuery( query, db.connectionName() );
     
     if( query.next() ) 
     {
@@ -1032,8 +1006,7 @@ QString Database::getBomgarQueueById( const QString& id, const QString& dbname )
     
     query.exec();
     
-Debug::logQuery( query, db.connectionName() );
-
+    Debug::logQuery( query, db.connectionName() );
     
     if( query.next() ) 
     {
@@ -1053,7 +1026,6 @@ QString Database::convertTime( const QString& dt )
 
 QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
 {
-    qDebug() << "getQmonSrs";
     QSqlDatabase db;
     
     if ( dbname.isNull() ) 
@@ -1250,8 +1222,7 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
 
     query.exec();
     
-Debug::logQuery( query, db.connectionName() );
-
+    Debug::logQuery( query, db.connectionName() );
     
     while ( query.next() ) 
     {
@@ -1319,7 +1290,7 @@ Debug::logQuery( query, db.connectionName() );
         
         list.append( si );
     }
-    qDebug() << "getQmonSrsdone";
+
     return list;
 }
 
@@ -1343,8 +1314,7 @@ QList< BomgarItem > Database::getChats( const QString& dbname )
     query.prepare( "SELECT LSID, EXTERNAL_KEY, CONFERENCE_NAME, TIMESTAMP FROM Collector_ODBC_NTSCHAT" );
     query.exec();
     
-Debug::logQuery( query, db.connectionName() );
-
+    Debug::logQuery( query, db.connectionName() );
     
     while ( query.next() ) 
     {
