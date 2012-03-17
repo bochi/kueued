@@ -30,6 +30,10 @@
 #include <QTcpSocket>
 #include <QTime>
 
+#include "network.h"
+
+class Network;
+
 class ServerThread : public QThread
 {
     Q_OBJECT
@@ -48,6 +52,7 @@ class ServerThread : public QThread
         QString mEngineer;
         QString mHostname;
         QString getWF( const QString& );
+        Network* mNetwork;
         QTime mTime;
         
     private slots:

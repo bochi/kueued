@@ -346,6 +346,8 @@ void ServerThread::run()
                     }
                     else
                     {
+                        mNetwork = &mNetwork->net();
+                        
                         openSiebelDB();
                         
                         out << "Content-Type: text/xml; charset=\"utf-8\"\r\n";
@@ -355,7 +357,7 @@ void ServerThread::run()
                         Statistics statz;
                         
                         QString numbers;
-                        QNetworkReply* r = Network::net().get( QUrl( "http://proetus.provo.novell.com/qmon/closed4.asp?tse=" + q ) );
+                        QNetworkReply* r = mNetwork->get( QUrl( "http://proetus.provo.novell.com/qmon/closed4.asp?tse=" + q ) );
                         QEventLoop loop;
     
                         QObject::connect( r, SIGNAL( finished() ), 
@@ -366,7 +368,7 @@ void ServerThread::run()
                         numbers = r->readAll();
                         
                         QString csat;
-                        QNetworkReply* csr = Network::net().get( QUrl( "http://proetus.provo.novell.com/qmon/custsat.asp?wf=" + wf ) );
+                        QNetworkReply* csr = mNetwork->get( QUrl( "http://proetus.provo.novell.com/qmon/custsat.asp?wf=" + wf ) );
                         
                         QObject::connect( csr, SIGNAL( finished() ), 
                                         &loop, SLOT( quit() ) );
@@ -378,7 +380,7 @@ void ServerThread::run()
                         QStringList csatList = csat.split( "<br>" );
                         
                         QString tts;
-                        QNetworkReply* ttr = Network::net().get( QUrl( "http://proetus.provo.novell.com/qmon/timetosolutiontse.asp?tse=" +  q ) );
+                        QNetworkReply* ttr = mNetwork->get( QUrl( "http://proetus.provo.novell.com/qmon/timetosolutiontse.asp?tse=" +  q ) );
                         
                         QObject::connect( ttr, SIGNAL( finished() ), 
                                         &loop, SLOT( quit() ) );
@@ -440,6 +442,7 @@ void ServerThread::run()
                         statz.csatList = csatItemList;
                         
                         out << XML::stats( statz );
+                        mNetwork->destroy();
                     }
                 }
                 
@@ -543,7 +546,6 @@ void ServerThread::openQmonDB()
 {
     if ( !QSqlDatabase::database( mQmonDB ).isOpen() )
     {
-        
         QSqlDatabase qmonDB = QSqlDatabase::addDatabase( "QODBC", mQmonDB );
         
         qmonDB.setDatabaseName( Settings::qmonDbDatabase() );
@@ -597,7 +599,7 @@ QString ServerThread::getWF( const QString& engineer )
     QEventLoop loop;
     QString wfid;
     
-    QNetworkReply *reply = Network::net().get( QUrl( Settings::dBServer() + "/workforce.asp?tse=" + engineer ) );
+    QNetworkReply *reply = mNetwork->get( QUrl( Settings::dBServer() + "/workforce.asp?tse=" + engineer ) );
     
     loop.connect( reply, SIGNAL( readyRead() ),
                   &loop, SLOT( quit() ) );
