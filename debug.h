@@ -28,6 +28,7 @@
 
 #include <iostream>
 #include <QFile>
+#include <QtSql>
 
 namespace Debug
 {
@@ -59,6 +60,38 @@ namespace Debug
 
         QString t = "[" + QDateTime::currentDateTime().toString( "MM/dd hh:mm:ss" ) + "] [" + host.toUpper() + "] [" + c.toUpper() + "] ";
         out << t << msg << "\n";
+        file.close();
+    }
+    
+    static void logQuery( QSqlQuery query, const QString& dbname )
+    {   
+        char hostname[ 1024 ];
+        gethostname( hostname, sizeof( hostname ) );
+        QString host = hostname;
+        
+        QFile file( "/var/log/kueued/kueued-queries.log" );
+        
+        if (!file.open(QIODevice::Append | QIODevice::WriteOnly | QIODevice::Text))
+        {
+            qDebug() << "File not open";
+            return;
+        }
+        
+        QString err;
+
+        if ( query.lastError().text() == " " )
+        {
+            err = "None";
+        }
+        else
+        {
+            err = query.lastError().text();
+        }
+        
+        QTextStream out(&file);
+
+        QString t = "[" + QDateTime::currentDateTime().toString( "MM/dd hh:mm:ss" ) + "] [" + host.toUpper() + "] [" + dbname + "] Error: " + err + "\nExecuted query: " + query.executedQuery();
+        out << t << "\n\n";
         file.close();
     }
 }
