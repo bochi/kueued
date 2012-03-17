@@ -80,7 +80,7 @@ void ServerThread::run()
     }
     else
     {
-        qDebug() << "Database already open in this thread:" << mMysqlDB;
+        qDebug() << "Database already open in this thread:" << mMysqlDB << QSqlDatabase::database( mMysqlDB ).tables();
     }
     
     if ( !QSqlDatabase::database( mQmonDB ).isOpen() )
@@ -103,7 +103,7 @@ void ServerThread::run()
     }
     else
     {
-        qDebug() << "Database already open in this thread:" << mQmonDB;
+        qDebug() << "Database already open in this thread:" << mQmonDB << QSqlDatabase::database( mQmonDB ).tables();
     }
     
     if ( !QSqlDatabase::database( mSiebelDB ).isOpen() )
@@ -127,7 +127,7 @@ void ServerThread::run()
     }
     else
     {
-        qDebug() << "Database already open:" << mSiebelDB;
+        qDebug() << "Database already open in this thread:" << mSiebelDB << QSqlDatabase::database( mSiebelDB ).tables();
     }
     
     QTcpSocket* socket= new QTcpSocket;
