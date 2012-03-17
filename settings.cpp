@@ -150,3 +150,9 @@ bool Settings::logQueries()
     QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
     return settings.value( "logQueries" ).toBool();
 }
+
+bool Settings::debugLog()
+{
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
+    return settings.value( "debugLog" ).toBool();
+}

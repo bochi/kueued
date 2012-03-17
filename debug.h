@@ -35,12 +35,15 @@ namespace Debug
 {
     static void print( const QString& c, const QString& msg )
     {   
-        char hostname[ 1024 ];
-        gethostname( hostname, sizeof( hostname ) );
-        QString host = hostname;
+        if ( Settings::debugLog() )
+        {
+            char hostname[ 1024 ];
+            gethostname( hostname, sizeof( hostname ) );
+            QString host = hostname;
 
-        QString t = "[" + QDateTime::currentDateTime().toString( "MM/dd hh:mm:ss" ) + "] [" + host.toUpper() + "] [" + c.toUpper() + "] ";
-        std::cout << t.toStdString() << msg.toStdString() << std::endl;
+            QString t = "[" + QDateTime::currentDateTime().toString( "MM/dd hh:mm:ss" ) + "] [" + host.toUpper() + "] [" + c.toUpper() + "] ";
+            std::cout << t.toStdString() << msg.toStdString() << std::endl;
+        }
     }
     
     static void log( const QString& c, const QString& msg )
@@ -53,7 +56,7 @@ namespace Debug
         
         if (!file.open(QIODevice::Append | QIODevice::WriteOnly | QIODevice::Text))
         {
-            qDebug() << "File not optn";
+            qDebug() << "File /var/log/kueued/kueued.log not open";
             return;
         }
         
@@ -76,7 +79,7 @@ namespace Debug
             
             if (!file.open(QIODevice::Append | QIODevice::WriteOnly | QIODevice::Text))
             {
-                qDebug() << "File not open";
+                qDebug() << "File /var/log/kueued/kueued-queries.log not open";
                 return;
             }
             

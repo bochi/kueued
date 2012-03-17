@@ -40,7 +40,7 @@ Database::Database()
     
     if ( !mysqlDB.open() )
     {
-        Debug::log( "database", "Failed to open the database " + mysqlDB.lastError().text() );
+        Debug::print( "database", "Failed to open the database " + mysqlDB.lastError().text() );
     }
     
     QSqlDatabase qmonDB = QSqlDatabase::addDatabase( "QODBC", "qmonDB" );
@@ -51,7 +51,7 @@ Database::Database()
     
     if ( !qmonDB.open() )
     {
-        Debug::log( "database", "Failed to open the Qmon DB " + qmonDB.lastError().text() );
+        Debug::print( "database", "Failed to open the Qmon DB " + qmonDB.lastError().text() );
     }
     
     QSqlDatabase siebelDB = QSqlDatabase::addDatabase( "QOCI", "siebelDB" );
@@ -64,14 +64,31 @@ Database::Database()
 
     if ( !siebelDB.open() )
     {
-        Debug::log( "database", "Failed to open the Siebel DB " + siebelDB.lastError().text() );
+        Debug::print( "database", "Failed to open the Siebel DB " + siebelDB.lastError().text() );
     }
 }
 
 Database::~Database()
 {   
-    QSqlDatabase::removeDatabase( "mysqlDB" );
-    QSqlDatabase::removeDatabase( "qmonDB" );
+    if ( QSqlDatabase::database( "mysqlDB" ).isOpen() )
+    {
+        QSqlDatabase::database( "mysqlDB" ).close();
+        QSqlDatabase::removeDatabase( "mysqlDB" );
+    }
+    
+    if ( QSqlDatabase::database( "qmonDB" ).isOpen() )
+    {
+        QSqlDatabase::database( "qmonDB" ).close();
+        QSqlDatabase::removeDatabase( "qmonDB" );
+    }
+     
+    if ( QSqlDatabase::database( "siebelDB" ).isOpen() )
+    {
+        QSqlDatabase::database( "siebelDB" ).close();
+        QSqlDatabase::removeDatabase( "siebelDB" );
+    }
+    
+    Debug::print( "database", "Destroying" );
 }
 
 void Database::insertSiebelItemIntoDB( SiebelItem item, const QString& dbname )
@@ -292,7 +309,6 @@ QString Database::getCreator(const QString& sr, const QString& dbname )
 
 QList< QueueItem > Database::getUserQueue( const QString& engineer, const QString& dbname )
 {
-    qDebug() << "getuserqueue";
     QSqlDatabase db;
     
     if ( dbname.isNull() ) 

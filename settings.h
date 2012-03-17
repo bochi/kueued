@@ -55,6 +55,7 @@ class Settings
         static int oraclePort();
         static int timezoneCorrection();
         static bool logQueries();
+        static bool debugLog();
 };    
 
 #endif

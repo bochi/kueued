@@ -33,7 +33,7 @@
 
 Kueued::Kueued()
 {
-    Debug::log( "kueued", "Constructing" );
+    Debug::print( "kueued", "Constructing" );
     
     mDB = new Database;
     mServer = new Server( 8080, this );    
@@ -42,7 +42,7 @@ Kueued::Kueued()
      
 Kueued::~Kueued()
 {
-    Debug::log( "kueued", "Destroying" );
+    Debug::print( "kueued", "Destroying" );
 }
 
 #include "kueued.moc"

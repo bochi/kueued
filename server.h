@@ -41,6 +41,7 @@ class Server : public QTcpServer
     
     public:
         Server(quint16 port, QObject* parent = 0);
+        ~Server();
         void incomingConnection(int socket);
 
     private slots:

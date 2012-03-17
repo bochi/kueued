@@ -35,7 +35,7 @@
 Server::Server( quint16 port, QObject* parent )
     : QTcpServer( parent )
 {
-    Debug::log( "server", "Constructing " + QString::number( thread()->currentThreadId() ) );
+    Debug::print( "server", "Constructing " + QString::number( thread()->currentThreadId() ) );
     
     QThreadPool::globalInstance()->setExpiryTimeout( -1 );
     
@@ -50,10 +50,13 @@ Server::Server( quint16 port, QObject* parent )
     listen( QHostAddress::Any, port );   
 }
 
+Server::~Server()
+{
+    Debug::print( "server", "Destroying" );
+}
+
 void Server::incomingConnection( int socket )
 {
-    qDebug() << "Threads:" << QThreadPool::globalInstance()->activeThreadCount();
-    
     ServerThread* q = new ServerThread( socket, this );
     
     connect( q, SIGNAL( finished() ), 
@@ -65,7 +68,7 @@ void Server::incomingConnection( int socket )
 void Server::deleteThread()
 {
     QThread* t = qobject_cast<QThread*>( sender() );
-    //Debug::log( "server", "Deleting SrvThread " + QString::number( t->currentThreadId() ) );
+    Debug::print( "server", "Deleting SrvThread " + QString::number( t->currentThreadId() ) );
     delete t;
 }
 
