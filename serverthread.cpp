@@ -60,6 +60,8 @@ void ServerThread::run()
     mSiebelDB = "siebelDB-" + tid;
     mQmonDB = "qmonDB-" + tid;
     
+    if ( !QSqlDatabase::database( mMysqlDB ).isOpen() )
+    {
         QSqlDatabase mysqlDB = QSqlDatabase::addDatabase( "QMYSQL", mMysqlDB );
        
         mysqlDB.setHostName( Settings::mysqlHost() );
@@ -75,6 +77,14 @@ void ServerThread::run()
         {
             qDebug() << "DB open" << mysqlDB.connectionName();
         }
+    }
+    else
+    {
+        qDebug() << "Database already open in this thread:" << mMysqlDB;
+    }
+    
+    if ( !QSqlDatabase::database( mQmonDB ).isOpen() )
+    {
         
         QSqlDatabase qmonDB = QSqlDatabase::addDatabase( "QODBC", mQmonDB );
         
@@ -90,7 +100,14 @@ void ServerThread::run()
         {
             qDebug() << "DB open" << qmonDB.connectionName();
         }
+    }
+    else
+    {
+        qDebug() << "Database already open in this thread:" << mQmonDB;
+    }
     
+    if ( !QSqlDatabase::database( mSiebelDB ).isOpen() )
+    {
         QSqlDatabase siebelDB = QSqlDatabase::addDatabase( "QOCI", mSiebelDB );
 
         siebelDB.setDatabaseName( Settings::siebelDatabase() );
@@ -107,7 +124,11 @@ void ServerThread::run()
         {
             qDebug() << "DB open" << siebelDB.connectionName();
         }
-
+    }
+    else
+    {
+        qDebug() << "Database already open in this thread:" << mSiebelDB;
+    }
     
     QTcpSocket* socket= new QTcpSocket;
     
@@ -401,6 +422,10 @@ void ServerThread::run()
             }
         }
     }
+    
+    QSqlDatabase::database( mSiebelDB ).close();
+    QSqlDatabase::database( mQmonDB ).close();
+    QSqlDatabase::database( mMysqlDB ).close();
     
     //Debug::log( "srvthread", "SrvThread " + QString::number( currentThreadId() ) + " finished after " + QString::number(threadTime.elapsed() / 1000) + " sec" );
 }
