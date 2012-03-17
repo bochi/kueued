@@ -226,7 +226,7 @@ void Database::updateSiebelItem( SiebelItem item, const QString& dbname, const Q
     query.bindValue( ":high_value", item.high_value );
     query.bindValue( ":detailed_desc", item.detailed_desc );
     query.bindValue( ":category", item.category );
-    query.bindValue( ":creator", getCreator( item.id, db1 ) );
+    query.bindValue( ":creator", getCreator( item.id, dbname1 ) );
     query.bindValue( ":row_id", item.row_id );
     query.bindValue( ":id", item.id );
 
@@ -1274,7 +1274,7 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
         si.service_level = query.value( 17 ).toString();
         si.brief_desc = query.value( 18 ).toString();
         
-        if ( si.subtype == "Collaboration" )
+        if ( query.value( 16 ).toString() == "Collaboration" )
         {
             si.isCr = true;
             si.creator = getCreator( si.id, dbname );
