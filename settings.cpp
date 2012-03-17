@@ -144,3 +144,9 @@ QString Settings::qmonDbPassword()
     QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
     return settings.value( "qmonDbPassword" ).toString();
 }
+
+bool Settings::logQueries()
+{
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
+    return settings.value( "logQueries" ).toBool();
+}

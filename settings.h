@@ -54,6 +54,7 @@ class Settings
         static QString qmonDbPassword();
         static int oraclePort();
         static int timezoneCorrection();
+        static bool logQueries();
 };    
 
 #endif
