@@ -27,7 +27,7 @@
 #include "settings.h"
 
 #include <QtGui>
-#include <QDebug>
+#include "debug.h"
 
 Network* Network::instance = 0;
 
@@ -53,14 +53,14 @@ void Network::destroy()
 
 Network::Network()
 {
-    qDebug() << "[NETWORK] Constructing";   
+    Debug::print( "network", "Constructing in thread " + QString::number( thread()->currentThreadId() ) );
     
     mNAM = new QNetworkAccessManager( this );
 }
 
 Network::~Network()
 {
-    qDebug() << "[NETWORK] Destroying";
+    Debug::print( "network", "Destroying " + QString::number( thread()->currentThreadId() ) );
 }
 
 QNetworkReply* Network::getImpl( const QUrl& url )
@@ -80,7 +80,7 @@ void Network::error( QNetworkReply::NetworkError error )
 {
     QNetworkReply* reply = qobject_cast<QNetworkReply*>( QObject::sender() );
     
-    qDebug() << "[NETWORK] Error getting" << reply->url();
+    Debug::print( "network", "Error getting " + reply->url().toString() + " -- " + error );
 }
 
 #include "network.moc"
