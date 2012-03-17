@@ -193,7 +193,8 @@ void ServerThread::run()
                 QTime timer;
                 timer.start();
               
-                Debug::log( "serverthread", "Starting Bomgar update..." );
+                Debug::log( "serverthread", "Starting DB update..." );
+                Debug::print( "serverthread", "Starting Bomgar update..." );
                     
                 QList< BomgarItem > list = Database::getChats( mQmonDB );
                 QStringList l;
@@ -226,7 +227,7 @@ void ServerThread::run()
                 timer.restart();
 
                 Debug::print( "serverthread", "Bomgar update finished, took " + QString::number( btime ) + " sec" );
-                Debug::log( "serverthread", "Starting Unity update..." );
+                Debug::print( "serverthread", "Starting Unity update..." );
 
                 out << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
                 out << "\r\n";
