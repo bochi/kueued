@@ -761,14 +761,14 @@ QList< SiebelItem > Database::getSrsForQueue( const QString& queue, const QStrin
         query.prepare( "SELECT ID, QUEUE, GEO, HOURS, STATUS, SEVERITY, SOURCE, RESPOND_VIA, CREATED, LAST_UPDATE, "
                        "INQUEUE, SLA, SUPPORT_PROGRAM, SUPPORT_PROGRAM_LONG, ROUTING_PRODUCT, SUPPORT_GROUP_ROUTING, "
                        "INT_TYPE, SUBTYPE, SERVICE_LEVEL, BRIEF_DESC, CRITSIT, HIGH_VALUE, DETAILED_DESC, CATEGORY, "
-                       "CREATOR, ROW_ID from QMON_SIEBEL" );
+                       "CREATOR, ROW_ID from QMON_SIEBEL SORT BY CREATED ASC" );
     }
     else
     {
         query.prepare( "SELECT ID, QUEUE, GEO, HOURS, STATUS, SEVERITY, SOURCE, RESPOND_VIA, CREATED, LAST_UPDATE, "
                        "INQUEUE, SLA, SUPPORT_PROGRAM, SUPPORT_PROGRAM_LONG, ROUTING_PRODUCT, SUPPORT_GROUP_ROUTING, "
                        "INT_TYPE, SUBTYPE, SERVICE_LEVEL, BRIEF_DESC, CRITSIT, HIGH_VALUE, DETAILED_DESC, CATEGORY, "
-                       "CREATOR, ROW_ID from QMON_SIEBEL WHERE ( QUEUE = :queue )" );
+                       "CREATOR, ROW_ID from QMON_SIEBEL WHERE ( QUEUE = :queue ) SORT BY CREATED ASC" );
         
         query.bindValue( ":queue", queue );
     }
