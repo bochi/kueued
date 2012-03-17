@@ -174,7 +174,7 @@ QString XML::queue( QList<QueueItem> list )
     //qint64 lu = ( adate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 ));
 
     xml += "<queue>\n";
-        
+    xml += "<total>" + QString::number( list.size() ) + "</total>\n";
     for ( int i = 0; i < list.size(); ++i ) 
     {
         QueueItem qi = list.at( i );
@@ -261,6 +261,77 @@ QString XML::queue( QList<QueueItem> list )
     }
     
     xml += "</queue>\n";
+    
+    return xml;
+}
+
+QString XML::stats( Statistics s )
+{
+    QString xml;
+    QList<ClosedItem> closedList = s.closedList;
+    QList<CsatItem> csatList = s.csatList;
+    
+    int ttsAvg = 0;
+    
+    for ( int i = 0; i < closedList.size(); ++i ) 
+    {
+        ttsAvg = ( ttsAvg + closedList.at( i ).tts );
+    }
+    
+    ttsAvg = ttsAvg / closedList.size();
+    
+    int engSatAvg = 0;
+    int srSatAvg = 0;
+    int rtsPercent = 0;
+    
+    for ( int i = 0; i < csatList.size(); ++i ) 
+    {
+        engSatAvg = engSatAvg + csatList.at( i ).engsat;
+        srSatAvg = srSatAvg + csatList.at( i ).srsat;
+        rtsPercent = rtsPercent + csatList.at( i ).rts;
+    }
+    
+    engSatAvg = ( engSatAvg / csatList.size() );
+    srSatAvg = ( srSatAvg / csatList.size() );
+    rtsPercent = ( rtsPercent * 100 / csatList.size() );
+    
+    xml += "<stats>\n\n";
+    xml += "  <closed>\n\n";
+    xml += "    <srs>" + s.closedSr + "</srs>\n";
+    xml += "    <crs>" + s.closedCr + "</crs>\n";
+    xml += "    <srttsavg>" + QString::number( ttsAvg ) + "</srttsavg>\n\n";
+    
+    for ( int i = 0; i < closedList.size(); ++i ) 
+    {
+        xml += "    <closedsr>\n";
+        xml += "      <sr>" + closedList.at(i).sr + "</sr>\n";
+        xml += "      <tts>" + QString::number( closedList.at(i).tts ) + "</tts>\n";
+        xml += "      <customer><![CDATA[" + closedList.at(i).customer + "]]></customer>\n";
+        xml += "      <bdesc><![CDATA[" + closedList.at(i).bdesc + "]]></bdesc>\n";
+        xml += "    </closedsr>\n\n";
+    }
+    
+    xml += "  </closed>\n\n";
+    
+    xml += "  <csat>\n\n";
+    xml += "    <engavg>" + QString::number( engSatAvg ) + "</engavg>\n";
+    xml += "    <sravg>" + QString::number( srSatAvg ) + "</sravg>\n";
+    xml += "    <rtsavg>" + QString::number( rtsPercent ) + "</rtsavg>\n\n";
+    
+    for ( int i = 0; i < csatList.size(); ++i ) 
+    {
+        xml += "    <survey>\n";
+        xml += "      <sr>" + csatList.at(i).sr + "</sr>\n";
+        xml += "      <rts>" + QString::number( csatList.at(i).rts ) + "</rts>\n";
+        xml += "      <engsat>" + QString::number( csatList.at(i).engsat ) + "</engsat>\n";
+        xml += "      <srsat>" + QString::number( csatList.at(i).srsat ) + "</srsat>\n";
+        xml += "      <customer><![CDATA[" + csatList.at(i).customer + "]]></customer>\n";
+        xml += "      <bdesc><![CDATA[" + csatList.at(i).bdesc + "]]></bdesc>\n";
+        xml += "    </survey>\n\n";
+    }
+    
+    xml += "  </csat>\n\n";
+    xml += "</stats>\n";
     
     return xml;
 }

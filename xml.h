@@ -31,13 +31,45 @@
 
 class SiebelItem;
 //class BomgarItem;
+class Statistics;
 
 class XML
 {
     public:
         static QString qmon( QList<SiebelItem> );
         static QString queue( QList<QueueItem> );
+        static QString stats( Statistics );
     
+};
+
+class CsatItem
+{
+    public:
+        QString sr;
+        int engsat;
+        int srsat;
+        QString customer;
+        QString bdesc;
+        int rts;
+};
+
+class ClosedItem
+{
+    public:
+        QString sr;
+        int tts;
+        QString customer;
+        QString bdesc;
+};
+    
+class Statistics
+{
+    public:
+        QString closedSr;
+        QString closedCr;
+        QString openSr;
+        QList<CsatItem> csatList;
+        QList<ClosedItem> closedList;
 };
 
 

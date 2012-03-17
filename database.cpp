@@ -1324,6 +1324,42 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
     return list;
 }
 
+QStringList Database::srInfo( const QString& sr, const QString& dbname )
+{
+    QSqlDatabase db;
+    
+    if ( dbname.isNull() ) 
+    {
+        db = QSqlDatabase::database( "siebelDB" );
+    }
+    else
+    {
+        db = QSqlDatabase::database( dbname );
+    }
+    
+    QSqlQuery query( db );
+    
+    query.prepare( "SELECT SR_TITLE, g.FST_NAME, g.LAST_NAME, ext.NAME "
+                   "from siebel.s_srv_req sr, siebel.s_contact g, siebel.s_org_ext ext "
+                   "where sr.sr_num = :sr and g.row_id = sr.CST_CON_ID and ext.row_id = sr.CST_OU_ID" );
+    
+    query.bindValue( ":sr", sr );
+    
+    query.exec();
+    
+    QStringList info;
+    
+    if ( query.next() )
+    {
+        info.append( query.value( 0 ).toString() );
+        info.append( query.value( 1 ).toString() );
+        info.append( query.value( 2 ).toString() );
+        info.append( query.value( 3 ).toString() );
+    }
+
+    return info;
+}
+
 QList< BomgarItem > Database::getChats( const QString& dbname )
 {
     QSqlDatabase db;

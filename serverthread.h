@@ -47,6 +47,7 @@ class ServerThread : public QThread
         QString mQmonDB;
         QString mEngineer;
         QString mHostname;
+        QString getWF( const QString& );
         QTime mTime;
         
     private slots:

@@ -56,6 +56,7 @@ SET( kueued_CPP     main.cpp
                     kueued.cpp
                     database.cpp
                     settings.cpp
+		    network.cpp
 		    serverthread.cpp
                     server.cpp
 		    xml.cpp)

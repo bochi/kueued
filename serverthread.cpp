@@ -28,11 +28,13 @@
 #include "debug.h"
 #include "serverthread.h"
 #include "database.h"
+#include "network.h"
 
 #include <iostream>
 #include <QtSql>
 #include <QTcpSocket>
 #include <QHostAddress>
+#include <QtNetwork>
 #include <QTime>
 
 ServerThread::ServerThread( int sd, QObject *parent ) : QThread(parent)
@@ -322,6 +324,127 @@ void ServerThread::run()
                     Debug::print( "server", "Userqueue for " + eng + " took " + QString::number( uqTimer.elapsed() / 1000 ) + " sec");
                 }
             }
+            else if ( cmd.startsWith( "/stats" ) )
+            {    
+                QString q = cmd.remove( "/stats" );
+                    
+                if ( q.remove( "/" ).isEmpty() )
+                {
+                    out << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
+                    out << "\r\n";
+                    out << "Please specify engineer";
+                }
+                else
+                {
+                    QString wf = getWF( q );
+                    
+                    if ( wf == "00000" )
+                    {
+                        out << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
+                        out << "\r\n";
+                        out << "Invalid engineer";
+                    }
+                    else
+                    {
+                        openSiebelDB();
+                        
+                        out << "Content-Type: text/xml; charset=\"utf-8\"\r\n";
+                        out << "\r\n";
+                        out << "<?xml version='1.0'?>\n\n";
+                        
+                        Statistics statz;
+                        
+                        QString numbers;
+                        QNetworkReply* r = Network::net().get( QUrl( "http://proetus.provo.novell.com/qmon/closed4.asp?tse=" + q ) );
+                        QEventLoop loop;
+    
+                        QObject::connect( r, SIGNAL( finished() ), 
+                                        &loop, SLOT( quit() ) );
+                    
+                        loop.exec();
+                            
+                        numbers = r->readAll();
+                        
+                        QString csat;
+                        QNetworkReply* csr = Network::net().get( QUrl( "http://proetus.provo.novell.com/qmon/custsat.asp?wf=" + wf ) );
+                        
+                        QObject::connect( csr, SIGNAL( finished() ), 
+                                        &loop, SLOT( quit() ) );
+                    
+                        loop.exec();
+                            
+                        csat = csr->readAll();
+                        
+                        QStringList csatList = csat.split( "<br>" );
+                        
+                        QString tts;
+                        QNetworkReply* ttr = Network::net().get( QUrl( "http://proetus.provo.novell.com/qmon/timetosolutiontse.asp?tse=" +  q ) );
+                        
+                        QObject::connect( ttr, SIGNAL( finished() ), 
+                                        &loop, SLOT( quit() ) );
+                    
+                        loop.exec();
+                            
+                        tts = ttr->readAll();
+                        QStringList ttsList = tts.split( "<br>" );
+                        
+                        QString o = numbers.split("<br>").at(0);
+                        o.remove( QRegExp( "<(?:div|span|tr|td|br|body|html|tt|a|strong|p)[^>]*>", Qt::CaseInsensitive ) );
+                        
+                        statz.closedSr = o.split("|").at(0).trimmed();
+                        statz.closedCr = o.split("|").at(1).trimmed();
+                        
+                        QList<ClosedItem> closedList;
+                        
+                        for ( int i = 0; i < ttsList.size() - 1; ++i )
+                        {
+                            ClosedItem ci;
+                            
+                            QString tmp = ttsList.at(i);
+                            tmp.remove( QRegExp( "<(?:div|span|tr|td|br|body|html|tt|a|strong|p)[^>]*>", Qt::CaseInsensitive ) );
+                            
+                            ci.sr = tmp.split( "|" ).at( 1 );
+                            ci.tts = tmp.split( "|" ).at( 2 ).toInt();
+                            
+                            QStringList info = Database::srInfo( ci.sr, mSiebelDB );
+                            
+                            ci.customer = info.at( 3 ) + " (" + info.at(1) + " " + info.at(2) + ")";
+                            ci.bdesc = info.at( 0 );
+                            
+                            closedList.append( ci );
+                        }
+                        
+                        QList<CsatItem> csatItemList;
+                        
+                        for ( int i = 0; i < csatList.size() - 1; ++i )
+                        {
+                            CsatItem csi;
+                           
+                            QString tmp = csatList.at(i);
+                            tmp.remove( QRegExp( "<(?:div|span|tr|td|br|body|html|tt|a|strong|p)[^>]*>", Qt::CaseInsensitive ) );
+                            
+                            csi.sr = tmp.split( "|" ).at( 1 ).trimmed();
+                            csi.srsat = tmp.split( "|" ).at( 2 ).trimmed().toInt();
+                            csi.engsat = tmp.split( "|" ).at( 3 ).trimmed().toInt();
+                            csi.rts = tmp.split( "|" ).at( 4 ).trimmed().toInt();
+                                                            
+                            QStringList info = Database::srInfo( csi.sr, mSiebelDB );
+                            
+                            csi.customer = info.at( 3 ) + " (" + info.at(1) + " " + info.at(2) + ")";
+                            csi.bdesc = info.at(0);
+                            
+                            csatItemList.append( csi );
+                        }
+                        
+                        statz.closedList = closedList;
+                        statz.csatList = csatItemList;
+                        
+                        out << XML::stats( statz );
+                    }
+                }
+                
+                socket->close();
+            }
             else
             {
                 out << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
@@ -378,7 +501,6 @@ void ServerThread::run()
                 
                 socket->close();
             }
-            
             
             if ( socket->waitForBytesWritten() )
             {
@@ -468,6 +590,24 @@ void ServerThread::openSiebelDB()
     {
         Debug::print( "database", "DB already open in this thread " + mSiebelDB );
     }
+}
+
+QString ServerThread::getWF( const QString& engineer )
+{
+    QEventLoop loop;
+    QString wfid;
+    
+    QNetworkReply *reply = Network::net().get( QUrl( Settings::dBServer() + "/workforce.asp?tse=" + engineer ) );
+    
+    loop.connect( reply, SIGNAL( readyRead() ),
+                  &loop, SLOT( quit() ) );
+        
+    loop.exec();
+       
+    wfid = reply->readAll();
+    wfid.remove( QRegExp( "<(?:div|span|tr|td|br|body|html|tt|a|strong|p)[^>]*>", Qt::CaseInsensitive ) );
+   
+    return wfid.trimmed();
 }
 
 #include "serverthread.moc"
