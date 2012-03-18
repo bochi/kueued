@@ -408,15 +408,29 @@ QString XML::stats( Statistics s )
     int srSatAvg = 0;
     int rtsPercent = 0;
     
+    int engTotal = 0;
+    int srTotal = 0;
+   
+    
     for ( int i = 0; i < csatList.size(); ++i ) 
     {
-        engSatAvg = engSatAvg + csatList.at( i ).engsat;
-        srSatAvg = srSatAvg + csatList.at( i ).srsat;
+        if ( csatList.at( i ).engsat != 88 )
+        {
+            engSatAvg = engSatAvg + csatList.at( i ).engsat;
+            engTotal = engTotal + 1;
+        }
+        
+        if ( csatList.at( i ).srsat != 88 )
+        {
+            srSatAvg = srSatAvg + csatList.at( i ).srsat;
+            srTotal = srTotal + 1;
+        }
+        
         rtsPercent = rtsPercent + csatList.at( i ).rts;
     }
     
-    engSatAvg = ( engSatAvg / csatList.size() );
-    srSatAvg = ( srSatAvg / csatList.size() );
+    engSatAvg = ( engSatAvg / engTotal );
+    srSatAvg = ( srSatAvg / srTotal );
     rtsPercent = ( rtsPercent * 100 / csatList.size() );
     
     xml += "<stats>\n\n";
@@ -447,8 +461,17 @@ QString XML::stats( Statistics s )
         xml += "    <survey>\n";
         xml += "      <sr>" + csatList.at(i).sr + "</sr>\n";
         xml += "      <rts>" + QString::number( csatList.at(i).rts ) + "</rts>\n";
-        xml += "      <engsat>" + QString::number( csatList.at(i).engsat ) + "</engsat>\n";
-        xml += "      <srsat>" + QString::number( csatList.at(i).srsat ) + "</srsat>\n";
+        
+        if ( csatList.at( i ).engsat != 88 )
+        {
+            xml += "      <engsat>" + QString::number( csatList.at(i).engsat ) + "</engsat>\n";
+        }
+        
+        if ( csatList.at( i ).srsat != 88 )
+        {
+            xml += "      <srsat>" + QString::number( csatList.at(i).srsat ) + "</srsat>\n";
+        }
+        
         xml += "      <customer><![CDATA[" + csatList.at(i).customer + "]]></customer>\n";
         xml += "      <bdesc><![CDATA[" + csatList.at(i).bdesc + "]]></bdesc>\n";
         xml += "    </survey>\n\n";

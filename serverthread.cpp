@@ -439,8 +439,25 @@ void ServerThread::run()
                             tmp.remove( QRegExp( "<(?:div|span|tr|td|br|body|html|tt|a|strong|p)[^>]*>", Qt::CaseInsensitive ) );
                             
                             csi.sr = tmp.split( "|" ).at( 1 ).trimmed();
-                            csi.srsat = tmp.split( "|" ).at( 2 ).trimmed().toInt();
-                            csi.engsat = tmp.split( "|" ).at( 3 ).trimmed().toInt();
+                            
+                            if ( tmp.split( "|" ).at( 2 ).isEmpty() )
+                            {
+                                csi.srsat = 88;
+                            }
+                            else
+                            {
+                                csi.srsat = tmp.split( "|" ).at( 2 ).trimmed().toInt();
+                            }
+                            
+                            if ( tmp.split( "|" ).at( 3 ).isEmpty() )
+                            {
+                                csi.engsat = 88;
+                            }
+                            else
+                            {
+                                csi.engsat = tmp.split( "|" ).at( 3 ).trimmed().toInt();
+                            }
+                            
                             csi.rts = tmp.split( "|" ).at( 4 ).trimmed().toInt();
                                                             
                             QStringList info = Database::srInfo( csi.sr, mSiebelDB );
