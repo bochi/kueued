@@ -282,7 +282,7 @@ QString Database::getDetDesc( const QString& sr, const QString& dbname )
     
     if ( query.next() )
     {
-        return query.value( 0 ).toString();
+        return query.value(0).toString();
     }
     else
     {

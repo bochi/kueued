@@ -134,10 +134,11 @@ void ServerThread::run()
         {
             QByteArray block;
             QTextStream out( socket );
+            out.setCodec("UTF-8");
             
             out << "HTTP/1.1 200 OK\r\n";
             out << "Server: kueued @ " + mHostname + " (Linux)\r\n";     
-            out << "Connection: close\r\n";
+            
             
             if ( cmd.startsWith( "/qmon_date" ) )
             {
