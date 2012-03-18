@@ -260,6 +260,36 @@ void Database::updateSiebelItem( SiebelItem item, const QString& dbname, const Q
     Debug::logQuery( cquery, db.connectionName() );
 }
 
+QString Database::getDetDesc( const QString& sr, const QString& dbname )
+{
+    QSqlDatabase db;
+    
+    if ( dbname.isNull() ) 
+    {
+        db = QSqlDatabase::database( "siebelDB" );
+    }
+    else
+    {
+        db = QSqlDatabase::database( dbname );
+    }
+    
+    QSqlQuery query( db );
+
+    query.prepare( "SELECT DESC_TEXT FROM SIEBEL.S_SRV_REQ WHERE SR_NUM = :sr" );
+    
+    query.bindValue( ":sr", sr );
+    query.exec();
+    
+    if ( query.next() )
+    {
+        return query.value( 0 ).toString();
+    }
+    else
+    {
+        return "ERROR";
+    }
+}
+
 void Database::updateSiebelQueue( SiebelItem si, const QString& dbname )
 {
     Debug::log( "database", "Updating Siebel queue for " + si.id + " to " + si.queue );

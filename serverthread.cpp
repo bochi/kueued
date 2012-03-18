@@ -200,6 +200,26 @@ void ServerThread::run()
                                 
                 out << Settings::latestVersion();
             }
+            else if ( cmd.startsWith( "/detailed" ) )
+            {
+                QString q = cmd.remove( "/detailed" );
+
+                if ( q.remove( "/" ).isEmpty() )
+                {  
+                    out << "Please specify sr number";
+                }
+                else
+                {  
+                    openSiebelDB();
+                
+                    out << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
+                    out << "\r\n";
+                                
+                    out << Database::getDetDesc( q, mSiebelDB );
+                }
+                
+                socket->close();
+            }
             else if ( cmd.startsWith( "/updateDB" ) )
             {
                 openMysqlDB();
