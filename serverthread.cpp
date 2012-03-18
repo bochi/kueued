@@ -139,6 +139,19 @@ void ServerThread::run()
             out << "Server: kueued @ " + mHostname + " (Linux)\r\n";     
             out << "Connection: close\r\n";
             
+            if ( cmd.startsWith( "/qmon_date" ) )
+            {
+                openMysqlDB();
+                
+                QString xml = XML::qmonDate( Database::getSrsForQueue( "NONE", mMysqlDB ) );
+
+                out << "Content-Type: text/xml; charset=\"utf-8\"\r\n";
+                out << "\r\n";
+                out << "<?xml version='1.0'?>\n\n";
+                out << xml;
+                
+                socket->close();
+            }
             if ( cmd.startsWith( "/qmon" ) )
             {
                 openMysqlDB();
