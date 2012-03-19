@@ -523,6 +523,31 @@ void Database::updatePseudoQueues( const QString& qDb, const QString& mDb )
     }
 }
 
+QStringList Database::getPseudoQueues( const QString& dbname )
+{
+    QStringList list;
+    QSqlDatabase db;
+    
+    if ( dbname.isNull() ) 
+    {
+        db = QSqlDatabase::database( "mysqlDB" );
+    }
+    else
+    {
+        db = QSqlDatabase::database( dbname );
+    }
+    
+    QSqlQuery query( db );
+    query.exec( "SELECT * FROM PSEUDOQ" );
+    
+    while ( query.next() )
+    {
+        list.append( query.value( 0 ).toString() );
+    }
+    
+    return list;
+}
+
 
 void Database::deleteSiebelItemFromDB( const QString& id, const QString& dbname )
 {

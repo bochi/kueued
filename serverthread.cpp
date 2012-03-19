@@ -366,27 +366,19 @@ void ServerThread::run()
             }
             else if ( cmd.startsWith( "/pseudoQ" ) )
             {
-                openQmonDB();
                 openMysqlDB();
                 
-                //QList<PseudoQueueItem> l = Database::getPseudoQueues( mQmonDB );
+                QStringList pl = Database::getPseudoQueues( mMysqlDB );
                 
-              
-                out << "Content-Type: text/xml; charset=\"utf-8\"\r\n";
+                out << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
                 out << "\r\n";
-                out << "<?xml version='1.0'?>\n\n";
-                out << "<pseudoqueues>\n";
                 
-                //for ( int i = 0; i < l.size(); ++i )
-                //{
-                    out << "  <queue>\n";
-                  //  out << "    <displayname>" + l.at(i).displayname + "</displayname>\n";
-                    //out << "    <queuename>" + l.at(i).queuename + "</queuename>\n";
-                    out << "  </queue>\n";
-                //}
-                
-                out << "</pseudoqueues>";
-                
+                for ( int i = 0; i < pl.size(); ++i )
+                {
+                    out << pl.at(i) + "\n";
+                }
+
+                socket->close();
             }
             else if ( cmd.startsWith( "/userqueue" ) )
             {    
