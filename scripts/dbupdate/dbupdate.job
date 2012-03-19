@@ -1,0 +1,30 @@
+#!/bin/bash
+
+count=0
+
+while ( true ); do
+
+    count=$(($count+1)) 
+    IP=$(host data.kueue.tk|tail -1| sed "s/data.kueue.tk has address //g")
+
+    if [ "$count" -lt "15" ]; then
+
+        RESULT=$(curl -A kueue-dbupdate --silent http://$IP:8080/updateDB | tail -1)
+
+    else
+
+        RESULT=$(curl -A kueue-dbupdate --silent http://$IP:8080/updateDB/full | tail -1)
+        count=0
+
+    fi
+
+    if [ "$RESULT" == "UPDATE FINISHED" ]; then
+
+	    echo "$(date +%F\ %X) - Update successful :)"
+
+    else
+	    echo "$(date +%F\ %X) - Something went wrong - please check server logs :("
+
+    fi
+
+done

@@ -1,0 +1,39 @@
+#!/bin/bash
+
+if [ -z "$1" ]; then
+
+echo "Usage: dbupdate start|stop"
+exit
+
+fi
+
+if [ "$1" == "start" ]; then
+
+  if [ -e "/tmp/dbupdate.pid" ]; then 
+
+    echo "dbupdate already running (pidfile /tmp/dbupdate.pid exists)"
+    exit
+
+  else
+    /usr/bin/dbupdate.job &
+    echo $(jobs -p) > /tmp/dbupdate.pid
+
+  fi
+
+else if [ "$1" == "stop" ]; then
+
+  if [ -e "/tmp/dbupdate.pid" ]; then
+
+    kill -9 $(cat /tmp/dbupdate.pid)
+    rm /tmp/dbupdate.pid
+    echo "Done"
+    exit
+
+  else
+
+    echo "dbupdate doesn't seem to be running ((pidfile /tmp/dbupdate.pid does not exist)"
+    exit
+
+  fi
+fi
+fi
