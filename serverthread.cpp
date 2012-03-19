@@ -223,28 +223,48 @@ void ServerThread::run()
             }
             else if ( cmd.startsWith( "/updateDB" ) )
             {
+                bool full;
+                QString q = cmd.remove( "/updateDB" );
+
+                if ( q.remove( "/" ).isEmpty() )
+                {  
+                    full = false;
+                }
+                else if ( q.remove( "/" ) == "full" )
+                {
+                    full = true;
+                }
+                else
+                {
+                    full = false;
+                }
+                
                 openMysqlDB();
                 openSiebelDB();
                 openQmonDB();
                 
+                int btime;
                 QTime timer;
                 timer.start();
               
                 Debug::log( "serverthread", "Starting DB update..." );
               
-                Debug::print( "serverthread", "Starting PseudoQ update..." );
-                
-                Database::updatePseudoQueues( mQmonDB, mMysqlDB );
-                
-                int btime = timer.elapsed() / 1000;
-                timer.restart();
-                
-                Debug::print( "serverthread", "PseudoQ update finished, took " + QString::number( btime ) + " sec" );
-                
-                out << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
-                out << "\r\n";
-                out << "PseudoQ update took " +  QString::number( btime / 1000 ) + " sec\n";
-                
+                if ( full )
+                {
+                    Debug::print( "serverthread", "Starting PseudoQ update..." );
+                    
+                    Database::updatePseudoQueues( mQmonDB, mMysqlDB );
+                    
+                    btime = timer.elapsed() / 1000;
+                    timer.restart();
+                    
+                    Debug::print( "serverthread", "PseudoQ update finished, took " + QString::number( btime ) + " sec" );
+                    
+                    out << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
+                    out << "\r\n";
+                    out << "PseudoQ update took " +  QString::number( btime ) + " sec\n";
+                }
+                    
                 Debug::print( "serverthread", "Starting Bomgar update..." );
                     
                 QList< BomgarItem > list = Database::getChats( mQmonDB );
@@ -280,7 +300,7 @@ void ServerThread::run()
                 Debug::print( "serverthread", "Bomgar update finished, took " + QString::number( btime ) + " sec" );
                 Debug::print( "serverthread", "Starting Unity update..." );
 
-                out << "Bomgar update took " +  QString::number( btime / 1000 ) + " sec\n";
+                out << "Bomgar update took " +  QString::number( btime ) + " sec\n";
                 
                 QList<SiebelItem> ql = Database::getQmonSrs( mSiebelDB );
                 QStringList newList;
