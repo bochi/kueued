@@ -314,45 +314,42 @@ QString XML::queue( QList<QueueItem> list )
         else
         {
             xml += "    <srtype>sr</srtype>\n";
-            xml += "    <customer>\n";
-            xml += "      <account><![CDATA[" + qi.customer + "]]></account>\n";
+            xml += "    <cus_account><![CDATA[" + qi.customer + "]]></cus_account>\n";
             
             if ( ( !qi.contact_firstname.isEmpty() ) && ( qi.contact_firstname != "1" ) && ( qi.contact_firstname != "0" ) )
             {
-                xml += "      <firstname><![CDATA[" + qi.contact_firstname + "]]></firstname>\n";
+                xml += "    <cus_firstname><![CDATA[" + qi.contact_firstname + "]]></cus_firstname>\n";
             }
             
             if ( ( !qi.contact_lastname.isEmpty() ) && ( qi.contact_lastname != "1" )&& ( qi.contact_lastname != "0" )   )
             {
-                xml += "      <lastname><![CDATA[" + qi.contact_lastname + "]]></lastname>\n";
+                xml += "    <cus_lastname><![CDATA[" + qi.contact_lastname + "]]></cus_lastname>\n";
             }
             
             if ( ( !qi.contact_title.isEmpty() ) && ( qi.contact_title != "1" ) && ( qi.contact_title != "0" ) )
             {
-                xml += "      <title><![CDATA[" + qi.contact_title + "]]></title>\n";
+                xml += "    <cus_title><![CDATA[" + qi.contact_title + "]]></cus_title>\n";
             }
             
             if ( ( !qi.contact_email.isEmpty() ) && ( qi.contact_email != "1" ) && ( qi.contact_email != "0" ) )
             {
-                xml += "      <email><![CDATA[" + qi.contact_email + "]]></email>\n";  
+                xml += "    <cus_email><![CDATA[" + qi.contact_email + "]]></cus_email>\n";  
             }
             
             if ( ( !qi.contact_phone.isEmpty() ) && ( qi.contact_phone != "1" ) && ( qi.contact_phone != "0" ) )
             {
-                xml += "      <phone><![CDATA[" + qi.contact_phone + "]]></phone>\n";
+                xml += "    <cus_phone><![CDATA[" + qi.contact_phone + "]]></cus_phone>\n";
             }
             
             if ( ( !qi.onsite_phone.isEmpty() ) && ( qi.onsite_phone != "1" ) && ( qi.onsite_phone != "0" ) )
             {
-                xml += "      <onsitephone><![CDATA[" + qi.onsite_phone + "]]></onsitephone>\n";
+                xml += "    <cus_onsitephone><![CDATA[" + qi.onsite_phone + "]]></cus_onsitephone>\n";
             }
             
             if ( ( !qi.contact_lang.isEmpty() ) && ( qi.contact_lang != "1" ) && ( qi.contact_lang != "0" ) )
             {
-                xml += "      <lang><![CDATA[" + qi.contact_lang + "]]></lang>\n";
+                xml += "    <cus_lang><![CDATA[" + qi.contact_lang + "]]></cus_lang>\n";
             }
-            
-            xml += "    </customer>\n";
         }
 
         xml += "    <severity><![CDATA[" + qi.severity + "]]></severity>\n";
