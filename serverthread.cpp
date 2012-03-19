@@ -223,7 +223,7 @@ void ServerThread::run()
             }
             else if ( cmd.startsWith( "/updateDB" ) )
             {
-                bool full;
+                bool full = false;
                 QString q = cmd.remove( "/updateDB" );
 
                 if ( q.remove( "/" ).isEmpty() )
