@@ -538,7 +538,7 @@ QStringList Database::getPseudoQueues( const QString& dbname )
     }
     
     QSqlQuery query( db );
-    query.exec( "SELECT * FROM PSEUDOQ" );
+    query.exec( "SELECT * FROM PSEUDOQ ORDER BY QUEUENAME ASC" );
     
     while ( query.next() )
     {
