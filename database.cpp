@@ -486,6 +486,44 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
     return list;
 }
 
+void Database::updatePseudoQueues( const QString& qDb, const QString& mDb )
+{
+    QSqlDatabase qdb;
+    QSqlDatabase mdb;
+    
+    if ( qDb.isNull() ) 
+    {
+        qdb = QSqlDatabase::database( "qmonDB" );
+    }
+    else
+    {
+        qdb = QSqlDatabase::database( qDb );
+    }
+    
+    if ( mDb.isNull() ) 
+    {
+        mdb = QSqlDatabase::database( "mysqlDB" );
+    }
+    else
+    {
+        mdb = QSqlDatabase::database( mDb );
+    }
+    
+    QSqlQuery query( qdb );
+    QSqlQuery inQuery( mdb );
+    
+    query.prepare( "SELECT PseudoQueue FROM _NovQueuePseudoQueue" );
+    query.exec();
+    
+    while ( query.next() )
+    {
+          inQuery.prepare( "INSERT INTO PSEUDOQ( QUEUENAME ) VALUES ( :queuename )" );
+          inQuery.bindValue( ":queuename", query.value(0).toString() );
+          inQuery.exec();
+    }
+}
+
+
 void Database::deleteSiebelItemFromDB( const QString& id, const QString& dbname )
 {
     Debug::log( "database", "Deleting SiebelItem " + id );

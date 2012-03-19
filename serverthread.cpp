@@ -231,6 +231,20 @@ void ServerThread::run()
                 timer.start();
               
                 Debug::log( "serverthread", "Starting DB update..." );
+              
+                Debug::print( "serverthread", "Starting PseudoQ update..." );
+                
+                Database::updatePseudoQueues( mQmonDB, mMysqlDB );
+                
+                int btime = timer.elapsed() / 1000;
+                timer.restart();
+                
+                Debug::print( "serverthread", "PseudoQ update finished, took " + QString::number( btime ) + " sec" );
+                
+                out << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
+                out << "\r\n";
+                out << "PseudoQ update took " +  QString::number( btime / 1000 ) + " sec\n";
+                
                 Debug::print( "serverthread", "Starting Bomgar update..." );
                     
                 QList< BomgarItem > list = Database::getChats( mQmonDB );
@@ -260,14 +274,12 @@ void ServerThread::run()
                     }
                 }
                 
-                int btime = timer.elapsed() / 1000;
+                btime = timer.elapsed() / 1000;
                 timer.restart();
 
                 Debug::print( "serverthread", "Bomgar update finished, took " + QString::number( btime ) + " sec" );
                 Debug::print( "serverthread", "Starting Unity update..." );
 
-                out << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
-                out << "\r\n";
                 out << "Bomgar update took " +  QString::number( btime / 1000 ) + " sec\n";
                 
                 QList<SiebelItem> ql = Database::getQmonSrs( mSiebelDB );
@@ -330,6 +342,30 @@ void ServerThread::run()
                 }
                 
                 out << "</chat>";
+                
+            }
+            else if ( cmd.startsWith( "/pseudoQ" ) )
+            {
+                openQmonDB();
+                openMysqlDB();
+                
+                //QList<PseudoQueueItem> l = Database::getPseudoQueues( mQmonDB );
+                
+              
+                out << "Content-Type: text/xml; charset=\"utf-8\"\r\n";
+                out << "\r\n";
+                out << "<?xml version='1.0'?>\n\n";
+                out << "<pseudoqueues>\n";
+                
+                //for ( int i = 0; i < l.size(); ++i )
+                //{
+                    out << "  <queue>\n";
+                  //  out << "    <displayname>" + l.at(i).displayname + "</displayname>\n";
+                    //out << "    <queuename>" + l.at(i).queuename + "</queuename>\n";
+                    out << "  </queue>\n";
+                //}
+                
+                out << "</pseudoqueues>";
                 
             }
             else if ( cmd.startsWith( "/userqueue" ) )

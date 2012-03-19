@@ -31,6 +31,7 @@
 class SiebelItem;
 class BomgarItem;
 class QueueItem;
+class PseudoQueueItem;
 
 class Database : public QObject
 {
@@ -62,7 +63,7 @@ class Database : public QObject
         static QString getBomgarQueue( const QString&, const QString& = QString::Null() );
         static QString getBomgarQueueById( const QString&, const QString& = QString::Null() );
         static void updateBomgarQueue( BomgarItem, const QString& = QString::Null() );
-        
+        static void updatePseudoQueues( const QString& = QString::Null(), const QString& = QString::Null() );
         static QStringList getCurrentBomgars( const QString& = QString::Null() );
         
         static QString convertTime( const QString& );
@@ -153,6 +154,13 @@ class BomgarItem
         QString sr;
         QString name;
         QString date;
+};
+
+class PseudoQueueItem
+{
+    public:
+        QString displayname;
+        QString queuename;
 };
 
 #endif
