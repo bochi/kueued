@@ -66,45 +66,42 @@ QString XML::qmon( QList<SiebelItem> list )
         else
         {
             xml += "    <srtype>sr</srtype>\n";
-            xml += "    <customer>\n";
-            xml += "      <account><![CDATA[" + si.customer + "]]></account>\n";
+            xml += "    <cus_account><![CDATA[" + si.customer + "]]></cus_account>\n";
             
             if ( ( !si.contact_firstname.isEmpty() ) && ( si.contact_firstname != "1" ) && ( si.contact_firstname != "0" ) )
             {
-                xml += "      <firstname><![CDATA[" + si.contact_firstname + "]]></firstname>\n";
+                xml += "    <cus_firstname><![CDATA[" + si.contact_firstname + "]]></cus_firstname>\n";
             }
             
             if ( ( !si.contact_lastname.isEmpty() ) && ( si.contact_lastname != "1" )&& ( si.contact_lastname != "0" )   )
             {
-                xml += "      <lastname><![CDATA[" + si.contact_lastname + "]]></lastname>\n";
+                xml += "    <cus_lastname><![CDATA[" + si.contact_lastname + "]]></cus_lastname>\n";
             }
             
             if ( ( !si.contact_title.isEmpty() ) && ( si.contact_title != "1" ) && ( si.contact_title != "0" ) )
             {
-                xml += "      <title><![CDATA[" + si.contact_title + "]]></title>\n";
+                xml += "    <cus_title><![CDATA[" + si.contact_title + "]]></cus_title>\n";
             }
             
             if ( ( !si.contact_email.isEmpty() ) && ( si.contact_email != "1" ) && ( si.contact_email != "0" ) )
             {
-                xml += "      <email><![CDATA[" + si.contact_email + "]]></email>\n";  
+                xml += "    <cus_email><![CDATA[" + si.contact_email + "]]></cus_email>\n";  
             }
             
             if ( ( !si.contact_phone.isEmpty() ) && ( si.contact_phone != "1" ) && ( si.contact_phone != "0" ) )
             {
-                xml += "      <phone><![CDATA[" + si.contact_phone + "]]></phone>\n";
+                xml += "    <cus_phone><![CDATA[" + si.contact_phone + "]]></cus_phone>\n";
             }
             
             if ( ( !si.onsite_phone.isEmpty() ) && ( si.onsite_phone != "1" ) && ( si.onsite_phone != "0" ) )
             {
-                xml += "      <onsitephone><![CDATA[" + si.onsite_phone + "]]></onsitephone>\n";
+                xml += "    <cus_onsitephone><![CDATA[" + si.onsite_phone + "]]></cus_onsitephone>\n";
             }
             
             if ( ( !si.contact_lang.isEmpty() ) && ( si.contact_lang != "1" ) && ( si.contact_lang != "0" ) )
             {
-                xml += "      <lang><![CDATA[" + si.contact_lang + "]]></lang>\n";
+                xml += "    <cus_lang><![CDATA[" + si.contact_lang + "]]></cus_lang>\n";
             }
-            
-            xml += "    </customer>\n";
         }
 
         xml += "    <severity><![CDATA[" + si.severity + "]]></severity>\n";
@@ -190,45 +187,42 @@ QString XML::qmonDate( QList<SiebelItem> list )
         else
         {
             xml += "    <srtype>sr</srtype>\n";
-            xml += "    <customer>\n";
-            xml += "      <account><![CDATA[" + si.customer + "]]></account>\n";
+            xml += "    <cus_account><![CDATA[" + si.customer + "]]></cus_account>\n";
             
             if ( ( !si.contact_firstname.isEmpty() ) && ( si.contact_firstname != "1" ) && ( si.contact_firstname != "0" ) )
             {
-                xml += "      <firstname><![CDATA[" + si.contact_firstname + "]]></firstname>\n";
+                xml += "    <cus_firstname><![CDATA[" + si.contact_firstname + "]]></cus_firstname>\n";
             }
             
             if ( ( !si.contact_lastname.isEmpty() ) && ( si.contact_lastname != "1" )&& ( si.contact_lastname != "0" )   )
             {
-                xml += "      <lastname><![CDATA[" + si.contact_lastname + "]]></lastname>\n";
+                xml += "    <cus_lastname><![CDATA[" + si.contact_lastname + "]]></cus_lastname>\n";
             }
             
             if ( ( !si.contact_title.isEmpty() ) && ( si.contact_title != "1" ) && ( si.contact_title != "0" ) )
             {
-                xml += "      <title><![CDATA[" + si.contact_title + "]]></title>\n";
+                xml += "    <cus_title><![CDATA[" + si.contact_title + "]]></cus_title>\n";
             }
             
             if ( ( !si.contact_email.isEmpty() ) && ( si.contact_email != "1" ) && ( si.contact_email != "0" ) )
             {
-                xml += "      <email><![CDATA[" + si.contact_email + "]]></email>\n";  
+                xml += "    <cus_email><![CDATA[" + si.contact_email + "]]></cus_email>\n";  
             }
             
             if ( ( !si.contact_phone.isEmpty() ) && ( si.contact_phone != "1" ) && ( si.contact_phone != "0" ) )
             {
-                xml += "      <phone><![CDATA[" + si.contact_phone + "]]></phone>\n";
+                xml += "    <cus_phone><![CDATA[" + si.contact_phone + "]]></cus_phone>\n";
             }
             
             if ( ( !si.onsite_phone.isEmpty() ) && ( si.onsite_phone != "1" ) && ( si.onsite_phone != "0" ) )
             {
-                xml += "      <onsitephone><![CDATA[" + si.onsite_phone + "]]></onsitephone>\n";
+                xml += "    <cus_onsitephone><![CDATA[" + si.onsite_phone + "]]></cus_onsitephone>\n";
             }
             
             if ( ( !si.contact_lang.isEmpty() ) && ( si.contact_lang != "1" ) && ( si.contact_lang != "0" ) )
             {
-                xml += "      <lang><![CDATA[" + si.contact_lang + "]]></lang>\n";
+                xml += "    <cus_lang><![CDATA[" + si.contact_lang + "]]></cus_lang>\n";
             }
-            
-            xml += "    </customer>\n";
         }
 
         xml += "    <severity><![CDATA[" + si.severity + "]]></severity>\n";
