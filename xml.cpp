@@ -141,12 +141,12 @@ QString XML::qmon( QList<SiebelItem> list )
         
         if ( si.high_value )
         {
-            xml += "    <highvalue>yes</highvalue>\n";
+            xml += "    <highvalue>1</highvalue>\n";
         }
         
         if ( si.critsit )
         {
-            xml += "    <critsit>yes</critsit>\n";
+            xml += "    <critsit>1</critsit>\n";
         }
         
         xml += "  </sr>\n";
@@ -262,12 +262,12 @@ QString XML::qmonDate( QList<SiebelItem> list )
         
         if ( si.high_value )
         {
-            xml += "    <highvalue>yes</highvalue>\n";
+            xml += "    <highvalue>1</highvalue>\n";
         }
         
         if ( si.critsit )
         {
-            xml += "    <critsit>yes</critsit>\n";
+            xml += "    <critsit>1</critsit>\n";
         }
         
         xml += "  </sr>\n";
@@ -364,12 +364,12 @@ QString XML::queue( QList<QueueItem> list )
         
         if ( qi.high_value )
         {
-            xml += "    <highvalue>yes</highvalue>\n";
+            xml += "    <highvalue>1</highvalue>\n";
         }
         
         if ( qi.critsit )
         {
-            xml += "    <critsit>yes</critsit>\n";
+            xml += "    <critsit>1</critsit>\n";
         }
         
         xml += "  </sr>\n";
