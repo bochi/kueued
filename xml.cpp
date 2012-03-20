@@ -432,11 +432,11 @@ QString XML::stats( Statistics s )
     
     xml += "<stats>\n\n";
 
-    xml += "  <data>\n";
+    xml += "  <closeddata>\n";
     xml += "    <srs>" + s.closedSr + "</srs>\n";
     xml += "    <crs>" + s.closedCr + "</crs>\n";
     xml += "    <srttsavg>" + QString::number( ttsAvg ) + "</srttsavg>\n\n";
-    xml += "  </data>\n";
+    xml += "  </closeddata>\n";
     xml += "  <closed>\n\n";
     
     for ( int i = 0; i < closedList.size(); ++i ) 
@@ -451,10 +451,12 @@ QString XML::stats( Statistics s )
     
     xml += "  </closed>\n\n";
     
-    xml += "  <csat>\n\n";
+    xml += "  <csatdata>\n\n";
     xml += "    <engavg>" + QString::number( engSatAvg ) + "</engavg>\n";
     xml += "    <sravg>" + QString::number( srSatAvg ) + "</sravg>\n";
     xml += "    <rtsavg>" + QString::number( rtsPercent ) + "</rtsavg>\n\n";
+    xml += "  </csatdata>\n\n";
+    xml += "  <csat>\n\n";
     
     for ( int i = 0; i < csatList.size(); ++i ) 
     {
