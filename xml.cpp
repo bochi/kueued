@@ -431,10 +431,13 @@ QString XML::stats( Statistics s )
     rtsPercent = ( rtsPercent * 100 / csatList.size() );
     
     xml += "<stats>\n\n";
-    xml += "  <closed>\n\n";
+
+    xml += "  <data>\n";
     xml += "    <srs>" + s.closedSr + "</srs>\n";
     xml += "    <crs>" + s.closedCr + "</crs>\n";
     xml += "    <srttsavg>" + QString::number( ttsAvg ) + "</srttsavg>\n\n";
+    xml += "  </data>\n";
+    xml += "  <closed>\n\n";
     
     for ( int i = 0; i < closedList.size(); ++i ) 
     {
