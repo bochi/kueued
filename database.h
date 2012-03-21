@@ -67,7 +67,7 @@ class Database : public QObject
         static QStringList getPseudoQueues( const QString& =  QString::Null() );
         static QStringList getCurrentBomgars( const QString& = QString::Null() );
         
-        static QString convertTime( const QString&, bool = false );
+        static QString convertTime( const QString& );
         
         static QList< QueueItem > getUserQueue( const QString&, const QString& = QString::Null() );
         static QList< SiebelItem > getQmonSrs( const QString& = QString::Null() );

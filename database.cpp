@@ -125,8 +125,8 @@ void Database::insertSiebelItemIntoDB( SiebelItem item, const QString& dbname )
     query.bindValue( ":severity", item.severity );
     query.bindValue( ":source", item.source );
     query.bindValue( ":respond_via", item.respond_via );
-    query.bindValue( ":created", convertTime( item.created, true) );
-    query.bindValue( ":last_update", convertTime( item.last_update, true ) );
+    query.bindValue( ":created", convertTime( item.created ) );
+    query.bindValue( ":last_update", convertTime( item.last_update ) );
     query.bindValue( ":inqueue", QDateTime::currentDateTime().toString( "yyyy-MM-dd hh:mm:ss" ) );
     query.bindValue( ":sla", convertTime( item.sla ) );
     query.bindValue( ":support_program", item.support_program );
@@ -211,8 +211,8 @@ void Database::updateSiebelItem( SiebelItem item, const QString& dbname, const Q
     query.bindValue( ":severity", item.severity );
     query.bindValue( ":source", item.source );
     query.bindValue( ":respond_via", item.respond_via );
-    query.bindValue( ":created", convertTime( item.created, true ) );
-    query.bindValue( ":last_update", convertTime( item.last_update, true ) );
+    query.bindValue( ":created", convertTime( item.created ) );
+    query.bindValue( ":last_update", convertTime( item.last_update ) );
     query.bindValue( ":sla", convertTime( item.sla ) );
     query.bindValue( ":support_program", item.support_program );
     query.bindValue( ":support_program_long", item.support_program_long );
