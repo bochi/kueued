@@ -1148,7 +1148,7 @@ QString Database::convertTime( const QString& dt, bool correct )
     
     if ( !d.isValid() ) d = QDateTime::fromString( dt, "yyyy-MM-ddThh:mm:ss" );
     
-    if ( correct )
+    /*if ( correct )
     {
         QString time = d.toString( "yyyy-MM-dd" ) + " " + QString::number( d.time().hour() - 1 ) + ":" + d.toString( "mm:ss" );
         out = QDateTime::fromString( time, "yyyy-MM-dd H:mm:ss" );
@@ -1156,11 +1156,10 @@ QString Database::convertTime( const QString& dt, bool correct )
     else
     {
         out = d;
-    }
-  
+    }*/
+    if ( correct ) d.addSecs( Settings::timezoneCorrection() * 3600 );
 
-    qDebug() << d.toString("yyyy-MM-dd hh:mm:ss") << out.toString("yyyy-MM-dd hh:mm:ss");
-    return ( out.toString("yyyy-MM-dd hh:mm:ss") );
+    return ( d.toString("yyyy-MM-dd hh:mm:ss") );
 }
 
 QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
