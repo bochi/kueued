@@ -1141,24 +1141,12 @@ QString Database::getBomgarQueueById( const QString& id, const QString& dbname )
     }
 }
 
-QString Database::convertTime( const QString& dt, bool correct )
+QString Database::convertTime( const QString& dt )
 {
     QDateTime d = QDateTime::fromString( dt, "M/d/yyyy hh:mm:ss AP" );
-    QDateTime out;
     
     if ( !d.isValid() ) d = QDateTime::fromString( dt, "yyyy-MM-ddThh:mm:ss" );
-    
-    /*if ( correct )
-    {
-        QString time = d.toString( "yyyy-MM-dd" ) + " " + QString::number( d.time().hour() - 1 ) + ":" + d.toString( "mm:ss" );
-        out = QDateTime::fromString( time, "yyyy-MM-dd H:mm:ss" );
-    }
-    else
-    {
-        out = d;
-    }*/
-    if ( correct ) d.addSecs( Settings::timezoneCorrection() * 3600 );
-qDebug() << dt << d.toString("yyyy-MM-dd hh:mm:ss") ;
+
     return ( d.toString("yyyy-MM-dd hh:mm:ss") );
 }
 
