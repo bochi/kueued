@@ -1143,6 +1143,7 @@ QString Database::getBomgarQueueById( const QString& id, const QString& dbname )
 
 QString Database::convertTime( const QString& dt, bool correct )
 {
+    qDebug() << "convert" << dt;
     QDateTime d = QDateTime::fromString( dt, "M/d/yyyy h:mm:ss AP" );
     
     if ( correct )
