@@ -1146,6 +1146,8 @@ QString Database::convertTime( const QString& dt, bool correct )
     qDebug() << "convert" << dt;
     QDateTime d = QDateTime::fromString( dt, "M/d/yyyy hh:mm:ss AP" );
     
+    if ( !d.isValid() ) d = QDateTime::fromString( dt, "yyyy-MM-ddThh:mm:ss" );
+    
     if ( correct )
     {
         qDebug() << d.toString( "yyyy-MM-dd hh:mm:ss" );
