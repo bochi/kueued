@@ -1151,7 +1151,11 @@ QString Database::convertTime( const QString& dt, bool correct )
     if ( correct )
     {
         qDebug() << d.toString( "yyyy-MM-dd hh:mm:ss" );
-        d.time().setHMS( d.time().hour() - Settings::timezoneCorrection(), d.time().minute(), d.time().second() );
+        int h = d.time().hour();
+        int m = d.time().minute();
+        int s = d.time().second();
+        
+        qDebug() << h << m << s;
         qDebug() << d.toString( "yyyy-MM-dd hh:mm:ss" );
     }
     
