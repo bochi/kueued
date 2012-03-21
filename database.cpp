@@ -1158,7 +1158,7 @@ QString Database::convertTime( const QString& dt, bool correct )
         out = d;
     }*/
     if ( correct ) d.addSecs( Settings::timezoneCorrection() * 3600 );
-
+qDebug() << dt << d.toString("yyyy-MM-dd hh:mm:ss") ;
     return ( d.toString("yyyy-MM-dd hh:mm:ss") );
 }
 
