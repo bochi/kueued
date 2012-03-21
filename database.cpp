@@ -1143,7 +1143,6 @@ QString Database::getBomgarQueueById( const QString& id, const QString& dbname )
 
 QString Database::convertTime( const QString& dt, bool correct )
 {
-    qDebug() << "convert" << dt;
     QDateTime d = QDateTime::fromString( dt, "M/d/yyyy hh:mm:ss AP" );
     QDateTime out;
     
@@ -1152,11 +1151,16 @@ QString Database::convertTime( const QString& dt, bool correct )
     if ( correct )
     {
         QString time = d.toString( "yyyy-MM-dd" ) + " " + QString::number( d.time().hour() - 1 ) + ":" + d.toString( "mm:ss" );
-        qDebug() << time << d.toString( "yyyy-MM-dd hh:mm:ss" );
-        
+        out = QDateTime::fromString( time, "yyyy-MM-dd H:mm:ss" );
     }
-    
-    return ( d.toString("yyyy-MM-dd hh:mm:ss") );
+    else
+    {
+        out = d;
+    }
+  
+
+    qDebug() << d.toString("yyyy-MM-dd hh:mm:ss") << out.toString("yyyy-MM-dd hh:mm:ss");
+    return ( out.toString("yyyy-MM-dd hh:mm:ss") );
 }
 
 QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
