@@ -1151,10 +1151,10 @@ QString Database::convertTime( const QString& dt, bool correct )
     if ( correct )
     {
         qDebug() << d.toString( "yyyy-MM-dd hh:mm:ss" );
-        int h = d.time().hour();
+        int h = d.time().hour() - 1;
         int m = d.time().minute();
         int s = d.time().second();
-        
+        d.time().setHMS( h, m, s );
         qDebug() << h << m << s;
         qDebug() << d.toString( "yyyy-MM-dd hh:mm:ss" );
     }
