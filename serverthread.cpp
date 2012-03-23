@@ -394,6 +394,8 @@ void ServerThread::run()
                 }
                 else
                 {
+                    mNetwork = &mNetwork->net();
+                
                     QEventLoop loop;
                     QString o;
                     QNetworkReply* ass = mNetwork->get( QUrl( "http://proetus.provo.novell.com/qmon/assign.asp?sr=" + q.remove( "/" ).split( "|" ).at( 0 ) + "&owner=" + q.remove( "/" ).split( "|" ).at( 1 ) ) );
@@ -409,6 +411,7 @@ void ServerThread::run()
                     out << "\r\n";
                     out << o;
                     socket->close();
+                    mNetwork->destroy();
                 }
             }
             else if ( cmd.startsWith( "/userqueue" ) )
