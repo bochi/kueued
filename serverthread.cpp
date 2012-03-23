@@ -380,6 +380,37 @@ void ServerThread::run()
 
                 socket->close();
             }
+            else if ( cmd.startsWith( "/assign" ) )
+            {
+                QString q = cmd.remove( "/assign" );
+                
+                if ( q.remove( "/" ).isEmpty() )
+                {  
+                    out << "Please specify sr number and engineer  delimited by |";
+                }
+                else if ( !q.contains( "|" ) )
+                {  
+                    out << "Please specify engineer";
+                }
+                else
+                {
+                    QEventLoop loop;
+                    QString o;
+                    QNetworkReply* ass = mNetwork->get( QUrl( "http://proetus.provo.novell.com/qmon/assign.asp?sr=" + q.remove( "/" ).split( "|" ).at( 0 ) + "&owner=" + q.remove( "/" ).split( "|" ).at( 1 ) ) );
+                            
+                    QObject::connect( ass, SIGNAL( finished() ), 
+                                      &loop, SLOT( quit() ) );
+                        
+                    loop.exec();
+                                
+                    o = ass->readAll();
+
+                    out << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
+                    out << "\r\n";
+                    out << o;
+                    socket->close();
+                }
+            }
             else if ( cmd.startsWith( "/userqueue" ) )
             {    
                 openSiebelDB();
