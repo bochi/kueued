@@ -415,8 +415,10 @@ void ServerThread::run()
                     QObject::connect( ass, SIGNAL( finished() ), 
                                       &loop, SLOT( quit() ) );
                         
+                    qDebug() << "ASSIGN" << ass->url();
                     loop.exec();
-                                
+                    
+                    qDebug() << "DONE ASS";
                     o = ass->readAll();
 
                     out << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
