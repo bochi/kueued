@@ -380,6 +380,15 @@ void ServerThread::run()
 
                 socket->close();
             }
+            else if ( cmd.startsWith( "/unityURL" ) )
+            {
+                out << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
+                out << "\r\n";
+                
+                out << Settings::unityURL() + "\n";
+                
+                socket->close();
+            }
             else if ( cmd.startsWith( "/assign" ) )
             {
                 QString q = cmd.remove( "/assign" );
@@ -398,10 +407,13 @@ void ServerThread::run()
                 
                     QEventLoop loop;
                     QString o;
-                    QNetworkReply* ass = mNetwork->get( QUrl( "http://proetus.provo.novell.com/qmon/assign.asp?sr=" + q.remove( "/" ).split( "|" ).at( 0 ) + "&owner=" + q.remove( "/" ).split( "|" ).at( 1 ) ) );
+                    QNetworkReply* ass;
                             
                     QObject::connect( ass, SIGNAL( finished() ), 
                                       &loop, SLOT( quit() ) );
+                    
+                    ass = mNetwork->get( QUrl( "http://proetus.provo.novell.com/qmon/assign.asp?sr=" + q.remove( "/" ).split( "|" ).at( 0 ) + 
+                                               "&owner=" + q.remove( "/" ).split( "|" ).at( 1 ) ) );
                         
                     loop.exec();
                                 
@@ -410,7 +422,9 @@ void ServerThread::run()
                     out << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
                     out << "\r\n";
                     out << o;
+                    
                     socket->close();
+                    
                     mNetwork->destroy();
                 }
             }

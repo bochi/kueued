@@ -52,6 +52,7 @@ class Settings
         static QString qmonDbDatabase();
         static QString qmonDbUser();
         static QString qmonDbPassword();
+        static QString unityURL();
         static int oraclePort();
         static int timezoneCorrection();
         static bool logQueries();

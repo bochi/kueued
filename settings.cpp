@@ -145,6 +145,12 @@ QString Settings::qmonDbPassword()
     return settings.value( "qmonDbPassword" ).toString();
 }
 
+QString Settings::unityURL()
+{
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
+    return settings.value( "unityURL" ).toString();
+}
+
 bool Settings::logQueries()
 {
     QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
