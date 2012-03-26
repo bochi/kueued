@@ -393,6 +393,11 @@ void ServerThread::run()
             {
                 QString q = cmd.remove( "/assign" );
                 
+                if ( q.contains( "%7C" ) )
+                {
+                    q.replace( "%7C", "|" );
+                }
+                
                 if ( q.remove( "/" ).isEmpty() )
                 {  
                     out << "Please specify sr number and engineer  delimited by |";
@@ -401,6 +406,7 @@ void ServerThread::run()
                 {  
                     out << "Please specify engineer";
                 }
+                
                 else
                 {
                     mNetwork = &mNetwork->net();
