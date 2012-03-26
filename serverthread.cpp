@@ -409,11 +409,11 @@ void ServerThread::run()
                     QString o;
                     QNetworkReply* ass;
                             
-                    QObject::connect( ass, SIGNAL( finished() ), 
-                                      &loop, SLOT( quit() ) );
-                    
                     ass = mNetwork->get( QUrl( "http://proetus.provo.novell.com/qmon/assign.asp?sr=" + q.remove( "/" ).split( "|" ).at( 0 ) + 
                                                "&owner=" + q.remove( "/" ).split( "|" ).at( 1 ) ) );
+                    
+                    QObject::connect( ass, SIGNAL( finished() ), 
+                                      &loop, SLOT( quit() ) );
                         
                     loop.exec();
                                 
