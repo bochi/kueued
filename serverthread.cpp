@@ -420,7 +420,7 @@ void ServerThread::run()
                     
                     QObject::connect( ass, SIGNAL( finished() ), 
                                       &loop, SLOT( quit() ) );
-                        
+  
                     loop.exec();
                     
                     o = ass->readAll();
