@@ -1403,7 +1403,26 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
         }
         
         si.customer = query.value( 21 ).toString();
-        si.contact_phone = query.value( 22 ).toString();
+        
+        QString phone = query.value( 22 ).toString();
+        QString temp;
+        
+        if ( phone.contains( " " ) )
+        {
+            QStringList pl = phone.split( " " );
+            
+            for ( int i = 0; i < pl.count(); ++i ) 
+            {
+                temp = pl.at( i ).trimmed().simplified().remove( "0" );
+                
+                if ( !temp.isEmpty() )
+                {
+                    si.contact_phone += temp;
+                }
+            }
+        }
+        
+        //si.contact_phone = query.value( 22 ).toString();
         si.contact_firstname = query.value( 23 ).toString();
         si.contact_lastname = query.value( 24 ).toString();
         si.contact_email = query.value( 25 ).toString();
