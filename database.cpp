@@ -1470,7 +1470,6 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
         si.category = query.value( 32 ).toString();
         si.row_id = query.value( 33 ).toString();
         
-        qDebug() << "append" << si.id;
         list.append( si );
     }
 
