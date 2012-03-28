@@ -390,7 +390,8 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
                     "  flag.ATTRIB_11 as CRITSIT, "
                     "  flag.ATTRIB_56 as HIGH_VALUE, "
                     "  ext.NAME as CUSTOMER, "
-                    "  g.WORK_PH_NUM as CONTACT_PHONE, "
+                    "  REGEXP_REPLACE( g.WORK_PH_NUM, '(.*)' || CHR(10) || '(.*)', '\\1') AS CONTACT_PHONE,"
+                    "  REGEXP_REPLACE( g.WORK_PH_NUM, '(.*)' || CHR(10) || '(.*)', '\\2') AS FORMAT_STRING,"
                     "  g.FST_NAME as CONTACT_FIRSTNAME, "
                     "  g.LAST_NAME as CONTACT_LASTNAME, "
                     "  g.EMAIL_ADDR as CONTACT_EMAIL, "
@@ -448,14 +449,25 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
         {
             i.isCr = false;
             i.customer = query.value( 14 ).toString();
-            i.contact_phone = query.value( 15 ).toString();
-            i.contact_firstname = query.value( 16 ).toString();
-            i.contact_lastname = query.value( 17 ).toString();
-            i.contact_email = query.value( 18 ).toString();
-            i.contact_title = query.value( 19 ).toString();
-            i.contact_lang = query.value( 20 ).toString();
-            if ( query.value( 21 ).toString().contains( "\r" ) )
-            i.onsite_phone = query.value( 21 ).toString().split( "\r" ).at( 0 );
+            
+            QString p = query.value( 15 ).toString();
+            QString f = query.value( 16 ).toString();
+            
+            if ( p != f && !f.isEmpty() )
+            {
+                i.contact_phone = formatPhone( p, f );
+            }
+            else
+            {
+                i.contact_phone = p;
+            }
+                
+            i.contact_firstname = query.value( 17 ).toString();
+            i.contact_lastname = query.value( 18 ).toString();
+            i.contact_email = query.value( 19 ).toString();
+            i.contact_title = query.value( 20 ).toString();
+            i.contact_lang = query.value( 21 ).toString();
+            i.onsite_phone = query.value( 22 ).toString();
         }
             
         i.service_level = query.value( 10 ).toInt();
@@ -479,7 +491,7 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
             i.high_value = false;
         }
         
-        i.detailed_desc = query.value( 22 ).toString();
+        i.detailed_desc = query.value( 23 ).toString();
         
         list.append( i );
     }
@@ -1199,7 +1211,8 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
                     "  flag.ATTRIB_11 as CRITSIT, "
                     "  flag.ATTRIB_56 as HIGH_VALUE, "
                     "  ext.NAME as CUSTOMER, "
-                    "  g.WORK_PH_NUM as CONTACT_PHONE, "
+                    "  REGEXP_REPLACE( g.WORK_PH_NUM, '(.*)' || CHR(10) || '(.*)', '\\1') AS CONTACT_PHONE,"
+                    "  REGEXP_REPLACE( g.WORK_PH_NUM, '(.*)' || CHR(10) || '(.*)', '\\2') AS FORMAT_STRING,"
                     "  g.FST_NAME as CONTACT_FIRSTNAME, "
                     "  g.LAST_NAME as CONTACT_LASTNAME, "
                     "  g.EMAIL_ADDR as CONTACT_EMAIL, "
@@ -1269,6 +1282,7 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
                     "  '1', "
                     "  '1', "
                     "  '1', "
+                    "  '1', "
                     "  '1',"
                     "  sr.SR_CATEGORY_CD as SR_CATEGORY, "
                     "  sr.ROW_ID  "
@@ -1321,6 +1335,7 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
                     "  flag.ATTRIB_11 as CRITSIT, "
                     "  flag.ATTRIB_56 as HIGH_VALUE, "
                     "  ext.NAME as CUSTOMER, "
+                    "  '0', "
                     "  '0', "
                     "  '0', "
                     "  '0', "
@@ -1405,35 +1420,30 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
         
         si.customer = query.value( 21 ).toString();
         
-        QString phone = query.value( 22 ).toString();
-        QString temp;
+        QString p = query.value( 22 ).toString();
+        QString f = query.value( 23 ).toString();
         
-        if ( phone.contains( " " ) )
+        if ( p != f && !f.isEmpty() )
         {
-            QStringList pl = phone.split( " " );
-            
-            for ( int i = 0; i < pl.count(); ++i ) 
-            {
-                temp = pl.at( i ).trimmed().simplified().remove( "0" );
-                
-                if ( !temp.isEmpty() )
-                {
-                    si.contact_phone += temp;
-                }
-            }
+            si.contact_phone = formatPhone( p, f );
+        }
+        else
+        {
+            si.contact_phone = p;
         }
         
         //si.contact_phone = query.value( 22 ).toString();
-        si.contact_firstname = query.value( 23 ).toString();
-        si.contact_lastname = query.value( 24 ).toString();
-        si.contact_email = query.value( 25 ).toString();
-        si.contact_title = query.value( 26 ).toString();
-        si.contact_lang = query.value( 27 ).toString();
-        si.onsite_phone = query.value( 28 ).toString();
-        si.detailed_desc = query.value( 29 ).toString();
-        si.category = query.value( 30 ).toString();
-        si.row_id = query.value( 31 ).toString();
+        si.contact_firstname = query.value( 24 ).toString();
+        si.contact_lastname = query.value( 25 ).toString();
+        si.contact_email = query.value( 26 ).toString();
+        si.contact_title = query.value( 27 ).toString();
+        si.contact_lang = query.value( 28 ).toString();
+        si.onsite_phone = query.value( 29 ).toString();
+        si.detailed_desc = query.value( 30 ).toString();
+        si.category = query.value( 31 ).toString();
+        si.row_id = query.value( 32 ).toString();
         
+        qDebug() << "append" << si.id;
         list.append( si );
     }
 
@@ -1512,5 +1522,29 @@ QList< BomgarItem > Database::getChats( const QString& dbname )
         
     return list;
 }
+
+QString Database::formatPhone( QString p, const QString& f )
+{
+    int off;
+    QChar zero( '0' );
+    
+    if ( p.startsWith( "+" ) )
+    {
+        p.insert( 3, " " );
+        off = 4;
+    }
+        
+    for ( int i = 0; i < f.size() - 1; ++i ) 
+    {
+        if ( f.at( i ) != zero )
+        {
+            p.insert( ( off + i ), f.at( i ) );
+            off++;
+        }
+    }
+        
+    return p;
+}
+
 
 #include "database.moc"

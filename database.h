@@ -68,6 +68,7 @@ class Database : public QObject
         static QStringList getCurrentBomgars( const QString& = QString::Null() );
         
         static QString convertTime( const QString& );
+        static QString formatPhone( QString, const QString& );
         
         static QList< QueueItem > getUserQueue( const QString&, const QString& = QString::Null() );
         static QList< SiebelItem > getQmonSrs( const QString& = QString::Null() );
@@ -143,6 +144,7 @@ class QueueItem
         QString contact_lang;
         QString onsite_phone;
         QString creator;
+        QString format_string;
         bool isCr;
         bool critsit;
         bool high_value;
