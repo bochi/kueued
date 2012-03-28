@@ -454,7 +454,8 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
             i.contact_email = query.value( 18 ).toString();
             i.contact_title = query.value( 19 ).toString();
             i.contact_lang = query.value( 20 ).toString();
-            i.onsite_phone = query.value( 21 ).toString();
+            if ( query.value( 21 ).toString().contains( "\r" ) )
+            i.onsite_phone = query.value( 21 ).toString().split( "\r" ).at( 0 );
         }
             
         i.service_level = query.value( 10 ).toInt();
