@@ -397,7 +397,8 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
                     "  g.EMAIL_ADDR as CONTACT_EMAIL, "
                     "  g.JOB_TITLE as CONTACT_TITLE, "
                     "  g.PREF_LANG_ID as CONTACT_LANG,"
-                    "  sr.X_ONSITE_PH_NUM as ONSITE_PHONE, "
+                    "  REGEXP_REPLACE( sr.X_ONSITE_PH_NUM, '(.*)' || CHR(10) || '(.*)', '\\1') AS ONSITE_PHONE,"
+                    "  REGEXP_REPLACE( sr.X_ONSITE_PH_NUM, '(.*)' || CHR(10) || '(.*)', '\\2') AS ONSITE_FORMAT_STRING,"
                     "  sr.DESC_TEXT as DETAILED_DESC "
                     "from "
                     "  siebel.s_srv_req sr, "
@@ -467,7 +468,18 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
             i.contact_email = query.value( 19 ).toString();
             i.contact_title = query.value( 20 ).toString();
             i.contact_lang = query.value( 21 ).toString();
-            i.onsite_phone = query.value( 22 ).toString();
+         
+            QString op = query.value( 22 ).toString();
+            QString of = query.value( 23 ).toString();
+        
+            if ( op != of && !of.isEmpty() )
+            {
+                i.onsite_phone = formatPhone( op, of );
+            }
+            else
+            {
+                i.onsite_phone = op;
+            }
         }
             
         i.service_level = query.value( 10 ).toInt();
@@ -491,7 +503,7 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
             i.high_value = false;
         }
         
-        i.detailed_desc = query.value( 23 ).toString();
+        i.detailed_desc = query.value( 24 ).toString();
         
         list.append( i );
     }
@@ -1218,7 +1230,8 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
                     "  g.EMAIL_ADDR as CONTACT_EMAIL, "
                     "  g.JOB_TITLE as CONTACT_TITLE, "
                     "  g.PREF_LANG_ID as CONTACT_LANG,"
-                    "  sr.X_ONSITE_PH_NUM as ONSITE_PHONE, "
+                    "  REGEXP_REPLACE( sr.X_ONSITE_PH_NUM, '(.*)' || CHR(10) || '(.*)', '\\1') AS ONSITE_PHONE,"
+                    "  REGEXP_REPLACE( sr.X_ONSITE_PH_NUM, '(.*)' || CHR(10) || '(.*)', '\\2') AS ONSITE_FORMAT_STRING,"                    
                     "  sr.DESC_TEXT as DETAILED_DESC, "
                     "  sr.SR_CATEGORY_CD as CATEGORY, "
                     "  sr.ROW_ID "
@@ -1283,6 +1296,7 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
                     "  '1', "
                     "  '1', "
                     "  '1', "
+                    "  '1', "
                     "  '1',"
                     "  sr.SR_CATEGORY_CD as SR_CATEGORY, "
                     "  sr.ROW_ID  "
@@ -1335,6 +1349,7 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
                     "  flag.ATTRIB_11 as CRITSIT, "
                     "  flag.ATTRIB_56 as HIGH_VALUE, "
                     "  ext.NAME as CUSTOMER, "
+                    "  '0', "
                     "  '0', "
                     "  '0', "
                     "  '0', "
@@ -1438,10 +1453,22 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
         si.contact_email = query.value( 26 ).toString();
         si.contact_title = query.value( 27 ).toString();
         si.contact_lang = query.value( 28 ).toString();
-        si.onsite_phone = query.value( 29 ).toString();
-        si.detailed_desc = query.value( 30 ).toString();
-        si.category = query.value( 31 ).toString();
-        si.row_id = query.value( 32 ).toString();
+        
+        QString op = query.value( 29 ).toString();
+        QString of = query.value( 30 ).toString();
+        
+        if ( op != of && !of.isEmpty() )
+        {
+            si.onsite_phone = formatPhone( op, of );
+        }
+        else
+        {
+            si.onsite_phone = op;
+        }
+        
+        si.detailed_desc = query.value( 31 ).toString();
+        si.category = query.value( 32 ).toString();
+        si.row_id = query.value( 33 ).toString();
         
         qDebug() << "append" << si.id;
         list.append( si );
