@@ -486,10 +486,6 @@ void ServerThread::run()
                         
                         openSiebelDB();
                         
-                        out << "Content-Type: text/xml; charset=\"utf-8\"\r\n";
-                        out << "\r\n";
-                        out << "<?xml version='1.0'?>\n\n";
-                        
                         Statistics statz;
                         
                         QString numbers;
@@ -621,10 +617,16 @@ void ServerThread::run()
                             statz.closedList = closedList;
                             statz.csatList = csatItemList;
                             
+                            out << "Content-Type: text/xml; charset=\"utf-8\"\r\n";
+                            out << "\r\n";
+                            out << "<?xml version='1.0'?>\n\n";
+                            
                             out << XML::stats( statz );
                         }
                         else
                         {
+                            out << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
+                            out << "\r\n";
                             out << "ERROR";
                         }
                         
