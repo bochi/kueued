@@ -500,8 +500,15 @@ void ServerThread::run()
                                         &loop, SLOT( quit() ) );
                     
                         loop.exec();
-                            
-                        numbers = r->readAll();
+                        
+                        if ( !r->error() )
+                        {
+                            numbers = r->readAll();
+                        }
+                        else
+                        {
+                            numbers = "ERROR";
+                        }
                         
                         QString csat;
                         QNetworkReply* csr = mNetwork->get( QUrl( "http://proetus.provo.novell.com/qmon/custsat.asp?wf=" + wf ) );
@@ -510,10 +517,19 @@ void ServerThread::run()
                                         &loop, SLOT( quit() ) );
                     
                         loop.exec();
-                            
-                        csat = csr->readAll();
+                         
+                        QStringList csatList;
                         
-                        QStringList csatList = csat.split( "<br>" );
+                        if ( !csr->error() )
+                        {
+                            csat = csr->readAll();
+                            csatList = csat.split( "<br>" );
+                        
+                        }
+                        else
+                        {
+                            csat = "ERROR";
+                        }
                         
                         QString tts;
                         QNetworkReply* ttr = mNetwork->get( QUrl( "http://proetus.provo.novell.com/qmon/timetosolutiontse.asp?tse=" +  q ) );
@@ -522,79 +538,96 @@ void ServerThread::run()
                                         &loop, SLOT( quit() ) );
                     
                         loop.exec();
-                            
-                        tts = ttr->readAll();
-                        QStringList ttsList = tts.split( "<br>" );
                         
-                        QString o = numbers.split("<br>").at(0);
-                        o.remove( QRegExp( "<(?:div|span|tr|td|br|body|html|tt|a|strong|p)[^>]*>", Qt::CaseInsensitive ) );
+                        QStringList ttsList;
                         
-                        statz.closedSr = o.split("|").at(0).trimmed();
-                        statz.closedCr = o.split("|").at(1).trimmed();
-                        
-                        QList<ClosedItem> closedList;
-                        
-                        for ( int i = 0; i < ttsList.size() - 1; ++i )
+                        if ( !ttr->error() )
                         {
-                            ClosedItem ci;
-                            
-                            QString tmp = ttsList.at(i);
-                            tmp.remove( QRegExp( "<(?:div|span|tr|td|br|body|html|tt|a|strong|p)[^>]*>", Qt::CaseInsensitive ) );
-                            
-                            ci.sr = tmp.split( "|" ).at( 1 );
-                            ci.tts = tmp.split( "|" ).at( 2 ).toInt();
-                            
-                            QStringList info = Database::srInfo( ci.sr, mSiebelDB );
-                            
-                            ci.customer = info.at( 3 ) + " (" + info.at(1) + " " + info.at(2) + ")";
-                            ci.bdesc = info.at( 0 );
-                            
-                            closedList.append( ci );
+                            tts = ttr->readAll();
+                            ttsList = tts.split( "<br>" );
+                        }
+                        else
+                        {
+                            tts = "ERROR";
                         }
                         
-                        QList<CsatItem> csatItemList;
-                        
-                        for ( int i = 0; i < csatList.size() - 1; ++i )
+                        if ( tts != "ERROR" && csat != "ERROR" && numbers != "ERROR" )
                         {
-                            CsatItem csi;
-                           
-                            QString tmp = csatList.at(i);
-                            tmp.remove( QRegExp( "<(?:div|span|tr|td|br|body|html|tt|a|strong|p)[^>]*>", Qt::CaseInsensitive ) );
+                            QString o = numbers.split("<br>").at(0);
+                            o.remove( QRegExp( "<(?:div|span|tr|td|br|body|html|tt|a|strong|p)[^>]*>", Qt::CaseInsensitive ) );
                             
-                            csi.sr = tmp.split( "|" ).at( 1 ).trimmed();
+                            statz.closedSr = o.split("|").at(0).trimmed();
+                            statz.closedCr = o.split("|").at(1).trimmed();
                             
-                            if ( tmp.split( "|" ).at( 2 ).isEmpty() )
+                            QList<ClosedItem> closedList;
+                            
+                            for ( int i = 0; i < ttsList.size() - 1; ++i )
                             {
-                                csi.srsat = 88;
+                                ClosedItem ci;
+                                
+                                QString tmp = ttsList.at(i);
+                                tmp.remove( QRegExp( "<(?:div|span|tr|td|br|body|html|tt|a|strong|p)[^>]*>", Qt::CaseInsensitive ) );
+                                
+                                ci.sr = tmp.split( "|" ).at( 1 );
+                                ci.tts = tmp.split( "|" ).at( 2 ).toInt();
+                                
+                                QStringList info = Database::srInfo( ci.sr, mSiebelDB );
+                                
+                                ci.customer = info.at( 3 ) + " (" + info.at(1) + " " + info.at(2) + ")";
+                                ci.bdesc = info.at( 0 );
+                                
+                                closedList.append( ci );
                             }
-                            else
+                            
+                            QList<CsatItem> csatItemList;
+                            
+                            for ( int i = 0; i < csatList.size() - 1; ++i )
                             {
-                                csi.srsat = tmp.split( "|" ).at( 2 ).trimmed().toInt();
+                                CsatItem csi;
+                            
+                                QString tmp = csatList.at(i);
+                                tmp.remove( QRegExp( "<(?:div|span|tr|td|br|body|html|tt|a|strong|p)[^>]*>", Qt::CaseInsensitive ) );
+                                
+                                csi.sr = tmp.split( "|" ).at( 1 ).trimmed();
+                                
+                                if ( tmp.split( "|" ).at( 2 ).isEmpty() )
+                                {
+                                    csi.srsat = 88;
+                                }
+                                else
+                                {
+                                    csi.srsat = tmp.split( "|" ).at( 2 ).trimmed().toInt();
+                                }
+                                
+                                if ( tmp.split( "|" ).at( 3 ).isEmpty() )
+                                {
+                                    csi.engsat = 88;
+                                }
+                                else
+                                {
+                                    csi.engsat = tmp.split( "|" ).at( 3 ).trimmed().toInt();
+                                }
+                                
+                                csi.rts = tmp.split( "|" ).at( 4 ).trimmed().toInt();
+                                                                
+                                QStringList info = Database::srInfo( csi.sr, mSiebelDB );
+                                
+                                csi.customer = info.at( 3 ) + " (" + info.at(1) + " " + info.at(2) + ")";
+                                csi.bdesc = info.at(0);
+                                
+                                csatItemList.append( csi );
                             }
                             
-                            if ( tmp.split( "|" ).at( 3 ).isEmpty() )
-                            {
-                                csi.engsat = 88;
-                            }
-                            else
-                            {
-                                csi.engsat = tmp.split( "|" ).at( 3 ).trimmed().toInt();
-                            }
+                            statz.closedList = closedList;
+                            statz.csatList = csatItemList;
                             
-                            csi.rts = tmp.split( "|" ).at( 4 ).trimmed().toInt();
-                                                            
-                            QStringList info = Database::srInfo( csi.sr, mSiebelDB );
-                            
-                            csi.customer = info.at( 3 ) + " (" + info.at(1) + " " + info.at(2) + ")";
-                            csi.bdesc = info.at(0);
-                            
-                            csatItemList.append( csi );
+                            out << XML::stats( statz );
+                        }
+                        else
+                        {
+                            out << "ERROR";
                         }
                         
-                        statz.closedList = closedList;
-                        statz.csatList = csatItemList;
-                        
-                        out << XML::stats( statz );
                         mNetwork->destroy();
                     }
                 }
