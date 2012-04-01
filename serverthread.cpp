@@ -518,7 +518,11 @@ void ServerThread::run()
                         if ( !csr->error() )
                         {
                             csat = csr->readAll();
-                            csatList = csat.split( "<br>" );
+                            
+                            if ( csat.contains( "<br>" ) )
+                            {
+                                csatList = csat.split( "<br>" );
+                            }
                         
                         }
                         else
@@ -539,7 +543,11 @@ void ServerThread::run()
                         if ( !ttr->error() )
                         {
                             tts = ttr->readAll();
-                            ttsList = tts.split( "<br>" );
+                            
+                            if ( tts.contains( "<br>" ) )
+                            {
+                                ttsList = tts.split( "<br>" );
+                            }
                         }
                         else
                         {
@@ -548,11 +556,14 @@ void ServerThread::run()
                         
                         if ( tts != "ERROR" && csat != "ERROR" && numbers != "ERROR" )
                         {
-                            QString o = numbers.split("<br>").at(0);
-                            o.remove( QRegExp( "<(?:div|span|tr|td|br|body|html|tt|a|strong|p)[^>]*>", Qt::CaseInsensitive ) );
+                            if ( numbers.contains( "<br>" ) )
+                            {
+                                QString o = numbers.split("<br>").at(0);
+                                o.remove( QRegExp( "<(?:div|span|tr|td|br|body|html|tt|a|strong|p)[^>]*>", Qt::CaseInsensitive ) );
                             
-                            statz.closedSr = o.split("|").at(0).trimmed();
-                            statz.closedCr = o.split("|").at(1).trimmed();
+                                statz.closedSr = o.split("|").at(0).trimmed();
+                                statz.closedCr = o.split("|").at(1).trimmed();
+                            }
                             
                             QList<ClosedItem> closedList;
                             
