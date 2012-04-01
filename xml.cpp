@@ -393,7 +393,10 @@ QString XML::stats( Statistics s )
         ttsAvg = ( ttsAvg + closedList.at( i ).tts );
     }
     
-    ttsAvg = ttsAvg / closedList.size();
+    if ( closedList.size() > 0 )
+    {
+        ttsAvg = ttsAvg / closedList.size();
+    }
     
     int engSatAvg = 0;
     int srSatAvg = 0;
@@ -420,9 +423,20 @@ QString XML::stats( Statistics s )
         rtsPercent = rtsPercent + csatList.at( i ).rts;
     }
     
-    engSatAvg = ( engSatAvg / engTotal );
-    srSatAvg = ( srSatAvg / srTotal );
-    rtsPercent = ( rtsPercent * 100 / csatList.size() );
+    if ( engTotal > 0 )
+    {
+        engSatAvg = ( engSatAvg / engTotal );
+    }
+    
+    if ( srTotal > 0 )
+    {
+        srSatAvg = ( srSatAvg / srTotal );
+    }
+    
+    if ( csatList.size() > 0 )
+    {
+        rtsPercent = ( rtsPercent * 100 / csatList.size() );
+    }
     
     xml += "<stats>\n\n";
 
