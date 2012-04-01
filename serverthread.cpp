@@ -139,7 +139,6 @@ void ServerThread::run()
             out << "HTTP/1.1 200 OK\r\n";
             out << "Server: kueued @ " + mHostname + " (Linux)\r\n";     
             
-            
             if ( cmd.startsWith( "/qmon_date" ) )
             {
                 openMysqlDB();
@@ -400,7 +399,7 @@ void ServerThread::run()
                 
                 if ( q.remove( "/" ).isEmpty() )
                 {  
-                    out << "Please specify sr number and engineer  delimited by |";
+                    out << "Please specify sr number and engineer delimited by |";
                 }
                 else if ( !q.contains( "|" ) )
                 {  
@@ -489,7 +488,7 @@ void ServerThread::run()
                         Statistics statz;
                         
                         QString numbers;
-                        QNetworkReply* r = mNetwork->get( QUrl( "http://proetus.provo.novell.com/qmon/closed4.asp?tse=" + q ) );
+                        QNetworkReply* r = mNetwork->get( QUrl( "http://proetus.provo.novell.com/qmon/closed2.asp?tse=" + q ) );
                         QEventLoop loop;
     
                         QObject::connect( r, SIGNAL( finished() ), 
@@ -704,7 +703,7 @@ void ServerThread::run()
     }    
 }
 
-void ServerThread::openMysqlDB()
+bool ServerThread::openMysqlDB()
 {
     if ( !QSqlDatabase::database( mMysqlDB ).isOpen() )
     {
@@ -718,19 +717,22 @@ void ServerThread::openMysqlDB()
         if ( !mysqlDB.open() )
         {
             Debug::print( "database", "Failed to open the database " + mysqlDB.lastError().text() );
+            return false;
         }
         else
         {
             Debug::print( "database", "Opened DB " + mysqlDB.connectionName() );
+            return true;
         }
     }
     else
     {
         Debug::print( "database", "DB already open in this thread " + mMysqlDB );
+        return true;
     }
 }
 
-void ServerThread::openQmonDB()
+bool ServerThread::openQmonDB()
 {
     if ( !QSqlDatabase::database( mQmonDB ).isOpen() )
     {
@@ -743,19 +745,22 @@ void ServerThread::openQmonDB()
         if ( !qmonDB.open() )
         {
             Debug::print( "database", "Failed to open the Qmon DB " + qmonDB.lastError().text() );
+            return false;
         }
         else
         {
             Debug::print( "database", "Opened DB " + qmonDB.connectionName() );
+            return true;
         }
     }
     else
     {
         Debug::print( "database", "DB already open in this thread " + mQmonDB );
+        return true;
     }
 }
 
-void ServerThread::openSiebelDB()
+bool ServerThread::openSiebelDB()
 {
     if ( !QSqlDatabase::database( mSiebelDB ).isOpen() )
     {
@@ -770,15 +775,18 @@ void ServerThread::openSiebelDB()
         if ( !siebelDB.open() )
         {
             Debug::print( "database", "Failed to open the Siebel DB " + siebelDB.lastError().text() );
+            return false;
         }
         else
         {
             Debug::print( "database", "Opened DB " + siebelDB.connectionName() );
+            return true;
         }
     }
     else
     {
         Debug::print( "database", "DB already open in this thread " + mSiebelDB );
+        return true;
     }
 }
 
