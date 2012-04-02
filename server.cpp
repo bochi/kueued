@@ -28,7 +28,9 @@
 #include "settings.h"
 #include "debug.h"
 #include "serverthread.h"
+
 #include <iostream>
+
 #include <QThread>
 #include <QThreadPool>
 
@@ -38,14 +40,6 @@ Server::Server( quint16 port, QObject* parent )
     Debug::print( "server", "Constructing " + QString::number( thread()->currentThreadId() ) );
     
     QThreadPool::globalInstance()->setExpiryTimeout( -1 );
-    
-    /*for ( int i = 0; i < QThread::idealThreadCount(); ++i ) 
-    {
-        ServerThread* s = new ServerThread( 0, this );
-        
-        connect( s, SIGNAL( finished() ), 
-                 this, SLOT( deleteThread() ) );
-    }*/
     
     listen( QHostAddress::Any, port );   
 }

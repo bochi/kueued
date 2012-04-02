@@ -55,7 +55,9 @@ class ServerThread : public QThread
         Network* mNetwork;
         QTime mTime;
         
-    private slots:
+        QString text();
+        QString xml();
+        
         bool openMysqlDB();
         bool openSiebelDB();
         bool openQmonDB();

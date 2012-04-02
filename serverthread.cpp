@@ -145,9 +145,7 @@ void ServerThread::run()
                 
                 QString xml = XML::qmonDate( Database::getSrsForQueue( "NONE", mMysqlDB ) );
 
-                out << "Content-Type: text/xml; charset=\"utf-8\"\r\n";
-                out << "\r\n";
-                out << "<?xml version='1.0'?>\n\n";
+
                 out << xml;
                 
                 socket->close();
@@ -156,12 +154,11 @@ void ServerThread::run()
             {
                 openMysqlDB();
                 
-                QString xml = XML::qmon( Database::getSrsForQueue( "NONE", mMysqlDB ) );
+                QString x = XML::qmon( Database::getSrsForQueue( "NONE", mMysqlDB ) );
 
-                out << "Content-Type: text/xml; charset=\"utf-8\"\r\n";
-                out << "\r\n";
-                out << "<?xml version='1.0'?>\n\n";
-                out << xml;
+                out << xml();
+                
+                out << x;
                 
                 socket->close();
             }
@@ -171,8 +168,7 @@ void ServerThread::run()
                 
                 QString q = cmd.remove( "/srnrs" );
 
-                out << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
-                out << "\r\n";
+                out << text();
 
                 if ( q.remove( "/" ).isEmpty() )
                 {  
@@ -195,8 +191,7 @@ void ServerThread::run()
             }
             else if ( cmd.startsWith( "/latestkueue" ) )
             {
-                out << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
-                out << "\r\n";
+                out << text();
                                 
                 out << Settings::latestVersion();
             }
@@ -212,8 +207,7 @@ void ServerThread::run()
                 {  
                     openSiebelDB();
                 
-                    out << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
-                    out << "\r\n";
+                    out << text();
                                 
                     out << Database::getDetDesc( q, mSiebelDB );
                 }
@@ -259,8 +253,8 @@ void ServerThread::run()
                     
                     Debug::print( "serverthread", "PseudoQ update finished, took " + QString::number( btime ) + " sec" );
                     
-                    out << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
-                    out << "\r\n";
+                    out << text();
+                    
                     out << "PseudoQ update took " +  QString::number( btime ) + " sec\n";
                 }
                     
@@ -347,9 +341,8 @@ void ServerThread::run()
                 
                 QStringList l = Database::getCurrentBomgars();
               
-                out << "Content-Type: text/xml; charset=\"utf-8\"\r\n";
-                out << "\r\n";
-                out << "<?xml version='1.0'?>\n\n";
+                out << xml();
+                
                 out << "<chat>\n";
                 
                 for ( int i = 0; i < l.size(); ++i )
@@ -369,8 +362,7 @@ void ServerThread::run()
                 
                 QStringList pl = Database::getPseudoQueues( mMysqlDB );
                 
-                out << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
-                out << "\r\n";
+                out << text();
                 
                 for ( int i = 0; i < pl.size(); ++i )
                 {
@@ -381,8 +373,7 @@ void ServerThread::run()
             }
             else if ( cmd.startsWith( "/unityURL" ) )
             {
-                out << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
-                out << "\r\n";
+                out << text();
                 
                 out << Settings::unityURL() + "\n";
                 
@@ -424,8 +415,8 @@ void ServerThread::run()
                     
                     o = ass->readAll();
 
-                    out << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
-                    out << "\r\n";
+                    out << text();
+                    
                     out << o;
                     
                     socket->close();
@@ -450,9 +441,7 @@ void ServerThread::run()
                 {
                     QString eng = q.remove( "/" ).toUpper();
                     
-                    out << "Content-Type: text/xml; charset=\"utf-8\"\r\n";
-                    out << "\r\n";
-                    out << "<?xml version='1.0'?>\n\n";
+                    out << xml();
 
                     out << XML::queue( Database::getUserQueue( eng, mSiebelDB ) );
 
@@ -465,8 +454,7 @@ void ServerThread::run()
                     
                 if ( q.remove( "/" ).isEmpty() )
                 {
-                    out << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
-                    out << "\r\n";
+                    out << text();
                     out << "Please specify engineer";
                 }
                 else
@@ -477,8 +465,7 @@ void ServerThread::run()
                     
                     if ( wf == "00000" )
                     {
-                        out << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
-                        out << "\r\n";
+
                         out << "Invalid engineer";
                     }
                     else
@@ -627,16 +614,13 @@ void ServerThread::run()
                             statz.closedList = closedList;
                             statz.csatList = csatItemList;
                             
-                            out << "Content-Type: text/xml; charset=\"utf-8\"\r\n";
-                            out << "\r\n";
-                            out << "<?xml version='1.0'?>\n\n";
+                            out << xml();
                             
                             out << XML::stats( statz );
                         }
                         else
                         {
-                            out << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
-                            out << "\r\n";
+                            out << text();
                             out << "ERROR";
                         }
                     }
@@ -649,8 +633,7 @@ void ServerThread::run()
             }
             else
             {
-                out << "Content-Type: text/plain; charset=\"utf-8\"\r\n";
-                out << "\r\n";
+                out << text();
                 out << "Welcome to kueued\n\n";
                 out << "Usage:\n\n";
                 out << "  * http://kueue.hwlab.suse.de:8080/qmon\n    Get a list of all SRs in all pseudo queues\n\n";
@@ -800,6 +783,19 @@ bool ServerThread::openSiebelDB()
         Debug::print( "database", "DB already open in this thread " + mSiebelDB );
         return true;
     }
+}
+
+QString ServerThread::text()
+{
+    return( "Content-Type: text/plain; charset=\"utf-8\"\r\n"
+            "\r\n" );
+}
+
+QString ServerThread::xml()
+{
+    return( "Content-Type: text/xml; charset=\"utf-8\"\r\n"
+            "\r\n"
+            "<?xml version='1.0'?>\n\n" );
 }
 
 QString ServerThread::getWF( const QString& engineer, Network* net )
