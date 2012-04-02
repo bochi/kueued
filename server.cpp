@@ -39,13 +39,13 @@ Server::Server( quint16 port, QObject* parent )
     
     QThreadPool::globalInstance()->setExpiryTimeout( -1 );
     
-    for ( int i = 0; i < QThread::idealThreadCount(); ++i ) 
+    /*for ( int i = 0; i < QThread::idealThreadCount(); ++i ) 
     {
         ServerThread* s = new ServerThread( 0, this );
         
         connect( s, SIGNAL( finished() ), 
                  this, SLOT( deleteThread() ) );
-    }
+    }*/
     
     listen( QHostAddress::Any, port );   
 }
@@ -68,7 +68,7 @@ void Server::incomingConnection( int socket )
 void Server::deleteThread()
 {
     QThread* t = qobject_cast<QThread*>( sender() );
-    Debug::print( "server", "Deleting SrvThread " + QString::number( t->currentThreadId() ) );
+    Debug::print( "server", "Deleting ServerThread " + QString::number( t->currentThreadId() ) );
     delete t;
 }
 

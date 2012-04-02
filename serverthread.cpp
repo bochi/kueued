@@ -408,13 +408,13 @@ void ServerThread::run()
                 
                 else
                 {
-                    mNetwork = &mNetwork->net();
+                    Network* net = new Network();
                 
                     QEventLoop loop;
                     QString o;
                     QNetworkReply* ass;
                             
-                    ass = mNetwork->get( QUrl( "http://proetus.provo.novell.com/qmon/assign.asp?sr=" + q.remove( "/" ).split( "|" ).at( 0 ) + 
+                    ass = net->get( QUrl( "http://proetus.provo.novell.com/qmon/assign.asp?sr=" + q.remove( "/" ).split( "|" ).at( 0 ) + 
                                                "&owner=" + q.remove( "/" ).split( "|" ).at( 1 ) ) );
                     
                     QObject::connect( ass, SIGNAL( finished() ), 
@@ -430,7 +430,7 @@ void ServerThread::run()
                     
                     socket->close();
                     
-                    mNetwork->destroy();
+                    delete net;
                 }
             }
             else if ( cmd.startsWith( "/userqueue" ) )
@@ -471,7 +471,9 @@ void ServerThread::run()
                 }
                 else
                 {
-                    QString wf = getWF( q );
+                    Network* net = new Network();
+                    
+                    QString wf = getWF( q, net );
                     
                     if ( wf == "00000" )
                     {
@@ -481,14 +483,12 @@ void ServerThread::run()
                     }
                     else
                     {
-                        mNetwork = &mNetwork->net();
-                        
                         openSiebelDB();
                         
                         Statistics statz;
                         
                         QString numbers;
-                        QNetworkReply* r = mNetwork->get( QUrl( "http://proetus.provo.novell.com/qmon/closed2.asp?tse=" + q ) );
+                        QNetworkReply* r = net->get( QUrl( "http://proetus.provo.novell.com/qmon/closed2.asp?tse=" + q ) );
                         QEventLoop loop;
     
                         QObject::connect( r, SIGNAL( finished() ), 
@@ -506,7 +506,7 @@ void ServerThread::run()
                         }
                         
                         QString csat;
-                        QNetworkReply* csr = mNetwork->get( QUrl( "http://proetus.provo.novell.com/qmon/custsat.asp?wf=" + wf ) );
+                        QNetworkReply* csr = net->get( QUrl( "http://proetus.provo.novell.com/qmon/custsat.asp?wf=" + wf ) );
                         
                         QObject::connect( csr, SIGNAL( finished() ), 
                                         &loop, SLOT( quit() ) );
@@ -531,7 +531,7 @@ void ServerThread::run()
                         }
                         
                         QString tts;
-                        QNetworkReply* ttr = mNetwork->get( QUrl( "http://proetus.provo.novell.com/qmon/timetosolutiontse.asp?tse=" +  q ) );
+                        QNetworkReply* ttr = net->get( QUrl( "http://proetus.provo.novell.com/qmon/timetosolutiontse.asp?tse=" +  q ) );
                         
                         QObject::connect( ttr, SIGNAL( finished() ), 
                                         &loop, SLOT( quit() ) );
@@ -639,11 +639,12 @@ void ServerThread::run()
                             out << "\r\n";
                             out << "ERROR";
                         }
-                        
-                        mNetwork->destroy();
                     }
+                    
+                    delete net;      
                 }
                 
+                          
                 socket->close();
             }
             else
@@ -801,12 +802,12 @@ bool ServerThread::openSiebelDB()
     }
 }
 
-QString ServerThread::getWF( const QString& engineer )
+QString ServerThread::getWF( const QString& engineer, Network* net )
 {
     QEventLoop loop;
     QString wfid;
     
-    QNetworkReply *reply = mNetwork->get( QUrl( Settings::dBServer() + "/workforce.asp?tse=" + engineer ) );
+    QNetworkReply *reply = net->get( QUrl( Settings::dBServer() + "/workforce.asp?tse=" + engineer ) );
     
     loop.connect( reply, SIGNAL( readyRead() ),
                   &loop, SLOT( quit() ) );

@@ -29,28 +29,6 @@
 #include <QtGui>
 #include "debug.h"
 
-Network* Network::instance = 0;
-
-Network& Network::net()
-{
-    if ( !instance )
-    {
-        instance = new Network;
-    }
- 
-    return *instance; 
-}
-
-void Network::destroy()
-{
-    if ( instance )
-    {
-        delete instance;
-    }
-      
-    instance = 0;
-}
-
 Network::Network()
 {
     Debug::print( "network", "Constructing in thread " + QString::number( thread()->currentThreadId() ) );
@@ -63,7 +41,7 @@ Network::~Network()
     Debug::print( "network", "Destroying " + QString::number( thread()->currentThreadId() ) );
 }
 
-QNetworkReply* Network::getImpl( const QUrl& url )
+QNetworkReply* Network::get( const QUrl& url )
 {
     QNetworkRequest request( url );
     request.setRawHeader( "User-Agent", QString( "kueue " + QApplication::applicationVersion() ).toUtf8() );

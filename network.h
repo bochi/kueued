@@ -32,22 +32,15 @@ class Network : public QObject
 {
     Q_OBJECT
     
-    private:
-        static Network* instance;
+    public:
         Network();
         ~Network();
         
+        QNetworkReply* get( const QUrl& url );
+    
+    private:
         QNetworkAccessManager* mNAM;
-        QNetworkReply* getImpl( const QUrl& );
- 
-    public:
-        static Network& net();
-        static void destroy();
-        static QNetworkReply* get( const QUrl& url )
-        {
-            return Network::net().getImpl( url );
-        }
-
+    
     private slots:
         void error( QNetworkReply::NetworkError );
 };
