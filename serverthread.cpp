@@ -443,7 +443,7 @@ void ServerThread::run()
                     out << xml();
 
                     out << XML::queue( Database::getUserQueue( eng, mSiebelDB ) );
-
+                    out.flush();
                     Debug::print( "server", "Userqueue for " + eng + " took " + QString::number( uqTimer.elapsed() / 1000 ) + " sec");
                 }
             }

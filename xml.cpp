@@ -290,7 +290,7 @@ QString XML::queue( QList<QueueItem> list )
     
     //qint64 age = ( odate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 ) );
     //qint64 lu = ( adate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 ));
-qDebug() << "queue" << list.size() ;
+
     xml += "<queue>\n";
     xml += "<total>" + QString::number( list.size() ) + "</total>\n";
     for ( int i = 0; i < list.size(); ++i ) 
