@@ -430,7 +430,7 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
     while ( query.next() )
     {
         QueueItem i;
-        qDebug() << engineer << i.id;
+        
         i.id = query.value( 0 ).toString();
         i.geo = query.value( 1 ).toString();
         i.hours = query.value( 2 ).toString();
