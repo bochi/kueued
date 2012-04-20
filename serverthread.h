@@ -52,7 +52,6 @@ class ServerThread : public QThread
         QString mEngineer;
         QString mHostname;
         QString getWF( const QString&, Network*  );
-        Network* mNetwork;
         QTime mTime;
         
         QString text();
