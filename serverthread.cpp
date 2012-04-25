@@ -147,6 +147,7 @@ void ServerThread::run()
 
                 out << xml;
                 
+                out.flush();
                 socket->close();
             }
             if ( cmd.startsWith( "/qmon" ) )
@@ -158,6 +159,7 @@ void ServerThread::run()
                 out << xml();
                 
                 out << x;
+                out.flush();
                 
                 socket->close();
             }
@@ -187,12 +189,16 @@ void ServerThread::run()
                     //}
                 }
                 
+                out.flush();
+                
             }
             else if ( cmd.startsWith( "/latestkueue" ) )
             {
                 out << text();
                                 
                 out << Settings::latestVersion();
+                
+                out.flush();
             }
             else if ( cmd.startsWith( "/detailed" ) )
             {
@@ -201,6 +207,7 @@ void ServerThread::run()
                 if ( q.remove( "/" ).isEmpty() )
                 {  
                     out << "Please specify sr number";
+                    out.flush();
                 }
                 else
                 {  
@@ -209,6 +216,7 @@ void ServerThread::run()
                     out << text();
                                 
                     out << Database::getDetDesc( q, mSiebelDB );
+                    out.flush();
                 }
                 
                 socket->close();
@@ -328,6 +336,7 @@ void ServerThread::run()
                
                 out << "Unity update took " + QString::number( timer.elapsed() / 1000 ) + " sec\n\n";
                 out << "UPDATE FINISHED\n";
+                out.flush();
                 
                 socket->close();
                 
@@ -353,6 +362,7 @@ void ServerThread::run()
                 }
                 
                 out << "</chat>";
+                out.flush();
                 
             }
             else if ( cmd.startsWith( "/pseudoQ" ) )
@@ -367,7 +377,8 @@ void ServerThread::run()
                 {
                     out << pl.at(i) + "\n";
                 }
-
+                
+                out.flush();
                 socket->close();
             }
             else if ( cmd.startsWith( "/unityURL" ) )
@@ -376,6 +387,7 @@ void ServerThread::run()
                 
                 out << Settings::unityURL() + "\n";
                 
+                out.flush();
                 socket->close();
             }
             else if ( cmd.startsWith( "/assign" ) )
@@ -422,6 +434,8 @@ void ServerThread::run()
                     
                     delete net;
                 }
+                
+                out.flush();
             }
             else if ( cmd.startsWith( "/userqueue" ) )
             {    
@@ -446,6 +460,8 @@ void ServerThread::run()
                     out.flush();
                     Debug::print( "server", "Userqueue for " + eng + " took " + QString::number( uqTimer.elapsed() / 1000 ) + " sec");
                 }
+                
+                out.flush();
             }
             else if ( cmd.startsWith( "/stats" ) )
             {    
@@ -627,7 +643,7 @@ void ServerThread::run()
                     delete net;      
                 }
                 
-                          
+                out.flush();
                 socket->close();
             }
             else
@@ -683,6 +699,7 @@ void ServerThread::run()
                 out << "  * http://kueue.hwlab.suse.de:8080/bug/$SRNR\n    Get the bugreport for $SRNR (if any)\n\n";
                 out << "Stay tuned for more features!\n";
                 
+                out.flush();
                 socket->close();
             }
             
