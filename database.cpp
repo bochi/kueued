@@ -399,7 +399,9 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
                     "  g.PREF_LANG_ID as CONTACT_LANG,"
                     "  REGEXP_REPLACE( sr.X_ONSITE_PH_NUM, '(.*)' || CHR(10) || '(.*)', '\\1') AS ONSITE_PHONE,"
                     "  REGEXP_REPLACE( sr.X_ONSITE_PH_NUM, '(.*)' || CHR(10) || '(.*)', '\\2') AS ONSITE_FORMAT_STRING,"
-                    "  sr.DESC_TEXT as DETAILED_DESC "
+                    "  sr.DESC_TEXT as DETAILED_DESC, "
+                    "  sr.X_ALT_CONTACT, "
+                    "  sr.X_DEFECT_NUM "
                     "from "
                     "  siebel.s_srv_req sr, "
                     "  siebel.s_user u, "
@@ -504,6 +506,8 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
         }
         
         i.detailed_desc = query.value( 24 ).toString();
+        i.alt_contact = query.value( 25 ).toString();
+        i.bugId = query.value( 26 ).toString();
         
         list.append( i );
     }
@@ -1234,7 +1238,9 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
                     "  REGEXP_REPLACE( sr.X_ONSITE_PH_NUM, '(.*)' || CHR(10) || '(.*)', '\\2') AS ONSITE_FORMAT_STRING,"                    
                     "  sr.DESC_TEXT as DETAILED_DESC, "
                     "  sr.SR_CATEGORY_CD as CATEGORY, "
-                    "  sr.ROW_ID "
+                    "  sr.ROW_ID, "
+                    "  sr.X_ALT_CONTACT, "
+                    "  sr.X_DEFECT_NUM "
                     "from "
                     "  siebel.s_srv_req sr, "
                     "  siebel.s_user u, "
@@ -1299,7 +1305,9 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
                     "  '1', "
                     "  '1',"
                     "  sr.SR_CATEGORY_CD as SR_CATEGORY, "
-                    "  sr.ROW_ID  "
+                    "  sr.ROW_ID, "
+                    "  sr.X_ALT_CONTACT, "
+                    "  sr.X_DEFECT_NUM "
                     "from "
                     "  siebel.s_srv_req sr, "
                     "  siebel.s_user u, "
@@ -1360,7 +1368,9 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
                     "  '0', "
                     "  '0',"
                     "  sr.SR_CATEGORY_CD as SR_CATEGORY, "
-                    "  sr.ROW_ID "
+                    "  sr.ROW_ID, "
+                    "  sr.X_ALT_CONTACT, "
+                    "  sr.X_DEFECT_NUM "
                     "from "
                     "  siebel.s_srv_req sr, "
                     "  siebel.s_entlmnt e, "
@@ -1469,6 +1479,9 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
         si.detailed_desc = query.value( 31 ).toString();
         si.category = query.value( 32 ).toString();
         si.row_id = query.value( 33 ).toString();
+        si.alt_contact = query.value( 34 ).toString();
+        si.bugId = query.value( 35 ).toString();
+        qDebug() << "BUG" << si.bugId;
         
         list.append( si );
     }

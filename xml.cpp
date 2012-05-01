@@ -102,6 +102,11 @@ QString XML::qmon( QList<SiebelItem> list )
             {
                 xml += "    <cus_lang><![CDATA[" + si.contact_lang + "]]></cus_lang>\n";
             }
+            
+            if ( !si.alt_contact.isEmpty() )
+            {
+                xml += "    <alt_contact><![CDATA[" + si.alt_contact + "]]></alt_contact>\n";
+            }
         }
 
         xml += "    <severity><![CDATA[" + si.severity + "]]></severity>\n";
@@ -128,6 +133,11 @@ QString XML::qmon( QList<SiebelItem> list )
         if ( !si.respond_via.isEmpty() )
         {
             xml += "    <respond_via><![CDATA[" + si.respond_via + "]]></respond_via>\n";      
+        }
+        
+        if ( !si.bugId.isEmpty() )
+        {
+            xml += "    <bug>" + si.bugId + "</bug>\n";
         }
         
         xml += "    <age>" + QString::number( age ) + "</age>\n";
@@ -344,6 +354,11 @@ QString XML::queue( QList<QueueItem> list )
             {
                 xml += "    <cus_lang><![CDATA[" + qi.contact_lang + "]]></cus_lang>\n";
             }
+            
+            if ( !qi.alt_contact.isEmpty() )
+            {
+                xml += "    <alt_contact><![CDATA[" + qi.alt_contact + "]]></alt_contact>\n";
+            }
         }
 
         xml += "    <severity><![CDATA[" + qi.severity + "]]></severity>\n";
@@ -353,6 +368,11 @@ QString XML::queue( QList<QueueItem> list )
         if ( ( !qi.detailed_desc.isEmpty() ) && ( qi.detailed_desc != "1" ) && ( qi.detailed_desc != "0" ) )
         {
             xml += "    <ddesc><![CDATA[" + qi.detailed_desc + "]]></ddesc>\n";        
+        }
+        
+        if ( !qi.bugId.isEmpty() )
+        {
+            xml += "    <bug>" + qi.bugId + "</bug>\n";
         }
         
         xml += "    <geo><![CDATA[" + qi.geo + "]]></geo>\n";

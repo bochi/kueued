@@ -114,6 +114,8 @@ class SiebelItem
         QString row_id;
         QString creator;
         QString bomgarQ;
+        QString alt_contact;
+        QString bugId;
         bool isCr;
         bool isChat;
         bool critsit;
@@ -145,6 +147,8 @@ class QueueItem
         QString onsite_phone;
         QString creator;
         QString format_string;
+        QString alt_contact;
+        QString bugId;
         bool isCr;
         bool critsit;
         bool high_value;
