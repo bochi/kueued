@@ -440,6 +440,7 @@ void ServerThread::run()
             else if ( cmd.startsWith( "/userqueue" ) )
             {    
                 openSiebelDB();
+                openMysqlDB();
                 
                 QTime uqTimer;
                 uqTimer.start();
@@ -456,7 +457,7 @@ void ServerThread::run()
                     
                     out << xml();
 
-                    out << XML::queue( Database::getUserQueue( eng, mSiebelDB ) );
+                    out << XML::queue( Database::getUserQueue( eng, mSiebelDB, mMysqlDB ) );
                     out.flush();
                     Debug::print( "server", "Userqueue for " + eng + " took " + QString::number( uqTimer.elapsed() / 1000 ) + " sec");
                 }

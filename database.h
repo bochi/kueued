@@ -70,12 +70,12 @@ class Database : public QObject
         static QString convertTime( const QString& );
         static QString formatPhone( QString, const QString& );
         
-        static QList< QueueItem > getUserQueue( const QString&, const QString& = QString::Null() );
+        static QList< QueueItem > getUserQueue( const QString&, const QString& = QString::Null(), const QString& = QString::Null() );
         static QList< SiebelItem > getQmonSrs( const QString& = QString::Null() );
         static QList< BomgarItem > getChats( const QString& = QString::Null() );  
         
         static QStringList srInfo( const QString&, const QString& = QString::Null() );
-        static QString getBugDesc( const QString& );
+        static QString getBugDesc( const QString&, const QString& );
 };
 
 class SiebelItem 

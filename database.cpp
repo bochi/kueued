@@ -353,9 +353,10 @@ QString Database::getCreator(const QString& sr, const QString& dbname )
     }
 }
 
-QList< QueueItem > Database::getUserQueue( const QString& engineer, const QString& dbname )
+QList< QueueItem > Database::getUserQueue( const QString& engineer, const QString& dbname, const QString& mysqlname )
 {
     QSqlDatabase db;
+    QSqlDatabase mysqldb;
     
     if ( dbname.isNull() ) 
     {
@@ -364,6 +365,7 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
     else
     {
         db = QSqlDatabase::database( dbname );
+        mysqldb = QSqlDatabase::database( mysqlname );
     }
     
     QSqlQuery query( db );
@@ -513,7 +515,7 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
         
         if ( !i.bugId.isEmpty() )
         {
-            i.bugDesc = getBugDesc( i.bugId );
+            i.bugDesc = getBugDesc( i.bugId, mysqlname );
         }
         
         list.append( i );
@@ -1591,35 +1593,65 @@ QString Database::formatPhone( QString p, const QString& f )
     return p;
 }
 
-QString Database::getBugDesc( const QString& bug )
+QString Database::getBugDesc( const QString& bug, const QString& dbname )
 {
-    Network* net = new Network;
+    QSqlDatabase db;
+    QString desc;
     
-    QEventLoop loop;
-    QString xml;
+    if ( dbname.isNull() ) 
+    {
+        db = QSqlDatabase::database( "mysqlDB" );
+    }
+    else
+    {
+        db = QSqlDatabase::database( dbname );
+    }
     
-    QUrl url( "https://apibugzilla.novell.com/show_bug.cgi?id=" + bug + "&ctype=xml" );
-    url.setUserName( Settings::bugzillaUser() );
-    url.setPassword( Settings::bugzillaPassword() );
+    QSqlQuery query( db );
     
-    QNetworkReply *reply = net->getExt( url );
-    
-    loop.connect( reply, SIGNAL( readyRead() ),
-                  &loop, SLOT( quit() ) );
+    query.prepare( "SELECT TITLE FROM BUG WHERE ( ID = :bug )" );
+                
+    query.bindValue( ":bug", bug );
+                
+    if ( !query.exec() ) qDebug() << query.lastError().text();
         
-    loop.exec();
-       
-    xml = reply->readAll();
-    
-    QDomDocument xmldoc;
-    xmldoc.setContent(xml);
-    QDomNodeList list = xmldoc.elementsByTagName( "short_desc" );
-    QString desc = list.item(0).toElement().text();
-   
-    delete net;
-
-    return desc.trimmed();
-    // https://apibugzilla.novell.com/show_bug.cgi?id=BUG&ctype=xml
+    if ( query.size() == 0 )
+    {
+        Network* net = new Network;
+        QEventLoop loop;
+        QString xml;
+        
+        QUrl url( "https://apibugzilla.novell.com/show_bug.cgi?id=" + bug + "&ctype=xml" );
+        url.setUserName( Settings::bugzillaUser() );
+        url.setPassword( Settings::bugzillaPassword() );
+        
+        QNetworkReply *reply = net->getExt( url );
+        
+        loop.connect( reply, SIGNAL( readyRead() ),
+                    &loop, SLOT( quit() ) );
+            
+        loop.exec();
+        
+        xml = reply->readAll();
+        
+        QDomDocument xmldoc;
+        xmldoc.setContent(xml);
+        QDomNodeList list = xmldoc.elementsByTagName( "short_desc" );
+        desc = list.item(0).toElement().text();
+        
+        query.prepare( "INSERT INTO BUG( ID, TITLE ) VALUES ( :bug, :title )" );
+                
+        query.bindValue( ":bug", bug );
+        query.bindValue( ":title", desc.trimmed() );
+        
+        if ( !query.exec() ) qDebug() << query.lastError().text();
+        delete net;
+        return desc.trimmed();
+    }
+    else if ( query.next() )
+    { 
+        return query.value( 0 ).toString();
+    }
 }
 
 #include "database.moc"
