@@ -1488,7 +1488,6 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
         si.row_id = query.value( 33 ).toString();
         si.alt_contact = query.value( 34 ).toString();
         si.bugId = query.value( 35 ).toString();
-        qDebug() << "BUG" << si.bugId;
         
         list.append( si );
     }
@@ -1618,7 +1617,7 @@ QString Database::getBugDesc( const QString& bug )
     QString desc = list.item(0).toElement().text();
    
     delete net;
-    qDebug() << desc;
+
     return desc.trimmed();
     // https://apibugzilla.novell.com/show_bug.cgi?id=BUG&ctype=xml
 }
