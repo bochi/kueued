@@ -26,7 +26,9 @@
 #include "database.h"
 #include "debug.h"
 #include "settings.h"
+#include "network.h"
 
+#include <QtXml>
 #include <QDateTime>
 
 Database::Database()
@@ -508,6 +510,11 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
         i.detailed_desc = query.value( 24 ).toString();
         i.alt_contact = query.value( 25 ).toString();
         i.bugId = query.value( 26 ).toString();
+        
+        if ( !i.bugId.isEmpty() )
+        {
+            i.bugDesc = getBugDesc( i.bugId );
+        }
         
         list.append( i );
     }
@@ -1585,5 +1592,35 @@ QString Database::formatPhone( QString p, const QString& f )
     return p;
 }
 
+QString Database::getBugDesc( const QString& bug )
+{
+    Network* net = new Network;
+    
+    QEventLoop loop;
+    QString xml;
+    
+    QUrl url( "https://apibugzilla.novell.com/show_bug.cgi?id=" + bug + "&ctype=xml" );
+    url.setUserName( Settings::bugzillaUser() );
+    url.setPassword( Settings::bugzillaPassword() );
+    
+    QNetworkReply *reply = net->getExt( url );
+    
+    loop.connect( reply, SIGNAL( readyRead() ),
+                  &loop, SLOT( quit() ) );
+        
+    loop.exec();
+       
+    xml = reply->readAll();
+    
+    QDomDocument xmldoc;
+    xmldoc.setContent(xml);
+    QDomNodeList list = xmldoc.elementsByTagName( "short_desc" );
+    QString desc = list.item(0).toElement().text();
+   
+    delete net;
+    qDebug() << desc;
+    return desc.trimmed();
+    // https://apibugzilla.novell.com/show_bug.cgi?id=BUG&ctype=xml
+}
 
 #include "database.moc"

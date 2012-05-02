@@ -54,6 +54,20 @@ QNetworkReply* Network::get( const QUrl& url )
     return reply;
 }
 
+QNetworkReply* Network::getExt( const QUrl& url )
+{
+    QNetworkRequest request( url );
+    request.setRawHeader( "User-Agent", QString( "kueue " + QApplication::applicationVersion() ).toUtf8() );
+    
+    QNetworkReply* reply = mNAM->get( request );
+    
+    connect( reply, SIGNAL( error( QNetworkReply::NetworkError ) ),
+            this, SLOT( error( QNetworkReply::NetworkError ) ) );
+
+    //qDebug() << "[NETWORK] Downloading" << request.url();
+    return reply;
+}
+
 void Network::error( QNetworkReply::NetworkError error )
 {
     QNetworkReply* reply = qobject_cast<QNetworkReply*>( QObject::sender() );

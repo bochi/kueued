@@ -138,6 +138,7 @@ QString XML::qmon( QList<SiebelItem> list )
         if ( !si.bugId.isEmpty() )
         {
             xml += "    <bug>" + si.bugId + "</bug>\n";
+            //xml += "    <bug_desc>" + si.bugDesc + "</bug_desc>\n";
         }
         
         xml += "    <age>" + QString::number( age ) + "</age>\n";
@@ -373,6 +374,7 @@ QString XML::queue( QList<QueueItem> list )
         if ( !qi.bugId.isEmpty() )
         {
             xml += "    <bug>" + qi.bugId + "</bug>\n";
+            xml += "    <bug_desc>" + qi.bugDesc + "</bug_desc>\n";
         }
         
         xml += "    <geo><![CDATA[" + qi.geo + "]]></geo>\n";

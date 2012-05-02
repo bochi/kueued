@@ -37,6 +37,7 @@ class Network : public QObject
         ~Network();
         
         QNetworkReply* get( const QUrl& url );
+        QNetworkReply* getExt( const QUrl& url );
     
     private:
         QNetworkAccessManager* mNAM;

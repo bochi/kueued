@@ -24,6 +24,7 @@
 */
 
 #include "settings.h"
+#include "simplecrypt/simplecrypt.h"
 
 QString Settings::dBServer()
 {
@@ -161,4 +162,28 @@ bool Settings::debugLog()
 {
     QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
     return settings.value( "debugLog" ).toBool();
+}
+
+QString Settings::bugzillaUser()
+{
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
+    return settings.value( "bugzillaUser" ).toString();
+}
+
+QString Settings::bugzillaPassword()
+{
+    // I know this is not really secure, but how would one hide the 
+    // encryption key in OSS software? :P
+    // At least it's not in the config file in cleartext...
+    
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
+    SimpleCrypt crypto( Q_UINT64_C( 0424632454124622 ) );
+    QString pw;
+    
+    if ( !settings.value( "bugzillaPassword" ).toString().isEmpty() )
+    {
+        pw = crypto.decryptToString( settings.value( "bugzillaPassword" ).toString() );
+    }
+
+    return pw;
 }

@@ -59,7 +59,8 @@ SET( kueued_CPP     main.cpp
 		    network.cpp
 		    serverthread.cpp
                     server.cpp
-		    xml.cpp)
+		    xml.cpp
+		    simplecrypt/simplecrypt.cpp)
 
 QT4_AUTOMOC( ${kueued_CPP} )
 

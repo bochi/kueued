@@ -75,6 +75,7 @@ class Database : public QObject
         static QList< BomgarItem > getChats( const QString& = QString::Null() );  
         
         static QStringList srInfo( const QString&, const QString& = QString::Null() );
+        static QString getBugDesc( const QString& );
 };
 
 class SiebelItem 
@@ -149,6 +150,7 @@ class QueueItem
         QString format_string;
         QString alt_contact;
         QString bugId;
+        QString bugDesc;
         bool isCr;
         bool critsit;
         bool high_value;
