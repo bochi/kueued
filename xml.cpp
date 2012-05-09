@@ -291,113 +291,112 @@ QString XML::qmonDate( QList<SiebelItem> list )
 
 QString XML::queue( QList<QueueItem> list )
 {
-    /*QDateTime now = QDateTime::currentDateTime();
-    QDateTime odate = QDateTime::fromString( qi.created, "yyyy-MM-dd hh:mm:ss" );
-    QDateTime adate = QDateTime::fromString( qi.last_update, "yyyy-MM-dd hh:mm:ss" );
-    */
-    
-    
     QString xml;
-    
-    //qint64 age = ( odate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 ) );
-    //qint64 lu = ( adate.secsTo( now ) - ( Settings::timezoneCorrection() * 3600 ));
 
     xml += "<queue>\n";
     xml += "<total>" + QString::number( list.size() ) + "</total>\n";
+
     for ( int i = 0; i < list.size(); ++i ) 
     {
-        QueueItem qi = list.at( i );
-    
-        xml += "  <sr>\n";
-        xml += "    <id><![CDATA[" + qi.id + "]]></id>\n";
-        
-        if ( qi.isCr )
-        {
-            xml += "    <srtype>cr</srtype>\n";
-            xml += "    <creator>" + qi.creator + "</creator>\n";
-        }
-        else
-        {
-            xml += "    <srtype>sr</srtype>\n";
-            xml += "    <cus_account><![CDATA[" + qi.customer + "]]></cus_account>\n";
-            
-            if ( ( !qi.contact_firstname.isEmpty() ) && ( qi.contact_firstname != "1" ) && ( qi.contact_firstname != "0" ) )
-            {
-                xml += "    <cus_firstname><![CDATA[" + qi.contact_firstname + "]]></cus_firstname>\n";
-            }
-            
-            if ( ( !qi.contact_lastname.isEmpty() ) && ( qi.contact_lastname != "1" )&& ( qi.contact_lastname != "0" )   )
-            {
-                xml += "    <cus_lastname><![CDATA[" + qi.contact_lastname + "]]></cus_lastname>\n";
-            }
-            
-            if ( ( !qi.contact_title.isEmpty() ) && ( qi.contact_title != "1" ) && ( qi.contact_title != "0" ) )
-            {
-                xml += "    <cus_title><![CDATA[" + qi.contact_title + "]]></cus_title>\n";
-            }
-            
-            if ( ( !qi.contact_email.isEmpty() ) && ( qi.contact_email != "1" ) && ( qi.contact_email != "0" ) )
-            {
-                xml += "    <cus_email><![CDATA[" + qi.contact_email + "]]></cus_email>\n";  
-            }
-            
-            if ( ( !qi.contact_phone.isEmpty() ) && ( qi.contact_phone != "1" ) && ( qi.contact_phone != "0" ) )
-            {
-                xml += "    <cus_phone><![CDATA[" + qi.contact_phone + "]]></cus_phone>\n";
-            }
-            
-            if ( ( !qi.onsite_phone.isEmpty() ) && ( qi.onsite_phone != "1" ) && ( qi.onsite_phone != "0" ) )
-            {
-                xml += "    <cus_onsitephone><![CDATA[" + qi.onsite_phone + "]]></cus_onsitephone>\n";
-            }
-            
-            if ( ( !qi.contact_lang.isEmpty() ) && ( qi.contact_lang != "1" ) && ( qi.contact_lang != "0" ) )
-            {
-                xml += "    <cus_lang><![CDATA[" + qi.contact_lang + "]]></cus_lang>\n";
-            }
-            
-            if ( !qi.alt_contact.isEmpty() )
-            {
-                xml += "    <alt_contact><![CDATA[" + qi.alt_contact + "]]></alt_contact>\n";
-            }
-        }
-
-        xml += "    <severity><![CDATA[" + qi.severity + "]]></severity>\n";
-        xml += "    <status><![CDATA[" + qi.status + "]]></status>\n";
-        xml += "    <bdesc><![CDATA[" + qi.brief_desc + "]]></bdesc>\n";
-        
-        if ( ( !qi.detailed_desc.isEmpty() ) && ( qi.detailed_desc != "1" ) && ( qi.detailed_desc != "0" ) )
-        {
-            xml += "    <ddesc><![CDATA[" + qi.detailed_desc + "]]></ddesc>\n";        
-        }
-        
-        if ( !qi.bugId.isEmpty() )
-        {
-            xml += "    <bug>" + qi.bugId + "</bug>\n";
-            xml += "    <bug_desc>" + qi.bugDesc + "</bug_desc>\n";
-        }
-        
-        xml += "    <geo><![CDATA[" + qi.geo + "]]></geo>\n";
-        xml += "    <hours><![CDATA[" + qi.hours + "]]></hours>\n";
-        xml += "    <contract><![CDATA[" + qi.support_program + "]]></contract>\n";
-        xml += "    <service_level><![CDATA[" + QString::number( qi.service_level ) + "]]></service_level>\n";
-        xml += "    <created>" + qi.created + "</created>\n";
-        xml += "    <lastupdate>" + qi.last_update + "</lastupdate>\n";
-        
-        if ( qi.high_value )
-        {
-            xml += "    <highvalue>1</highvalue>\n";
-        }
-        
-        if ( qi.critsit )
-        {
-            xml += "    <critsit>1</critsit>\n";
-        }
-        
-        xml += "  </sr>\n";
+        xml += sr( list.at( i ) );
     }
     
     xml += "</queue>\n";
+    
+    return xml;
+}
+
+QString XML::sr( QueueItem qi )
+{
+    QString xml;
+
+    xml += "  <sr>\n";
+    xml += "    <id><![CDATA[" + qi.id + "]]></id>\n";
+    
+    if ( qi.isCr )
+    {
+        xml += "    <srtype>cr</srtype>\n";
+        xml += "    <creator>" + qi.creator + "</creator>\n";
+    }
+    else
+    {
+        xml += "    <srtype>sr</srtype>\n";
+        xml += "    <cus_account><![CDATA[" + qi.customer + "]]></cus_account>\n";
+        
+        if ( ( !qi.contact_firstname.isEmpty() ) && ( qi.contact_firstname != "1" ) && ( qi.contact_firstname != "0" ) )
+        {
+            xml += "    <cus_firstname><![CDATA[" + qi.contact_firstname + "]]></cus_firstname>\n";
+        }
+        
+        if ( ( !qi.contact_lastname.isEmpty() ) && ( qi.contact_lastname != "1" )&& ( qi.contact_lastname != "0" )   )
+        {
+            xml += "    <cus_lastname><![CDATA[" + qi.contact_lastname + "]]></cus_lastname>\n";
+        }
+        
+        if ( ( !qi.contact_title.isEmpty() ) && ( qi.contact_title != "1" ) && ( qi.contact_title != "0" ) )
+        {
+            xml += "    <cus_title><![CDATA[" + qi.contact_title + "]]></cus_title>\n";
+        }
+        
+        if ( ( !qi.contact_email.isEmpty() ) && ( qi.contact_email != "1" ) && ( qi.contact_email != "0" ) )
+        {
+            xml += "    <cus_email><![CDATA[" + qi.contact_email + "]]></cus_email>\n";  
+        }
+        
+        if ( ( !qi.contact_phone.isEmpty() ) && ( qi.contact_phone != "1" ) && ( qi.contact_phone != "0" ) )
+        {
+            xml += "    <cus_phone><![CDATA[" + qi.contact_phone + "]]></cus_phone>\n";
+        }
+        
+        if ( ( !qi.onsite_phone.isEmpty() ) && ( qi.onsite_phone != "1" ) && ( qi.onsite_phone != "0" ) )
+        {
+            xml += "    <cus_onsitephone><![CDATA[" + qi.onsite_phone + "]]></cus_onsitephone>\n";
+        }
+        
+        if ( ( !qi.contact_lang.isEmpty() ) && ( qi.contact_lang != "1" ) && ( qi.contact_lang != "0" ) )
+        {
+            xml += "    <cus_lang><![CDATA[" + qi.contact_lang + "]]></cus_lang>\n";
+        }
+        
+        if ( !qi.alt_contact.isEmpty() )
+        {
+            xml += "    <alt_contact><![CDATA[" + qi.alt_contact + "]]></alt_contact>\n";
+        }
+    }
+
+    xml += "    <severity><![CDATA[" + qi.severity + "]]></severity>\n";
+    xml += "    <status><![CDATA[" + qi.status + "]]></status>\n";
+    xml += "    <bdesc><![CDATA[" + qi.brief_desc + "]]></bdesc>\n";
+    
+    if ( ( !qi.detailed_desc.isEmpty() ) && ( qi.detailed_desc != "1" ) && ( qi.detailed_desc != "0" ) )
+    {
+        xml += "    <ddesc><![CDATA[" + qi.detailed_desc + "]]></ddesc>\n";        
+    }
+    
+    if ( !qi.bugId.isEmpty() )
+    {
+        xml += "    <bug>" + qi.bugId + "</bug>\n";
+        xml += "    <bug_desc>" + qi.bugDesc + "</bug_desc>\n";
+    }
+    
+    xml += "    <geo><![CDATA[" + qi.geo + "]]></geo>\n";
+    xml += "    <hours><![CDATA[" + qi.hours + "]]></hours>\n";
+    xml += "    <contract><![CDATA[" + qi.support_program + "]]></contract>\n";
+    xml += "    <service_level><![CDATA[" + QString::number( qi.service_level ) + "]]></service_level>\n";
+    xml += "    <created>" + qi.created + "</created>\n";
+    xml += "    <lastupdate>" + qi.last_update + "</lastupdate>\n";
+    
+    if ( qi.high_value )
+    {
+        xml += "    <highvalue>1</highvalue>\n";
+    }
+    
+    if ( qi.critsit )
+    {
+        xml += "    <critsit>1</critsit>\n";
+    }
+    
+    xml += "  </sr>\n";
     
     return xml;
 }

@@ -524,6 +524,173 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
     return list;
 }
 
+QueueItem Database::getSrInfo( const QString& sr, const QString& dbname, const QString& mysqlname )
+{
+    QSqlDatabase db;
+    QSqlDatabase mysqldb;
+    
+    if ( dbname.isNull() ) 
+    {
+        db = QSqlDatabase::database( "siebelDB" );
+    }
+    else
+    {
+        db = QSqlDatabase::database( dbname );
+        mysqldb = QSqlDatabase::database( mysqlname );
+    }
+    
+    QSqlQuery query( db );
+    QueueItem i;
+
+    query.prepare( "select "
+                    "  sr.sr_num as ID, "
+                    "  case "
+                    "    when sr.BU_ID = '0-R9NH' then 'Default Organization' "
+                    "    when sr.BU_ID = '1-AHT' then 'EMEA' "
+                    "    when sr.BU_ID = '1-AHV' then 'ASIAPAC' "
+                    "    when sr.BU_ID = '1-AHX' then 'USA' "
+                    "    when sr.BU_ID = '1-AHZ' then 'LATIN AMERICA' "
+                    "    when sr.BU_ID = '1-AI1' then 'CANADA' "
+                    "  else 'Undefined' end as GEO,  "
+                    "  cal.NAME as HOURS, "
+                    "  sr.SR_SUB_STAT_ID as STATUS, "
+                    "  sr.SR_SEV_CD as SEVERITY, "
+                    "  sr.CREATED, "
+                    "  sr.CREATED_BY, "
+                    "  sr.LAST_UPD as LAST_UPDATE,  "
+                    "  e.NAME as SUPPORT_PROGRAM,"
+                    "  sr.X_SR_SUB_TYPE as SUBTYPE, "
+                    "  e.ENTL_PRIORITY_NUM as SERVICE_LEVEL, "
+                    "  SR_TITLE as BRIEF_DESC, "
+                    "  flag.ATTRIB_11 as CRITSIT, "
+                    "  flag.ATTRIB_56 as HIGH_VALUE, "
+                    "  ext.NAME as CUSTOMER, "
+                    "  REGEXP_REPLACE( g.WORK_PH_NUM, '(.*)' || CHR(10) || '(.*)', '\\1') AS CONTACT_PHONE,"
+                    "  REGEXP_REPLACE( g.WORK_PH_NUM, '(.*)' || CHR(10) || '(.*)', '\\2') AS FORMAT_STRING,"
+                    "  g.FST_NAME as CONTACT_FIRSTNAME, "
+                    "  g.LAST_NAME as CONTACT_LASTNAME, "
+                    "  g.EMAIL_ADDR as CONTACT_EMAIL, "
+                    "  g.JOB_TITLE as CONTACT_TITLE, "
+                    "  g.PREF_LANG_ID as CONTACT_LANG,"
+                    "  REGEXP_REPLACE( sr.X_ONSITE_PH_NUM, '(.*)' || CHR(10) || '(.*)', '\\1') AS ONSITE_PHONE,"
+                    "  REGEXP_REPLACE( sr.X_ONSITE_PH_NUM, '(.*)' || CHR(10) || '(.*)', '\\2') AS ONSITE_FORMAT_STRING,"
+                    "  sr.DESC_TEXT as DETAILED_DESC, "
+                    "  sr.X_ALT_CONTACT, "
+                    "  sr.X_DEFECT_NUM "
+                    "from "
+                    "  siebel.s_srv_req sr, "
+                    "  siebel.s_user u, "
+                    "  siebel.s_contact c, "
+                    "  siebel.s_contact g, "
+                    "  siebel.s_entlmnt e, "
+                    "  siebel.s_sched_cal cal, "
+                    "  siebel.s_org_ext ext, "
+                    "  siebel.s_prod_int prd, "
+                    "  siebel.s_org_ext_x flag "
+                    "where "
+                    "  sr.owner_emp_id = u.row_id "
+                    "  and u.row_id = c.row_id "
+                    "  and g.row_id = sr.CST_CON_ID  "
+                    "  and sr.sr_num = :sr "
+                    "  and sr.agree_id = e.row_id "
+                    "  and e.svc_calendar_id = cal.row_id "
+                    "  and sr.cst_ou_id = ext.row_id "
+                    "  and sr.X_PROD_FEATURE_ID = prd.row_id "
+                    "  and ext.row_id = flag.row_id" );
+        
+    query.bindValue( ":sr", sr );
+    if ( !query.exec() ) qDebug() << query.lastError().text();
+    
+    Debug::logQuery( query, db.connectionName() );
+    qDebug() << sr;
+    if ( query.next() )
+    {
+        qDebug() << "qnext";
+        i.id = query.value( 0 ).toString();
+        i.geo = query.value( 1 ).toString();
+        i.hours = query.value( 2 ).toString();
+        i.status = query.value( 3 ).toString();
+        i.severity = query.value( 4 ).toString();
+        i.created = convertTime( query.value( 5 ).toString() );
+        i.last_update = convertTime( query.value( 7 ).toString() );
+        i.support_program = query.value( 8 ).toString();
+        i.subtype = query.value( 9 ).toString();
+        
+        if ( query.value( 9 ).toString() == "Collaboration" )
+        {
+            i.isCr = true;
+            i.creator = getCreator( i.id, dbname );
+        }
+        else
+        {
+            i.isCr = false;
+            i.customer = query.value( 14 ).toString();
+            
+            QString p = query.value( 15 ).toString();
+            QString f = query.value( 16 ).toString();
+            
+            if ( p != f && !f.isEmpty() )
+            {
+                i.contact_phone = formatPhone( p, f );
+            }
+            else
+            {
+                i.contact_phone = p;
+            }
+                
+            i.contact_firstname = query.value( 17 ).toString();
+            i.contact_lastname = query.value( 18 ).toString();
+            i.contact_email = query.value( 19 ).toString();
+            i.contact_title = query.value( 20 ).toString();
+            i.contact_lang = query.value( 21 ).toString();
+         
+            QString op = query.value( 22 ).toString();
+            QString of = query.value( 23 ).toString();
+        
+            if ( op != of && !of.isEmpty() )
+            {
+                i.onsite_phone = formatPhone( op, of );
+            }
+            else
+            {
+                i.onsite_phone = op;
+            }
+        }
+            
+        i.service_level = query.value( 10 ).toInt();
+        i.brief_desc = query.value( 11 ).toString();
+        
+        if ( query.value( 12 ).toString() == "Y" )
+        {
+            i.critsit = true;
+        }
+        else
+        {
+            i.critsit = false;
+        }
+        
+        if ( query.value( 13 ).toString() == "Y" )
+        {
+            i.high_value = true;
+        }
+        else
+        {
+            i.high_value = false;
+        }
+        
+        i.detailed_desc = query.value( 24 ).toString();
+        i.alt_contact = query.value( 25 ).toString();
+        i.bugId = query.value( 26 ).toString();
+        
+        if ( !i.bugId.isEmpty() )
+        {
+            i.bugDesc = getBugDesc( i.bugId, mysqlname );
+        }
+    }
+        
+    return i;
+}
+
 void Database::updatePseudoQueues( const QString& qDb, const QString& mDb )
 {
     QSqlDatabase qdb;
@@ -1651,6 +1818,10 @@ QString Database::getBugDesc( const QString& bug, const QString& dbname )
     else if ( query.next() )
     { 
         return query.value( 0 ).toString();
+    }
+    else
+    {
+        return "No description - something went wrong :-(";
     }
 }
 

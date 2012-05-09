@@ -166,7 +166,7 @@ void ServerThread::run()
             else if ( cmd.startsWith( "/srnrs" ) )
             {  
                 openMysqlDB();
-                
+                                
                 QString q = cmd.remove( "/srnrs" );
 
                 out << text();
@@ -191,6 +191,27 @@ void ServerThread::run()
                 
                 out.flush();
                 
+            }
+            else if ( cmd.startsWith( "/srinfo" ) )
+            {  
+                openSiebelDB();
+                openMysqlDB();
+                
+                QRegExp srnr( "^[0-9]{11}$" );
+                QString q = cmd.remove( "/srinfo" );
+
+                if ( ( q.remove( "/" ).isEmpty() ) || ( !srnr.exactMatch( q.remove( "/" ) ) ) )
+                {  
+                    out << text();
+                    out << "No SR number";
+                }
+                else
+                {  
+                    out << xml();
+                    out << XML::sr( Database::getSrInfo( q.remove( "/" ), mSiebelDB, mMysqlDB ) );
+                }
+                
+                out.flush();
             }
             else if ( cmd.startsWith( "/latestkueue" ) )
             {
