@@ -143,9 +143,11 @@ void ServerThread::run()
             {
                 openMysqlDB();
                 
-                QString xml = XML::qmonDate( Database::getSrsForQueue( "NONE", mMysqlDB ) );
+                QString x = XML::qmonDate( Database::getSrsForQueue( "NONE", mMysqlDB ) );
 
-                out << xml;
+                out << xml();
+                
+                out << x;
                 
                 out.flush();
                 socket->close();
