@@ -142,12 +142,15 @@ QString XML::qmon( QList<SiebelItem> list )
         }
         
         xml += "    <age>" + QString::number( age ) + "</age>\n";
+        xml += "    <agedate>" + si.created + "</agedate>\n";
         xml += "    <lastupdate>" + QString::number( lu ) + "</lastupdate>\n";
+        xml += "    <lastupdatedate>" + si.last_update + "</lastupdatedate>\n";
         xml += "    <timeinQ>" + QString::number( qt ) + "</timeinQ>\n";
 
         if ( sla > 0 )      
         {
             xml += "    <sla>" + QString::number( sla ) + "</sla>\n";
+            xml += "    <sladate>" + si.sla + "</sladate>\n";
         }
         
         if ( si.high_value )
