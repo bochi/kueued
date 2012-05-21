@@ -730,8 +730,14 @@ void ServerThread::run()
             if ( socket->waitForBytesWritten() )
             {
                 Debug::print( "serverthread", "Wrote to socket " + QString::number( mSocket ) );
+                
                 socket->disconnectFromHost();
-                socket->waitForDisconnected();
+                
+                if ( !socket->state() != QAbstractSocket::UnconnectedState )
+                {
+                    socket->waitForDisconnected();
+                }
+                
                 delete socket;
             }
         }
