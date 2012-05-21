@@ -733,7 +733,7 @@ void ServerThread::run()
                 
                 socket->disconnectFromHost();
                 
-                if ( !socket->state() != QAbstractSocket::UnconnectedState )
+                if ( socket->state() != QAbstractSocket::UnconnectedState )
                 {
                     socket->waitForDisconnected();
                 }
