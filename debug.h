@@ -46,7 +46,7 @@ namespace Debug
         }
     }
     
-    static void log( const QString& c, const QString& msg )
+    static void log( const QString& c, QString msg )
     {   
         char hostname[ 1024 ];
         gethostname( hostname, sizeof( hostname ) );
@@ -63,6 +63,12 @@ namespace Debug
         QTextStream out(&file);
 
         QString t = "[" + QDateTime::currentDateTime().toString( "MM/dd hh:mm:ss" ) + "] [" + host.toUpper() + "] [" + c.toUpper() + "] ";
+        
+        if ( msg.contains( "%7C" ) )
+        {
+            msg.replace( "%7C", "|" );
+        }
+
         out << t << msg << "\n";
         file.close();
     }
