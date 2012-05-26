@@ -602,10 +602,9 @@ QueueItem Database::getSrInfo( const QString& sr, const QString& dbname, const Q
     if ( !query.exec() ) qDebug() << query.lastError().text();
     
     Debug::logQuery( query, db.connectionName() );
-    qDebug() << sr;
+    
     if ( query.next() )
     {
-        qDebug() << "qnext";
         i.id = query.value( 0 ).toString();
         i.geo = query.value( 1 ).toString();
         i.hours = query.value( 2 ).toString();
