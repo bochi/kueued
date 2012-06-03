@@ -721,6 +721,10 @@ QString Database::getSrStatus( const QString& sr, const QString& dbname )
     {
         return query.value( 0 ).toString();
     }
+    else
+    {
+        return "NOT FOUND";
+    }
 }
 
 void Database::updatePseudoQueues( const QString& qDb, const QString& mDb )
