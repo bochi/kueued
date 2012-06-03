@@ -72,6 +72,7 @@ class Database : public QObject
         
         static QList< QueueItem > getUserQueue( const QString&, const QString& = QString::Null(), const QString& = QString::Null() );
         static QueueItem getSrInfo( const QString&, const QString& = QString::Null(), const QString& = QString::Null() );
+        static QString getSrStatus( const QString&, const QString& = QString::Null() );
         static QList< SiebelItem > getQmonSrs( const QString& = QString::Null() );
         static QList< BomgarItem > getChats( const QString& = QString::Null() );  
         

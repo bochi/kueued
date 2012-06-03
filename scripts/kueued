@@ -18,6 +18,10 @@
 ### END INIT INFO
 
 
+# The kueued binary is "kueued.ld", which LD_PRELOADs a more recent
+# Qt version from /usr/local/qt48 and sets NLS_LANG so umlauts and 
+# stuff are interpreted correctly from the oracle DBs
+
 KUEUED_BIN=/usr/bin/kueued.ld
 test -x $KUEUED_BIN || exit 5
 

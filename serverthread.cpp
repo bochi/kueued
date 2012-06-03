@@ -215,6 +215,26 @@ void ServerThread::run()
                 
                 out.flush();
             }
+            else if ( cmd.startsWith( "/srstatus" ) )
+            {  
+                openSiebelDB();
+                
+                QRegExp srnr( "^[0-9]{11}$" );
+                QString q = cmd.remove( "/srstatus" );
+
+                if ( ( q.remove( "/" ).isEmpty() ) || ( !srnr.exactMatch( q.remove( "/" ) ) ) )
+                {  
+                    out << text();
+                    out << "No SR number";
+                }
+                else
+                {  
+                    out << text();
+                    out << Database::getSrStatus( q.remove( "/" ), mSiebelDB );
+                }
+                
+                out.flush();
+            }
             else if ( cmd.startsWith( "/latestkueue" ) )
             {
                 out << text();

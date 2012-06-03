@@ -1,38 +1,30 @@
 #!/bin/bash
-#
-# copy to /usr/bin and run as cronjob 
-# */10 * * * * /usr/bin/check_kueued
 
-DATE=$(LANG=en_EN date)
+function check_daemon {
 
-/etc/init.d/kueued-db status
-   
-if [ "$?" != "0" ]; then
+  PID=$(pidof kueued)
 
-  echo "$DATE -- kueued database not OK - restarting" >> /var/log/kueued/kueued-check.log
-  /etc/init.d/kueued-db stop
-  sleep 1
-  killall -9 kueued-db
-  /etc/init.d/kueued-db start
+  if [ -z "$PID" ] ; then 
 
-else
+      /etc/init.d/kueued stop
+      /etc/init.d/kueued start
+      echo "I had to restart kueued at $(date)" | mail -s "kueued @ $HOSTNAME" kueue@suse.de
+  fi
+}
 
-  echo "$DATE -- kueued database running fine" >> /var/log/kueued/kueued-check.log
+function check_dbupdate {
 
-fi
+  /etc/init.d/kueued-dbupdate status
 
-/etc/init.d/kueued-srv status
+  if [ "$?" != "0" ] ; then
 
-if [ "$?" != "0" ]; then
+      /etc/init.d/kueued-dbupdate start
+      echo "I had to restart kueued-dbupdate at $(date)" | mail -s "kueued @ $HOSTNAME" kueue@suse.de
+  fi
+}
 
-  echo "$DATE -- kueued server not OK - restarting" >> /var/log/kueued/kueued-check.log
-  /etc/init.d/kueued-srv stop
-  sleep 1
-  killall -9 kueued-srv
-  /etc/init.d/kueued-srv start
 
-else 
+check_daemon
+check_dbupdate
 
-  echo "$DATE -- kueued server running fine" >> /var/log/kueued/kueued-check.log
 
-fi

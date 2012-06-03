@@ -690,6 +690,39 @@ QueueItem Database::getSrInfo( const QString& sr, const QString& dbname, const Q
     return i;
 }
 
+QString Database::getSrStatus( const QString& sr, const QString& dbname )
+{
+    QSqlDatabase db;
+        
+    if ( dbname.isNull() ) 
+    {
+        db = QSqlDatabase::database( "siebelDB" );
+    }
+    else
+    {
+        db = QSqlDatabase::database( dbname );
+    }
+    
+    QSqlQuery query( db );
+    QueueItem i;
+
+    query.prepare( "select SR_STAT_ID from siebel.s_srv_req where sr_num = :sr" );
+        
+    query.bindValue( ":sr", sr );
+    
+    if ( !query.exec() ) 
+    {
+        qDebug() << query.lastError().text();
+    }
+    
+    Debug::logQuery( query, db.connectionName() );
+    
+    if ( query.next() )
+    {
+        return query.value( 0 ).toString();
+    }
+}
+
 void Database::updatePseudoQueues( const QString& qDb, const QString& mDb )
 {
     QSqlDatabase qdb;
