@@ -1145,10 +1145,10 @@ QList< SiebelItem > Database::getSrsForQueue( const QString& queue, const QStrin
         si.int_type = query.value( 16 ).toString();
         si.subtype = query.value( 17 ).toString();
         si.service_level = query.value( 18 ).toString();
-        si.brief_desc = query.value( 19 ).toString();
+        si.brief_desc = query.value( 19 ).toString().replace( "]]>", "]]&gt;" );
         si.critsit = query.value( 20 ).toBool();
         si.high_value = query.value( 21 ).toBool();
-        si.detailed_desc = query.value( 22 ).toString();
+        si.detailed_desc = query.value( 22 ).toString().replace( "]]>", "]]&gt;" );
         si.category = query.value( 23 ).toString();
         si.row_id = query.value( 25 ).toString();
         
