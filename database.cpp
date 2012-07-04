@@ -153,10 +153,10 @@ void Database::insertSiebelItemIntoDB( SiebelItem item, const QString& dbname )
     QSqlQuery cquery( db );
     
     cquery.prepare( "INSERT INTO CUSTOMER( ID, CUSTOMER, CONTACT_PHONE, CONTACT_FIRSTNAME, CONTACT_LASTNAME, "
-                   "                           CONTACT_EMAIL, CONTACT_TITLE, CONTACT_LANG, ONSITE_PHONE ) "
+                   "                           CONTACT_EMAIL, CONTACT_TITLE, CONTACT_LANG, ONSITE_PHONE, ORACLE_ID ) "
                    "VALUES"
                    "( :id, :customer, :contact_phone, :contact_firstname, :contact_lastname, :contact_email, "
-                   "  :contact_title, :contact_lang, :onsite_phone )" );
+                   "  :contact_title, :contact_lang, :onsite_phone, :oracle_id )" );
     
     cquery.bindValue( ":id", item.id );
     cquery.bindValue( ":customer", item.customer );
@@ -167,6 +167,7 @@ void Database::insertSiebelItemIntoDB( SiebelItem item, const QString& dbname )
     cquery.bindValue( ":contact_title", item.contact_title );
     cquery.bindValue( ":contact_lang", item.contact_lang );
     cquery.bindValue( ":onsite_phone", item.onsite_phone );
+    cquery.bindValue( ":oracle_id", item.cstNum );
     
     if ( !cquery.exec() ) qDebug() << cquery.lastError().text();                  
     
@@ -244,7 +245,7 @@ void Database::updateSiebelItem( SiebelItem item, const QString& dbname, const Q
     
     cquery.prepare( "UPDATE CUSTOMER SET CUSTOMER = :customer, CONTACT_PHONE = :contact_phone, CONTACT_FIRSTNAME = :contact_firstname, "
                    "                          CONTACT_LASTNAME = :contact_lastname, CONTACT_EMAIL = :contact_email, "
-                   "                          CONTACT_TITLE = :contact_title, CONTACT_LANG = :contact_lang, ONSITE_PHONE = :onsite_phone "
+                   "                          CONTACT_TITLE = :contact_title, CONTACT_LANG = :contact_lang, ONSITE_PHONE = :onsite_phone, ORACLE_ID = :oracle_id "
                    "                          WHERE ID = :id" );
     
     cquery.bindValue( ":customer", item.customer );
@@ -255,6 +256,7 @@ void Database::updateSiebelItem( SiebelItem item, const QString& dbname, const Q
     cquery.bindValue( ":contact_title", item.contact_title );
     cquery.bindValue( ":contact_lang", item.contact_lang );
     cquery.bindValue( ":onsite_phone", item.onsite_phone );
+    cquery.bindValue( ":oracle_id", item.cstNum );
     cquery.bindValue( ":id", item.id );
 
     if ( !cquery.exec() ) qDebug() << cquery.lastError().text();
@@ -405,7 +407,8 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
                     "  REGEXP_REPLACE( sr.X_ONSITE_PH_NUM, '(.*)' || CHR(10) || '(.*)', '\\2') AS ONSITE_FORMAT_STRING,"
                     "  sr.DESC_TEXT as DETAILED_DESC, "
                     "  sr.X_ALT_CONTACT, "
-                    "  sr.X_DEFECT_NUM "
+                    "  sr.X_DEFECT_NUM, "
+                    "  ext.X_ORACLE_CUSTOMER_ID "
                     "from "
                     "  siebel.s_srv_req sr, "
                     "  siebel.s_user u, "
@@ -512,6 +515,7 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
         i.detailed_desc = query.value( 24 ).toString().replace( "]]>", "]]&gt;" );
         i.alt_contact = query.value( 25 ).toString();
         i.bugId = query.value( 26 ).toString();
+        i.cstNum = query.value( 27 ).toString();
         
         if ( !i.bugId.isEmpty() )
         {
@@ -576,7 +580,8 @@ QueueItem Database::getSrInfo( const QString& sr, const QString& dbname, const Q
                     "  REGEXP_REPLACE( sr.X_ONSITE_PH_NUM, '(.*)' || CHR(10) || '(.*)', '\\2') AS ONSITE_FORMAT_STRING,"
                     "  sr.DESC_TEXT as DETAILED_DESC, "
                     "  sr.X_ALT_CONTACT, "
-                    "  sr.X_DEFECT_NUM "
+                    "  sr.X_DEFECT_NUM, "
+                    "  ext.X_ORACLE_CUSTOMER_ID "
                     "from "
                     "  siebel.s_srv_req sr, "
                     "  siebel.s_user u, "
@@ -680,6 +685,7 @@ QueueItem Database::getSrInfo( const QString& sr, const QString& dbname, const Q
         i.detailed_desc = query.value( 24 ).toString();
         i.alt_contact = query.value( 25 ).toString();
         i.bugId = query.value( 26 ).toString();
+        i.cstNum = query.value( 27 ).toString();
         
         if ( !i.bugId.isEmpty() )
         {
@@ -1174,7 +1180,7 @@ QList< SiebelItem > Database::getSrsForQueue( const QString& queue, const QStrin
             QSqlQuery cquery( db );
         
             cquery.prepare( "SELECT CUSTOMER, CONTACT_PHONE, CONTACT_FIRSTNAME, CONTACT_LASTNAME, CONTACT_EMAIL, "
-                            "       CONTACT_TITLE, CONTACT_LANG, ONSITE_PHONE FROM CUSTOMER WHERE ID = :id" );
+                            "       CONTACT_TITLE, CONTACT_LANG, ONSITE_PHONE, ORACLE_ID FROM CUSTOMER WHERE ID = :id" );
         
             cquery.bindValue( ":id", si.id );
         
@@ -1190,6 +1196,7 @@ QList< SiebelItem > Database::getSrsForQueue( const QString& queue, const QStrin
                 si.contact_title = cquery.value( 5 ).toString();
                 si.contact_lang = cquery.value( 6 ).toString();
                 si.onsite_phone = cquery.value( 7 ).toString(); 
+                si.cstNum = cquery.value( 8 ).toString(); 
             }
         }
        
@@ -1452,7 +1459,8 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
                     "  sr.SR_CATEGORY_CD as CATEGORY, "
                     "  sr.ROW_ID, "
                     "  sr.X_ALT_CONTACT, "
-                    "  sr.X_DEFECT_NUM "
+                    "  sr.X_DEFECT_NUM, "
+                    "  ext.X_ORACLE_CUSTOMER_ID "
                     "from "
                     "  siebel.s_srv_req sr, "
                     "  siebel.s_user u, "
@@ -1519,7 +1527,8 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
                     "  sr.SR_CATEGORY_CD as SR_CATEGORY, "
                     "  sr.ROW_ID, "
                     "  sr.X_ALT_CONTACT, "
-                    "  sr.X_DEFECT_NUM "
+                    "  sr.X_DEFECT_NUM, "
+                    "  ext.X_ORACLE_CUSTOMER_ID "
                     "from "
                     "  siebel.s_srv_req sr, "
                     "  siebel.s_user u, "
@@ -1582,7 +1591,8 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
                     "  sr.SR_CATEGORY_CD as SR_CATEGORY, "
                     "  sr.ROW_ID, "
                     "  sr.X_ALT_CONTACT, "
-                    "  sr.X_DEFECT_NUM "
+                    "  sr.X_DEFECT_NUM, "
+                    "  ext.X_ORACLE_CUSTOMER_ID "
                     "from "
                     "  siebel.s_srv_req sr, "
                     "  siebel.s_entlmnt e, "
@@ -1693,6 +1703,7 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
         si.row_id = query.value( 33 ).toString();
         si.alt_contact = query.value( 34 ).toString();
         si.bugId = query.value( 35 ).toString();
+        si.cstNum = query.value( 36 ).toString();
         
         list.append( si );
     }

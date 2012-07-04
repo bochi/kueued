@@ -67,6 +67,7 @@ QString XML::qmon( QList<SiebelItem> list )
         {
             xml += "    <srtype>sr</srtype>\n";
             xml += "    <cus_account><![CDATA[" + si.customer + "]]></cus_account>\n";
+            xml += "    <cus_num><![CDATA[" + si.cstNum + "]]></cus_num>\n";
             
             if ( ( !si.contact_firstname.isEmpty() ) && ( si.contact_firstname != "1" ) && ( si.contact_firstname != "0" ) )
             {
@@ -202,6 +203,7 @@ QString XML::qmonDate( QList<SiebelItem> list )
         {
             xml += "    <srtype>sr</srtype>\n";
             xml += "    <cus_account><![CDATA[" + si.customer + "]]></cus_account>\n";
+            xml += "    <cus_num><![CDATA[" + si.cstNum + "]]></cus_num>\n";
             
             if ( ( !si.contact_firstname.isEmpty() ) && ( si.contact_firstname != "1" ) && ( si.contact_firstname != "0" ) )
             {
@@ -325,6 +327,7 @@ QString XML::sr( QueueItem qi )
     {
         xml += "    <srtype>sr</srtype>\n";
         xml += "    <cus_account><![CDATA[" + qi.customer + "]]></cus_account>\n";
+        xml += "    <cus_num><![CDATA[" + qi.cstNum + "]]></cus_num>\n";
         
         if ( ( !qi.contact_firstname.isEmpty() ) && ( qi.contact_firstname != "1" ) && ( qi.contact_firstname != "0" ) )
         {

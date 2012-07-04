@@ -119,6 +119,7 @@ class SiebelItem
         QString bomgarQ;
         QString alt_contact;
         QString bugId;
+        QString cstNum;
         bool isCr;
         bool isChat;
         bool critsit;
@@ -153,6 +154,7 @@ class QueueItem
         QString alt_contact;
         QString bugId;
         QString bugDesc;
+        QString cstNum;
         bool isCr;
         bool critsit;
         bool high_value;
