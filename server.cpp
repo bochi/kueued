@@ -63,6 +63,9 @@ void Server::deleteThread()
 {
     QThread* t = qobject_cast<QThread*>( sender() );
     Debug::print( "server", "Deleting ServerThread " + QString::number( t->currentThreadId() ) );
+    t->quit();
+    t->wait();
+    
     delete t;
 }
 

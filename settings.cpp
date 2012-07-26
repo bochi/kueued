@@ -187,3 +187,21 @@ QString Settings::bugzillaPassword()
 
     return pw;
 }
+
+QString Settings::l3Server()
+{
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
+    return settings.value( "l3Server" ).toString();
+}
+
+QString Settings::l3User()
+{
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
+    return settings.value( "l3User" ).toString();
+}
+
+QString Settings::l3ApiKey()
+{
+    QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
+    return settings.value( "l3ApiKey" ).toString();
+}

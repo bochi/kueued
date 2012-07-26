@@ -503,10 +503,18 @@ QString XML::stats( Statistics s )
         {
             xml += "      <engsat>" + QString::number( csatList.at(i).engsat ) + "</engsat>\n";
         }
+        else
+        {
+            //xml += "      <engsat>NONE</engsat>\n";
+        }
         
         if ( csatList.at( i ).srsat != 88 )
         {
             xml += "      <srsat>" + QString::number( csatList.at(i).srsat ) + "</srsat>\n";
+        }
+        else
+        {
+            //xml += "      <srsat>NONE</srsat>\n";
         }
         
         xml += "      <customer><![CDATA[" + csatList.at(i).customer + "]]></customer>\n";

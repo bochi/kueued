@@ -55,6 +55,9 @@ class Settings
         static QString unityURL();
         static QString bugzillaUser();
         static QString bugzillaPassword();
+        static QString l3Server();
+        static QString l3User();
+        static QString l3ApiKey();
         static int oraclePort();
         static int timezoneCorrection();
         static bool logQueries();

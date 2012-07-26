@@ -152,6 +152,79 @@ void ServerThread::run()
                 out.flush();
                 socket->close();
             }
+            if ( cmd.startsWith( "/ptf" ) )
+            {
+                QString q = cmd.remove( "/ptf" );
+                
+                out << text();
+                
+                if ( q.remove( "/" ).isEmpty() )
+                {  
+                    out << "No filename given";
+                }
+                else
+                {
+                    Network* net = new Network();
+                    
+                    QEventLoop loop;
+                    QNetworkReply* r;
+                    QString res;
+                    QString id;
+                    
+                    r = net->get( QUrl( Settings::l3Server() + "/api/1/rpm/?filename=" + q + "&username=" + Settings::l3User() + "&api_key=" + Settings::l3ApiKey() ) );
+                    r->ignoreSslErrors();
+                       
+                    QObject::connect( r, SIGNAL( finished() ), 
+                                      &loop, SLOT( quit() ) );
+    
+                    loop.exec();
+                        
+                    res = r->readAll();
+                    
+                    QStringList values = res.split( "," );
+                    
+                       
+                    for ( int i = 0; i < values.size(); ++i )
+                    {
+                        if ( values.at( i ).contains( "build" ) )
+                        {
+                            id = values.at( i ).split( "build\": " ).at( 1 );
+                            id.remove( "/api/1/build/" );
+                            id.remove( "/" );
+                            id.remove( "\"" );
+                        }
+                    }
+                                        
+                    r = net->get( QUrl( Settings::l3Server() + "/api/1/publish/?build=" + id + "&username=" + Settings::l3User() + "&api_key=" + Settings::l3ApiKey() ) );
+                    r->ignoreSslErrors();
+                    
+                    QObject::connect( r, SIGNAL( finished() ), 
+                                      &loop, SLOT( quit() ) );
+
+                    loop.exec();
+                    
+                    QString url = r->readAll();
+                    url = url.split( "url\": " ).at( 1 );
+                    url.remove( "}" );
+                    url.remove( "]" );
+                    url.remove( "\"" );
+                    
+                    if ( url.contains( "you.novell.com" ) )
+                    {
+                        url.replace( "https://you.novell.com/update", "http://kueue.hwlab.suse.de/ptfold" );
+                    }
+                    else
+                    {
+                        url.replace( "https://ptf.suse.com", "http://kueue.hwlab.suse.de/ptf" );
+                    }
+                    
+                    
+                    out << url;
+                }
+                
+                out.flush(); 
+                socket->close();
+            }
             if ( cmd.startsWith( "/qmon" ) )
             {
                 openMysqlDB();
