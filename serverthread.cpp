@@ -180,7 +180,6 @@ void ServerThread::run()
                     loop.exec();
                         
                     res = r->readAll();
-                    Debug::print( "RESULT", res );
                     
                     if ( res.contains( "build" ) )
                     {
