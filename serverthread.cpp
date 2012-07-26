@@ -180,46 +180,62 @@ void ServerThread::run()
                     loop.exec();
                         
                     res = r->readAll();
+                    Debug::print( "RESULT", res );
                     
-                    QStringList values = res.split( "," );
-                    
-                       
-                    for ( int i = 0; i < values.size(); ++i )
+                    if ( res.contains( "build" ) )
                     {
-                        if ( values.at( i ).contains( "build" ) )
+                        QStringList values = res.split( "," );
+                        
+                        for ( int i = 0; i < values.size(); ++i )
                         {
-                            id = values.at( i ).split( "build\": " ).at( 1 );
-                            id.remove( "/api/1/build/" );
-                            id.remove( "/" );
-                            id.remove( "\"" );
+                            if ( values.at( i ).contains( "build" ) )
+                            {
+                                id = values.at( i ).split( "build\": " ).at( 1 );
+                                id.remove( "/api/1/build/" );
+                                id.remove( "/" );
+                                id.remove( "\"" );
+                            }
                         }
-                    }
-                                        
-                    r = net->get( QUrl( Settings::l3Server() + "/api/1/publish/?build=" + id + "&username=" + Settings::l3User() + "&api_key=" + Settings::l3ApiKey() ) );
-                    r->ignoreSslErrors();
-                    
-                    QObject::connect( r, SIGNAL( finished() ), 
-                                      &loop, SLOT( quit() ) );
+                                            
+                        r = net->get( QUrl( Settings::l3Server() + "/api/1/publish/?build=" + id + "&username=" + Settings::l3User() + "&api_key=" + Settings::l3ApiKey() ) );
+                        r->ignoreSslErrors();
+                        
+                        QObject::connect( r, SIGNAL( finished() ), 
+                                        &loop, SLOT( quit() ) );
 
-                    loop.exec();
-                    
-                    QString url = r->readAll();
-                    url = url.split( "url\": " ).at( 1 );
-                    url.remove( "}" );
-                    url.remove( "]" );
-                    url.remove( "\"" );
-                    
-                    if ( url.contains( "you.novell.com" ) )
-                    {
-                        url.replace( "https://you.novell.com/update", "http://kueue.hwlab.suse.de/ptfold" );
+                        loop.exec();
+  
+                        QString url = r->readAll();
+  
+                        if ( url.contains( "url\":" ) )
+                        {
+                            url = url.split( "url\": " ).at( 1 );
+                            url.remove( "}" );
+                            url.remove( "]" );
+                            url.remove( "\"" );
+                        
+                            if ( url.contains( "you.novell.com" ) )
+                            {
+                                url.replace( "https://you.novell.com/update", "http://kueue.hwlab.suse.de/ptfold" );
+                            }
+                            else
+                            {
+                                url.replace( "https://ptf.suse.com", "http://kueue.hwlab.suse.de/ptf" );
+                            }
+                            
+                            out << url;
+                        }
+                        else
+                        {
+                            out << "NOT FOUND";
+                        }
                     }
                     else
                     {
-                        url.replace( "https://ptf.suse.com", "http://kueue.hwlab.suse.de/ptf" );
+                        out << "NOT FOUND";
                     }
-                    
-                    
-                    out << url;
+                        
+                    delete net;
                 }
                 
                 out.flush(); 
