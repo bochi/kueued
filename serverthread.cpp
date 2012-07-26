@@ -223,16 +223,16 @@ void ServerThread::run()
                                 url.replace( "https://ptf.suse.com", "http://kueue.hwlab.suse.de/ptf" );
                             }
                             
-                            out << url;
+                            out << url + "/" + q;
                         }
                         else
                         {
-                            out << "NOT FOUND";
+                            out << "Unable to find " + q;
                         }
                     }
                     else
                     {
-                        out << "NOT FOUND";
+                        out << "Unable to find " + q;
                     }
                         
                     delete net;
