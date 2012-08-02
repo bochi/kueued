@@ -71,7 +71,7 @@ INDEXURL=http://kueue.hwlab.suse.de/index/$SUSEVER-SP$PATCHLEVEL-GM-$ARCH-INDEX.
 INDEXURL=${INDEXURL/586/386} # annoying
 
 SDKINDEXURL=http://kueue.hwlab.suse.de/index/$SUSEVER-SP$PATCHLEVEL-SDK-GM-$ARCH-INDEX.gz
-SDKINDEXURL=${INDEXURL/586/386} # annoying
+SDKINDEXURL=${SDKINDEXURL/586/386} # annoying
 
 curl -f -s -o SDKINDEX.gz $SDKINDEXURL
 curl -f -s -o INDEX.gz $INDEXURL
