@@ -366,22 +366,29 @@ void ServerThread::run()
                     if ( o.contains( "][" ) )
                     {
                         l = o.split( "][" );
+                        
+                        for ( int i = 0; i < l.size(); ++i ) 
+                        {
+                            QString x = l.at( i );
+                            x.remove( "[" ).remove( "]" );
+                            
+                            if ( x == split.at( 2 ) )
+                            {
+                                r = "1";
+                            }
+                        }
                     }
                     else
                     {
-                        l << o;
-                    }
-                    
-                    for ( int i = 0; i < l.size(); ++i ) 
-                    {
-                        QString x = l.at( i );
-                        x.remove( "[" ).remove( "]" );
-                        
+                        QString x = o.remove( "[" ).remove( "]" );
+                        qDebug() << x;
                         if ( x == split.at( 2 ) )
                         {
                             r = "1";
                         }
                     }
+                    
+
                     
                     out << r;
                 }
