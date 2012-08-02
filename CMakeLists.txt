@@ -68,6 +68,8 @@ ADD_EXECUTABLE( kueued ${kueued_CPP} )
 INSTALL( TARGETS kueued DESTINATION bin )
 INSTALL( PROGRAMS scripts/kueued DESTINATION /etc/init.d )
 INSTALL( PROGRAMS scripts/kueued.ld DESTINATION /usr/bin/ )
+INSTALL( PROGRAMS scripts/pversions DESTINATION /usr/bin/ )
+INSTALL( PROGRAMS scripts/clone.sh DESTINATION /usr/bin/ )
 INSTALL( SCRIPT scripts/kueued_post.cmake )
 
 TARGET_LINK_LIBRARIES( kueued     ${QT_LIBRARIES} 
