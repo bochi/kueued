@@ -372,7 +372,7 @@ void ServerThread::run()
                             
                             QString x = l.at( i );
                             x.remove( "[" ).remove( "]" );
-                            qDebug() << x << split.at( 2 );
+                            
                             if ( x.trimmed() == split.at( 2 ).trimmed() )
                             {
                                 r = "1";
