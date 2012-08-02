@@ -361,7 +361,16 @@ void ServerThread::run()
                 
                     QString r = "0";
                     QString o = p.readAllStandardOutput(); 
-                    QStringList l = o.split( "][" );
+                    QStringList l;
+                    
+                    if ( o.contains( "][" ) )
+                    {
+                        l = o.split( "][" );
+                    }
+                    else
+                    {
+                        l.append( o );
+                    }
                     
                     for ( int i = 0; i < l.size(); ++i ) 
                     {
