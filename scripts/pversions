@@ -1,30 +1,36 @@
 #!/bin/bash
 
-if [ "$1" = "SLES11-SP2-i386" ]; then
+if [ "$1" = "SLES11-SP2-i386" ] || [ "$1" = "SLES11-SP2-i586" ]; then
 
   DIR="/mirror/SuSE/zypp-patches.suse.de/i386/update/SLE-SERVER/11-SP2/rpm" 
   DIR2="/mirror/SuSE/zypp-patches.suse.de/i386/update/SLE-SERVER/11-SP1/rpm"
+  SDKDIR="/mirror/SuSE/zypp-patches.suse.de/i386/update/SLE-SDK/11-SP2/rpm"
 
 elif [ "$1" = "SLES11-SP2-x86_64" ]; then 
 
   DIR="/mirror/SuSE/zypp-patches.suse.de/x86_64/update/SLE-SERVER/11-SP2/rpm"
   DIR2="/mirror/SuSE/zypp-patches.suse.de/x86_64/update/SLE-SERVER/11-SP1/rpm"
+  SDKDIR="/mirror/SuSE/zypp-patches.suse.de/x86_64/update/SLE-SDK/11-SP2/rpm"
 
-elif [ "$1" = "SLES11-SP1-i386" ]; then
+elif [ "$1" = "SLES11-SP1-i386" ] || [ "$1" = "SLES11-SP1-i586" ]; then
 
   DIR="/mirror/SuSE/zypp-patches.suse.de/i386/update/SLE-SERVER/11-SP1/rpm"
+  DIR="/mirror/SuSE/zypp-patches.suse.de/i386/update/SLE-SDK/11-SP1/rpm"
 
 elif [ "$1" = "SLES11-SP1-x86_64" ]; then
 
   DIR="/mirror/SuSE/zypp-patches.suse.de/x86_64/update/SLE-SERVER/11-SP1/rpm"
+  SDKDIR="/mirror/SuSE/zypp-patches.suse.de/x86_64/update/SLE-SDK/11-SP1/rpm"
 
 elif [ "$1" = "SLES10-SP4-x86_64" ]; then
 
   DIR="/mirror/SuSE/zypp-patches.suse.de/x86_64/update/SLE-SERVER/10-SP4/rpm"
+  SDKDIR="/mirror/SuSE/zypp-patches.suse.de/x86_64/update/SLE-SDK/10-SP4/rpm"
 
-elif [ "$1" = "SLES10-SP4-i386" ]; then
+elif [ "$1" = "SLES10-SP4-i386" ] || [ "$1" = "SLES10-SP4-i586" ]; then
 
   DIR="/mirror/SuSE/zypp-patches.suse.de/i386/update/SLE-SERVER/10-SP4/rpm"
+  SDKDIR="/mirror/SuSE/zypp-patches.suse.de/i386/update/SLE-SDK/10-SP4/rpm"
 
 fi
 
@@ -42,8 +48,20 @@ RPMS=$(find $DIR -name *$2* | grep -v delta|grep -v src)
 if [ -z "$RPMS" ]; then 
 
   if [ ! -z "$DIR2" ]; then 
-  RPMS=$(find $DIR2 -name *$2* | grep -v delta|grep -v src)
+  
+    RPMS=$(find $DIR2 -name *$2* | grep -v delta|grep -v src)
+
+  fi
+
 fi
+
+if [ -z "$RPMS" ]; then 
+
+  if [ ! -z "$SDKDIR" ]; then 
+  
+    RPMS=$(find $SDKDIR -name *$2* | grep -v delta|grep -v src)
+
+  fi
 
 fi
 

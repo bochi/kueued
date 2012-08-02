@@ -119,10 +119,9 @@ while read line; do
 
         # get package details
 
-        line=$(echo $line | sed "s/  /|/g" | sed 's/[|\t]\+/|/g')
-        pkg=$(echo $line | awk -F"|" '{print $1}')
-        vendor=$(echo $line | awk -F"|" '{print $2}')
-        pkgver=$(echo $line | awk -F"|" '{print $3}')
+        pkg=$(echo $line | awk '{print $1}')
+        pkgver=$(echo $line | awk '{print $NF}')
+        vendor=$(echo $line | sed "s/$pkg //g" | sed "s/ $pkgver//g")
 
         # ignore gpg-pubkey
 
@@ -167,7 +166,7 @@ while read line; do
         else
 
           INDEXPKG=$(zgrep /$pkg-[0-9] INDEX.gz|grep -v 32bit|tr "/" "\n"|tail -1)
-          
+
           if [ -z "$INDEXPKG" ]; then
 
             INDEXPKG=$(zgrep /$pkg-[0-9] SDKINDEX.gz|grep -v 32bit|tr "/" "\n"|tail -1)
