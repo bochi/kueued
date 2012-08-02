@@ -282,6 +282,49 @@ void ServerThread::run()
                 out.flush();
                 
             }
+            else if ( cmd.startsWith( "/rpmversions" ) )
+            {  
+                QString q = cmd.remove( "/rpmversions" );
+
+                out << text();
+
+                if ( q.remove( "/" ).isEmpty() )
+                {  
+                    out << "Please specify product/packagename";
+                }
+                else if ( !q.contains( "|" ) )
+                {  
+                    out << "Please specify packagename";
+                }
+                else
+                {  
+                    QProcess p;
+                    QStringList args;
+                    
+                    args.append( q.remove( "/" ).split( "|" ).at( 0 ) );
+                    args.append( q.remove( "/" ).split( "|" ).at( 1 ) );
+                    
+                    p.start( "/usr/bin/pversions", args );
+                    
+                    if (  !p.waitForFinished ( -1 ) )
+                    {
+                        return;
+                    }
+                
+                    QString o = p.readAllStandardOutput(); 
+                    QStringList l = o.split( "][" );
+                    
+                    for ( int i = 0; i < l.size(); ++i ) 
+                    {
+                        QString x = l.at( i );
+                        x.remove( "[" ).remove( "]" );
+                        out << x + "\n";
+                    }
+                    //out << o;
+                }
+                
+                out.flush();
+            }
             else if ( cmd.startsWith( "/srinfo" ) )
             {  
                 openSiebelDB();
