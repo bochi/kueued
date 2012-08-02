@@ -327,6 +327,58 @@ void ServerThread::run()
                 
                 out.flush();
             }
+            else if ( cmd.startsWith( "/validversion" ) )
+            {  
+                QString q = cmd.remove( "/validversion" );
+                QStringList split = q.remove( "/" ).split( "|" );
+ 
+                out << text();
+
+                if ( ( q.remove( "/" ).isEmpty() ) || ( split.size() < 3 ) )
+                {  
+                    out << "Syntax:\n\n";
+                    out << "/validversion/PRODUCT|PACKAGE|VERSION\n\n";
+                    out << "Valid products:\n\n";
+                    out << "  * SLES11-SP(1|2)-(i386|x86_64)\n\n";
+                    out << "Result:\n\n";
+                    out << "  * 0 (invalid version)\n";
+                    out << "  * 1 (valid version)\n";
+                }
+                else
+                {  
+                    QProcess p;
+                    QStringList args;
+                 
+                    args.append( split.at( 0 ) );
+                    args.append( split.at( 1 ) );
+                    
+                    p.start( "/usr/bin/pversions", args );
+                    
+                    if (  !p.waitForFinished ( -1 ) )
+                    {
+                        return;
+                    }
+                
+                    QString r = "0";
+                    QString o = p.readAllStandardOutput(); 
+                    QStringList l = o.split( "][" );
+                    
+                    for ( int i = 0; i < l.size(); ++i ) 
+                    {
+                        QString x = l.at( i );
+                        x.remove( "[" ).remove( "]" );
+                        
+                        if ( x == split.at( 2 ) )
+                        {
+                            r = "1";
+                        }
+                    }
+                    
+                    out << r;
+                }
+                
+                out.flush();
+            }
             else if ( cmd.startsWith( "/srinfo" ) )
             {  
                 openSiebelDB();
