@@ -119,9 +119,10 @@ while read line; do
 
         # get package details
 
-        pkg=$(echo $line | awk '{print $1}')
-        vendor=$(echo $line | awk '{print $2}')
-        pkgver=$(echo $line | awk '{print $NF}')
+        line=$(echo $line | sed "s/  /|/g" | sed 's/[|\t]\+/|/g')
+        pkg=$(echo $line | awk -F"|" '{print $1}')
+        vendor=$(echo $line | awk -F"|" '{print $2}')
+        pkgver=$(echo $line | awk -F"|" '{print $3}')
 
         # ignore gpg-pubkey
 
