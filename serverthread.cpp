@@ -369,9 +369,10 @@ void ServerThread::run()
                         
                         for ( int i = 0; i < l.size(); ++i ) 
                         {
+                            
                             QString x = l.at( i );
                             x.remove( "[" ).remove( "]" );
-                            
+                            qDebug() << x << split.at( 2 );
                             if ( x == split.at( 2 ) )
                             {
                                 r = "1";
