@@ -1,0 +1,75 @@
+#!/bin/bash
+
+if [ "$1" = "SLES11-SP2-i386" ]; then
+
+  DIR="/mirror/SuSE/zypp-patches.suse.de/i386/update/SLE-SERVER/11-SP2/rpm" 
+  DIR2="/mirror/SuSE/zypp-patches.suse.de/i386/update/SLE-SERVER/11-SP1/rpm"
+
+elif [ "$1" = "SLES11-SP2-x86_64" ]; then 
+
+  DIR="/mirror/SuSE/zypp-patches.suse.de/x86_64/update/SLE-SERVER/11-SP2/rpm"
+  DIR2="/mirror/SuSE/zypp-patches.suse.de/x86_64/update/SLE-SERVER/11-SP1/rpm"
+
+elif [ "$1" = "SLES11-SP1-i386" ]; then
+
+  DIR="/mirror/SuSE/zypp-patches.suse.de/i386/update/SLE-SERVER/11-SP1/rpm"
+
+elif [ "$1" = "SLES11-SP1-x86_64" ]; then
+
+  DIR="/mirror/SuSE/zypp-patches.suse.de/x86_64/update/SLE-SERVER/11-SP1/rpm"
+
+elif [ "$1" = "SLES10-SP4-x86_64" ]; then
+
+  DIR="/mirror/SuSE/zypp-patches.suse.de/x86_64/update/SLE-SERVER/10-SP4/rpm"
+
+elif [ "$1" = "SLES10-SP4-i386" ]; then
+
+  DIR="/mirror/SuSE/zypp-patches.suse.de/i386/update/SLE-SERVER/10-SP4/rpm"
+
+fi
+
+if [ -z "$DIR" ]; then 
+
+  exit
+
+fi
+
+FILE=/tmp/versions-$(date +%H%M%S%N)
+touch $FILE
+
+RPMS=$(find $DIR -name *$2* | grep -v delta|grep -v src)
+
+if [ -z "$RPMS" ]; then 
+
+  if [ ! -z "$DIR2" ]; then 
+  RPMS=$(find $DIR2 -name *$2* | grep -v delta|grep -v src)
+fi
+
+fi
+
+for i in $RPMS; do 
+
+  rpm -qp --queryformat "%-35{NAME} %{VERSION}-%{RELEASE}\n" $i >> $FILE
+
+done 
+
+while read line; do
+
+  PKG=$(echo $line | awk '{print $1}')
+  VER=$(echo $line | awk '{print $2}')
+
+  if [ "$PKG" = "$2" ]; then
+
+    if [[ "$VERSIONS" != "*$VER*" ]]; then
+                                
+      VERSIONS="$VERSIONS[$VER]"
+
+    fi
+  
+  fi
+
+done < $FILE
+
+rm $FILE
+
+echo $VERSIONS
