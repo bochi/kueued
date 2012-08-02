@@ -175,7 +175,7 @@ while read line; do
 
           if [ "$INDEXPKGVER" == "$pkgver" ]; then
 
-            echo Requires: $pkg = $pkgver #>> clone.spec
+            echo Requires: $pkg = $pkgver >> clone.spec
 
           # if version doesn't match, check if the version is an official update
           # if it is, require in .spec, if it isn't, log to clone-result
@@ -186,7 +186,7 @@ while read line; do
 
             if [ "$VALID" == "1" ]; then
             
-              echo Requires: $pkg = $pkgver #>> clone.spec
+              echo Requires: $pkg = $pkgver >> clone.spec
 
             else
 
