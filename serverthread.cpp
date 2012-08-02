@@ -369,7 +369,7 @@ void ServerThread::run()
                     }
                     else
                     {
-                        l.append( o );
+                        l << o;
                     }
                     
                     for ( int i = 0; i < l.size(); ++i ) 
