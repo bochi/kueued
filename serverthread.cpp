@@ -290,7 +290,10 @@ void ServerThread::run()
 
                 if ( q.remove( "/" ).isEmpty() )
                 {  
-                    out << "Please specify product/packagename";
+                    out << "Syntax:\n\n";
+                    out << "/rpmversions/PRODUCT|PACKAGE\n\n";
+                    out << "Valid products:\n\n";
+                    out << "  * SLES11-SP(1|2)-(i386|x86_64)\n";
                 }
                 else if ( !q.contains( "|" ) )
                 {  
@@ -320,7 +323,6 @@ void ServerThread::run()
                         x.remove( "[" ).remove( "]" );
                         out << x + "\n";
                     }
-                    //out << o;
                 }
                 
                 out.flush();
