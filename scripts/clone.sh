@@ -70,6 +70,10 @@ eval $spver
 INDEXURL=http://kueue.hwlab.suse.de/index/$SUSEVER-SP$PATCHLEVEL-GM-$ARCH-INDEX.gz
 INDEXURL=${INDEXURL/586/386} # annoying
 
+SDKINDEXURL=http://kueue.hwlab.suse.de/index/$SUSEVER-SP$PATCHLEVEL-SDK-GM-$ARCH-INDEX.gz
+SDKINDEXURL=${INDEXURL/586/386} # annoying
+
+curl -f -s -o SDKINDEX.gz $SDKINDEXURL
 curl -f -s -o INDEX.gz $INDEXURL
 
 if [ $? -ne 0 ]; then
@@ -153,9 +157,21 @@ while read line; do
 
           INDEXPKG=$(zgrep /$pkg-[0-9] INDEX.gz|tr "/" "\n"|tail -1)
 
+          if [ -z "$INDEXPKG" ]; then
+
+            INDEXPKG=$(zgrep /$pkg-[0-9] SDKINDEX.gz|tr "/" "\n"|tail -1)
+
+          fi
+
         else
 
           INDEXPKG=$(zgrep /$pkg-[0-9] INDEX.gz|grep -v 32bit|tr "/" "\n"|tail -1)
+          
+          if [ -z "$INDEXPKG" ]; then
+
+            INDEXPKG=$(zgrep /$pkg-[0-9] SDKINDEX.gz|grep -v 32bit|tr "/" "\n"|tail -1)
+
+          fi
 
         fi
           
