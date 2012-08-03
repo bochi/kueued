@@ -139,6 +139,14 @@ while read line; do
 
         fi
 
+        # ignore NAME PACKAGE VERSION
+
+        if [ "$pkg" = "NAME" ] && [ "$pkgver" = "VERSION" ]; then
+
+          continue
+
+        fi
+
         # check if its a PTF, and if so, download it
 
         if [[ "$pkgver" =~ .*PTF.* ]]; then
