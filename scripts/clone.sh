@@ -179,7 +179,7 @@ while read line; do
 
         if [ -z "$INDEXPKG" ]; then
 
-          echo $pkg $pkgver - $vendor - "NOT AVAILABLE" >> clone-result
+          echo $pkg - $pkgver - $vendor >> clone-result
 
         # if package listed, compare version 
 
@@ -206,7 +206,7 @@ while read line; do
 
             else
 
-              echo $pkg $pkgver - $vendor - "NOT AVAILABLE" >> clone-result
+              echo $pkg - $pkgver - $vendor >> clone-result
 
             fi
 
