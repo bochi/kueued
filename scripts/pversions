@@ -45,13 +45,13 @@ fi
 FILE=/tmp/versions-$(date +%H%M%S%N)
 touch $FILE
 
-RPMS=$(find $DIR -name *$2* | grep -v delta|grep -v src)
+RPMS=$(find $DIR -name *$2-[0-9]* | grep -v delta|grep -v src)
 
 if [ -z "$RPMS" ]; then 
 
   if [ ! -z "$DIR2" ]; then 
   
-    RPMS=$(find $DIR2 -name *$2* | grep -v delta|grep -v src)
+    RPMS=$(find $DIR2 -name *$2-[0-9]* | grep -v delta|grep -v src)
 
   fi
 
@@ -61,7 +61,7 @@ if [ -z "$RPMS" ]; then
 
   if [ ! -z "$SDKDIR" ]; then 
   
-    RPMS=$(find $SDKDIR -name *$2* | grep -v delta|grep -v src)
+    RPMS=$(find $SDKDIR -name *$2-[0-9]* | grep -v delta|grep -v src)
 
   fi
 
@@ -71,7 +71,7 @@ if [ -z "$RPMS" ]; then
 
   if [ ! -z "$SDKDIR2" ]; then 
   
-    RPMS=$(find $SDKDIR2 -name *$2* | grep -v delta|grep -v src)
+    RPMS=$(find $SDKDIR2 -name *$2-[0-9]* | grep -v delta|grep -v src)
 
   fi
 
