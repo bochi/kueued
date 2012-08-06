@@ -20,7 +20,7 @@ rm clone-result
 
 # Get the hostname
 
-SERVERHOST=$(grep HOSTNAME env.txt | sed "s/HOSTNAME=//g")
+SERVERHOST=$(grep "HOSTNAME=" env.txt | head -1 | sed "s/HOSTNAME=//g")
 
 #Get the arch
 
