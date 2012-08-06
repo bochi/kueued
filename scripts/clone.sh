@@ -18,6 +18,10 @@ SECTION=0
 mkdir -p $RPMDIR
 rm clone-result 
 
+# Get the hostname
+
+SERVERHOST=$(grep HOSTNAME env.txt | sed "s/HOSTNAME=//g")
+
 #Get the arch
 
 tmpcpu=$(grep -m 1 CPU= env.txt)
@@ -279,7 +283,7 @@ rpmbuild -bb --target $ARCH clone.spec &> /dev/null
 if [ $? -eq 0 ]; then 
 	
     mv $ARCH/clone* $RPMDIR
-    echo "SUCCESS/$(echo $SUSEVER | sed 's/-//g')_SP$PATCHLEVEL/$ARCH"
+    echo "SUCCESS/$(echo $SUSEVER | sed 's/-//g')_SP$PATCHLEVEL/$ARCH/$SERVERHOST"
 
 else
     
