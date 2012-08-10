@@ -12,8 +12,6 @@ SLED11GA=SLE11/SLED-11-GM
 SLED11SP1=$SLE11/SLED-11-SP1-GM
 SLED11SP2=$SLE11/SLED-11-SP2-GM
 RPMDIR=./rpms
-FOUND=0
-SECTION=0
 
 mkdir -p $RPMDIR
 rm clone-result 
@@ -107,153 +105,128 @@ Summary:        dummy package for cloning a system through requirements
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 END
 
+awk '/==============================/{n++}{print > n "RPM.txt" }' rpm.txt
+awk 'FNR>3' 2RPM.txt > clone-rpm.txt
+TOTAL=$(wc -l clone-rpm.txt | awk '{print $1}')
+PROG=0
+
+echo "TOTAL" $TOTAL
+
 while read line; do
 
-  if (( SECTION )); then
+let PROG=PROG+1
+echo "PROG" $PROG 
 
-    if (( FOUND )); then
+  if [ -n "$line" ]; then
 
-      if echo $line | grep '#==\[' &>/dev/null; then
+    # get package details
 
-        SECTION=0
+    pkg=$(echo $line | awk '{print $1}')
+    pkgver=$(echo $line | awk '{print $NF}')
+    vendor=$(echo $line | sed "s/$pkg //g" | sed "s/ $pkgver//g")
 
-      fi
+    # ignore gpg-pubkey
 
-      if [ -n "$line" ]; then
+    if [ $pkg = "gpg-pubkey" ]; then
 
-        # get package details
+        continue
 
-        pkg=$(echo $line | awk '{print $1}')
-        pkgver=$(echo $line | awk '{print $NF}')
-        vendor=$(echo $line | sed "s/$pkg //g" | sed "s/ $pkgver//g")
+    fi
 
-        # ignore gpg-pubkey
+    # ignore supportutils
 
-        if [ $pkg = "gpg-pubkey" ]; then
+    if [[ "$vendor" == *NTS* ]]; then
 
-          continue
+        continue
 
-        fi
+    fi
 
-        # ignore supportutils
+    # ignore NAME PACKAGE VERSION
 
-        if [[ "$vendor" == *NTS* ]]; then
+    if [ "$pkg" = "NAME" ] && [ "$pkgver" = "VERSION" ]; then
 
-          continue
+        continue
 
-        fi
+    fi
 
-        # ignore NAME PACKAGE VERSION
+    # check if its a PTF, and if so, download it
 
-        if [ "$pkg" = "NAME" ] && [ "$pkgver" = "VERSION" ]; then
+    if [[ "$pkgver" =~ .*PTF.* ]]; then
 
-          continue
+        ptfurl=$(curl -A "clone.sh" -s http://kueue.hwlab.suse.de:8080/ptf/$pkg-$pkgver.$ARCH.rpm)
+        curl -s -o $RPMDIR/$pkg-$pkgver.$ARCH.rpm $ptfurl
 
-        fi
+        echo Requires: $pkg = $pkgver >> clone.spec
+        continue
 
-        # check if its a PTF, and if so, download it
+    fi
+                            
+    # lookup package in INDEX.gz
 
-        if [[ "$pkgver" =~ .*PTF.* ]]; then
+    if [[ "$pkg" == *32bit* ]]; then 
 
-          ptfurl=$(curl -A "clone.sh" -s http://kueue.hwlab.suse.de:8080/ptf/$pkg-$pkgver.$ARCH.rpm)
-          curl -s -o $RPMDIR/$pkg-$pkgver.$ARCH.rpm $ptfurl
-
-          echo Requires: $pkg = $pkgver >> clone.spec
-          continue
-
-        fi
-                                
-        # lookup package in INDEX.gz
-
-        if [[ "$pkg" == *32bit* ]]; then 
-
-          INDEXPKG=$(zgrep /$pkg-[0-9] INDEX.gz|tr "/" "\n"|tail -1)
-
-          if [ -z "$INDEXPKG" ]; then
-
-            INDEXPKG=$(zgrep /$pkg-[0-9] SDKINDEX.gz|tr "/" "\n"|tail -1)
-
-          fi
-
-        else
-
-          INDEXPKG=$(zgrep /$pkg-[0-9] INDEX.gz|grep -v 32bit|tr "/" "\n"|tail -1)
-
-          if [ -z "$INDEXPKG" ]; then
-
-            INDEXPKG=$(zgrep /$pkg-[0-9] SDKINDEX.gz|grep -v 32bit|tr "/" "\n"|tail -1)
-
-          fi
-
-        fi
-          
-        # if package not listed in index, log to clone-result
+        INDEXPKG=$(zgrep /$pkg-[0-9] INDEX.gz|tr "/" "\n"|tail -1)
 
         if [ -z "$INDEXPKG" ]; then
 
-          echo $pkg - $pkgver - $vendor >> clone-result
-
-        # if package listed, compare version 
-
-        else
-
-          INDEXPKGVER=$(echo $INDEXPKG | sed "s/$pkg-//g" | sed "s/.$ARCH.rpm//g" | sed "s/.noarch.rpm//g" )
-                                    
-          # if version matches, require package in .spec
-
-          if [ "$INDEXPKGVER" == "$pkgver" ]; then
-
-            echo Requires: $pkg = $pkgver >> clone.spec
-
-          # if version doesn't match, check if the version is an official update
-          # if it is, require in .spec, if it isn't, log to clone-result
-
-          else
-
-            VALID=$(curl -A "clone.sh" -s "http://kueue.hwlab.suse.de:8080/validversion/$SUSEVER-SP$PATCHLEVEL-$ARCH|$pkg|$pkgver")
-
-            if [ "$VALID" == "1" ]; then
-            
-              echo Requires: $pkg = $pkgver >> clone.spec
-
-            else
-
-              echo $pkg - $pkgver - $vendor >> clone-result
-
-            fi
-
-          fi
+        INDEXPKG=$(zgrep /$pkg-[0-9] SDKINDEX.gz|tr "/" "\n"|tail -1)
 
         fi
 
-      else
+    else
 
-        FOUND=0
-        SECTION=0
-       
-      fi
+        INDEXPKG=$(zgrep /$pkg-[0-9] INDEX.gz|grep -v 32bit|tr "/" "\n"|tail -1)
+
+        if [ -z "$INDEXPKG" ]; then
+
+        INDEXPKG=$(zgrep /$pkg-[0-9] SDKINDEX.gz|grep -v 32bit|tr "/" "\n"|tail -1)
+
+        fi
+
+    fi
+          
+    # if package not listed in index, log to clone-result
+
+    if [ -z "$INDEXPKG" ]; then
+
+        echo $pkg - $pkgver - $vendor >> clone-result
+
+    # if package listed, compare version 
 
     else
 
-      if echo $line | grep -q '# rpm -qa --queryformat'; then
+        INDEXPKGVER=$(echo $INDEXPKG | sed "s/$pkg-//g" | sed "s/.$ARCH.rpm//g" | sed "s/.noarch.rpm//g" )
+                                
+        # if version matches, require package in .spec
 
-        FOUND=1
+        if [ "$INDEXPKGVER" == "$pkgver" ]; then
+
+        echo Requires: $pkg = $pkgver >> clone.spec
+
+        # if version doesn't match, check if the version is an official update
+        # if it is, require in .spec, if it isn't, log to clone-result
+
+        else
+
+        VALID=$(curl -A "clone.sh" -s "http://kueue.hwlab.suse.de:8080/validversion/$SUSEVER-SP$PATCHLEVEL-$ARCH|$pkg|$pkgver")
+
+        if [ "$VALID" == "1" ]; then
+        
+            echo Requires: $pkg = $pkgver >> clone.spec
+
+        else
+
+            echo $pkg - $pkgver - $vendor >> clone-result
+
+        fi
 
       fi
-    
-    fi
-
-  else
-
-    if echo $line | grep '#==\[' &>/dev/null; then
-
-      SECTION=1
 
     fi
 
   fi
 
-done < rpm.txt
+done < clone-rpm.txt
 
 cat >> clone.spec <<END
 %description
