@@ -106,7 +106,8 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 END
 
 awk '/==============================/{n++}{print > n "RPM.txt" }' rpm.txt
-awk 'FNR>3' 2RPM.txt > clone-rpm.txt
+TMPFILE=$(grep -l "# rpm -qa --queryformat" *RPM*)
+awk 'FNR>3' $TMPFILE > clone-rpm.txt
 TOTAL=$(wc -l clone-rpm.txt | awk '{print $1}')
 PROG=0
 
