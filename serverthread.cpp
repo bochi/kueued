@@ -216,6 +216,7 @@ void ServerThread::run()
                             if ( url.contains( "you.novell.com" ) )
                             {
                                 QFile ptf( url.replace( "https://you.novell.com/update", "/srv/www/htdocs/ptfold/" ) );
+                                qDebug() << ptf.fileName() ;
                                 
                                 if ( ptf.exists() )
                                 {
@@ -230,6 +231,7 @@ void ServerThread::run()
                             else
                             {
                                 QFile ptf( url.replace( "https://ptf.suse.com", "/srv/www/htdocs/ptf/" ) );
+                                qDebug() << ptf.fileName() ;
                                 
                                 if ( ptf.exists() )
                                 {
