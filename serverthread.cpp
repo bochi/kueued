@@ -215,14 +215,32 @@ void ServerThread::run()
                         
                             if ( url.contains( "you.novell.com" ) )
                             {
-                                url.replace( "https://you.novell.com/update", "http://kueue.hwlab.suse.de/ptfold" );
+                                QFile ptf( url.replace( "https://you.novell.com/update", "/srv/www/htdocs/ptfold/" ) );
+                                
+                                if ( ptf.exists() )
+                                {
+                                    url.replace( "https://you.novell.com/update", "http://kueue.hwlab.suse.de/ptfold" );
+                                    out << url + "/" + q;
+                                }
+                                else
+                                {
+                                    out << "Unable to find " + q;
+                                }
                             }
                             else
                             {
-                                url.replace( "https://ptf.suse.com", "http://kueue.hwlab.suse.de/ptf" );
+                                QFile ptf( url.replace( "https://ptf.suse.com", "/srv/www/htdocs/ptf/" ) );
+                                
+                                if ( ptf.exists() )
+                                {
+                                    url.replace( "https://ptf.suse.com", "http://kueue.hwlab.suse.de/ptf" );
+                                    out << url + "/" + q;
+                                }
+                                else
+                                {
+                                    out << "Unable to find " + q;
+                                }
                             }
-                            
-                            out << url + "/" + q;
                         }
                         else
                         {

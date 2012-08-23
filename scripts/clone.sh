@@ -87,7 +87,7 @@ fi
 
 if ! test -e $INDEX; then
 
-  echo "FAILED/Couldn't find the index file. Make sure SCHNELL is pointing to the mount point of schnell.suse.de:/schnell"
+  echo "FAILED/Couldn't find the index file."
   exit
 
 fi
@@ -261,6 +261,6 @@ if [ $? -eq 0 ]; then
 
 else
     
-    echo "FAILED"
+    echo "FAILED/rpmbuild failed."
 
 fi    
