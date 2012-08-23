@@ -215,12 +215,12 @@ void ServerThread::run()
                         
                             if ( url.contains( "you.novell.com" ) )
                             {
-                                QFile ptf( url.replace( "https://you.novell.com/update", "/srv/www/htdocs/ptfold/" ) );
+                                QFile ptf( url.replace( "https://you.novell.com/update", "/srv/www/htdocs/ptfold" ) );
                                 Debug::log( "serverthread", ptf.fileName() );
                                 
                                 if ( ptf.exists() )
                                 {
-                                    url.replace( "https://you.novell.com/update", "http://kueue.hwlab.suse.de/ptfold" );
+                                    url.replace( "/srv/www/htdocs/ptfold", "http://kueue.hwlab.suse.de/ptfold" );
                                     out << url + "/" + q;
                                 }
                                 else
@@ -230,12 +230,12 @@ void ServerThread::run()
                             }
                             else
                             {
-                                QFile ptf( url.replace( "https://ptf.suse.com", "/srv/www/htdocs/ptf/" ) );
+                                QFile ptf( url.replace( "https://ptf.suse.com", "/srv/www/htdocs/ptf" ) );
                                 Debug::log( "serverthread", ptf.fileName() );
                                 
                                 if ( ptf.exists() )
                                 {
-                                    url.replace( "https://ptf.suse.com", "http://kueue.hwlab.suse.de/ptf" );
+                                    url.replace( "/srv/www/htdocs/ptf", "http://kueue.hwlab.suse.de/ptf" );
                                     out << url + "/" + q;
                                 }
                                 else
