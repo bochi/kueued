@@ -155,10 +155,14 @@ echo "PROG" $PROG
     if [[ "$pkgver" =~ .*PTF.* ]]; then
 
         ptfurl=$(curl -A "clone.sh" -s http://kueue.hwlab.suse.de:8080/ptf/$pkg-$pkgver.$ARCH.rpm)
-        curl -s -o $RPMDIR/$pkg-$pkgver.$ARCH.rpm $ptfurl
+        
+        if [[ $ptfurl == http* ]]; then
 
-        echo Requires: $pkg = $pkgver >> clone.spec
-        continue
+            curl -s -o $RPMDIR/$pkg-$pkgver.$ARCH.rpm $ptfurl
+            echo Requires: $pkg = $pkgver >> clone.spec
+            continue
+
+        fi
 
     fi
                             
