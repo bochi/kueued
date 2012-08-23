@@ -215,12 +215,12 @@ void ServerThread::run()
                         
                             if ( url.contains( "you.novell.com" ) )
                             {
-                                QFile ptf( url.replace( "https://you.novell.com/update", "/srv/www/htdocs/ptfold" ) );
+                                QFile ptf( url.replace( "https://you.novell.com/update", "/srv/www/htdocs/ptf/old" ) );
                                 Debug::log( "serverthread", ptf.fileName() );
                                 
                                 if ( ptf.exists() )
                                 {
-                                    url.replace( "/srv/www/htdocs/ptfold", "http://kueue.hwlab.suse.de/ptfold" );
+                                    url.replace( "/srv/www/htdocs/ptf/old", "http://kueue.hwlab.suse.de/ptf/old" );
                                     out << url + "/" + q;
                                 }
                                 else
