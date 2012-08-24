@@ -97,7 +97,7 @@ END
 gawk '/==============================/{n++}{print > n "RPM.txt" }' rpm.txt
 TMPFILE=$(grep -l "# rpm -qa --queryformat" *RPM*)
 gawk 'FNR>3' $TMPFILE > clone-rpm.txt
-TOTAL=$(wc -l clone-rpm.txt | gawk '{print $1}')aw
+TOTAL=$(wc -l clone-rpm.txt | gawk '{print $1}')
 PROG=0
 
 echo "TOTAL" $TOTAL
