@@ -246,7 +246,7 @@ touch %{buildroot}/foo
   Initial version
 END
 
-rpmbuild -bb --target $ARCH clone.spec &> /dev/null
+rpmbuild -bb --target $ARCH-linux clone.spec &> /dev/null
 
 if [ $? -eq 0 ]; then 
 	
