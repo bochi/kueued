@@ -1,23 +1,6 @@
 #!/bin/bash
 
-SCHNELL=/schnell
-API=paEr2RZGNJjA
-STUDIO=http://chevre.hwlab.suse.de
-
-SLE11=$SCHNELL/CD-ARCHIVE/SLE11
-SLES11GA=$SLE11/SLES-11-GM
-SLES11SP1=$SLE11/SLES-11-SP1-GM
-SLES11SP2=$SLE11/SLES-11-SP2-GM
-SLED11GA=SLE11/SLED-11-GM
-SLED11SP1=$SLE11/SLED-11-SP1-GM
-SLED11SP2=$SLE11/SLED-11-SP2-GM
 RPMDIR=./rpms
-
-if [ "$1" != "" ]; then
-
-  cd $1
-
-fi
 
 mkdir -p $RPMDIR
 rm clone-result 
@@ -254,7 +237,7 @@ Authors:
 
 %build
 %install
-if [ ! -d %{buildroot}; then mkdir %{buildroo
+if [ ! -d %{buildroot}; then mkdir %{buildroot}; fi
 touch %{buildroot}/foo
 %files
 /foo
