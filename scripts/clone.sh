@@ -111,10 +111,10 @@ Summary:        dummy package for cloning a system through requirements
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 END
 
-awk '/==============================/{n++}{print > n "RPM.txt" }' rpm.txt
+gawk '/==============================/{n++}{print > n "RPM.txt" }' rpm.txt
 TMPFILE=$(grep -l "# rpm -qa --queryformat" *RPM*)
-awk 'FNR>3' $TMPFILE > clone-rpm.txt
-TOTAL=$(wc -l clone-rpm.txt | awk '{print $1}')
+gawk 'FNR>3' $TMPFILE > clone-rpm.txt
+TOTAL=$(wc -l clone-rpm.txt | gawk '{print $1}')aw
 PROG=0
 
 echo "TOTAL" $TOTAL
@@ -128,8 +128,8 @@ echo "PROG" $PROG
 
     # get package details
 
-    pkg=$(echo $line | awk '{print $1}')
-    pkgver=$(echo $line | awk '{print $NF}')
+    pkg=$(echo $line | gawk '{print $1}')
+    pkgver=$(echo $line | gawk '{print $NF}')
     vendor=$(echo $line | sed "s/$pkg //g" | sed "s/ $pkgver//g")
 
     # ignore gpg-pubkey
@@ -254,7 +254,7 @@ Authors:
 
 %build
 %install
-if [ ! -d %{buildroot}; then mkdir %{buildroot}; fi
+if [ ! -d %{buildroot}; then mkdir %{buildroo
 touch %{buildroot}/foo
 %files
 /foo
