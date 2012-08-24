@@ -237,7 +237,7 @@ Authors:
 
 %build
 %install
-if [ ! -d %{buildroot}; then mkdir %{buildroot}; fi
+if [ ! -d %{buildroot} ]; then mkdir %{buildroot}; fi
 touch %{buildroot}/foo
 %files
 /foo
