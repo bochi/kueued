@@ -254,6 +254,7 @@ Authors:
 
 %build
 %install
+if [ ! -d %{buildroot}; then mkdir %{buildroot}; fi
 touch %{buildroot}/foo
 %files
 /foo
