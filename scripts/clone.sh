@@ -13,6 +13,12 @@ SLED11SP1=$SLE11/SLED-11-SP1-GM
 SLED11SP2=$SLE11/SLED-11-SP2-GM
 RPMDIR=./rpms
 
+if [ "$1" != "" ]; then
+
+  cd $1
+
+fi
+
 mkdir -p $RPMDIR
 rm clone-result 
 
