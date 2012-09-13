@@ -861,6 +861,39 @@ QStringList Database::getQmonSiebelList( const QString& dbname)
     return l;    
 }
 
+QStringList Database::getSrnumsForQueue( const QString& dbname, const QString& queue, const QString& geo )
+{
+    QSqlDatabase db;
+    
+    if ( dbname.isNull() ) 
+    {
+        db = QSqlDatabase::database( "mysqlDB" );
+    }
+    else
+    {
+        db = QSqlDatabase::database( dbname );
+    }
+    
+    QSqlQuery query( db );
+   
+    QStringList l;
+    
+    query.prepare( "SELECT ID FROM QMON_SIEBEL WHERE ( GEO = :geo ) AND ( QUEUE = :queue )" );
+    query.bindValue( ":geo", geo );
+    query.bindValue( ":queue", queue );
+    
+    if ( !query.exec() ) qDebug() << query.lastError().text();
+    
+    Debug::logQuery( query, db.connectionName() );
+
+    while( query.next() )
+    {
+        l.append( query.value( 0 ).toString() );
+    }
+    
+    return l;    
+}
+
 bool Database::siebelExistsInDB( const QString& id, const QString& dbname )
 {
     QSqlDatabase db;

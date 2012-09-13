@@ -29,6 +29,7 @@
 #include "serverthread.h"
 #include "database.h"
 #include "network.h"
+#include "../google-breakpad/src/testing/gtest/samples/sample3-inl.h"
 
 #include <iostream>
 #include <QtSql>
@@ -291,12 +292,12 @@ void ServerThread::run()
                 }
                 else
                 {  
-                    //QStringList l = Database::getSrNumsForQueue( q.remove( "/" ).split( "|" ).at( 0 ), q.remove( "/" ).split( "|" ).at( 1 ), mMysqlDB );
+                    QStringList l = Database::getSrnumsForQueue( q.remove( "/" ).split( "|" ).at( 0 ), q.remove( "/" ).split( "|" ).at( 1 ), mMysqlDB );
 
-                    //for ( int i = 0; i < l.size(); ++i )
-                    //{  
-                       // out << l.at( i ) + "\n";
-                    //}
+                    for ( int i = 0; i < l.size(); ++i )
+                    {  
+                        out << l.at( i ) + "\n";
+                    }
                 }
                 
                 out.flush();
