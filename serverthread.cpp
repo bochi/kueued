@@ -29,7 +29,6 @@
 #include "serverthread.h"
 #include "database.h"
 #include "network.h"
-#include "../google-breakpad/src/testing/gtest/samples/sample3-inl.h"
 
 #include <iostream>
 #include <QtSql>
