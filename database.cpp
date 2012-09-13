@@ -861,7 +861,7 @@ QStringList Database::getQmonSiebelList( const QString& dbname)
     return l;    
 }
 
-QStringList Database::getSrnumsForQueue( const QString& dbname, const QString& queue, const QString& geo )
+QStringList Database::getSrnumsForQueue( const QString& queue, const QString& geo, const QString& dbname  )
 {
     QSqlDatabase db;
     

@@ -66,7 +66,7 @@ class Database : public QObject
         static void updatePseudoQueues( const QString& = QString::Null(), const QString& = QString::Null() );
         static QStringList getPseudoQueues( const QString& =  QString::Null() );
         static QStringList getCurrentBomgars( const QString& = QString::Null() );
-        static QStringList getSrnumsForQueue( const QString& = QString::Null(), const QString& = QString::Null(), const QString& = QString::Null() );
+        static QStringList getSrnumsForQueue( const QString&, const QString&, const QString& = QString::Null() );
         static QString convertTime( const QString& );
         static QString formatPhone( QString, const QString& );
         
