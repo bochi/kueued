@@ -28,6 +28,7 @@
 
 #include "settings.h"
 #include <iostream>
+#include <unistd.h>
 #include <QFile>
 #include <QtSql>
 

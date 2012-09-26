@@ -388,7 +388,7 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
                     "  sr.SR_SEV_CD as SEVERITY, "
                     "  sr.CREATED, "
                     "  sr.CREATED_BY, "
-                    "  sr.LAST_UPD as LAST_UPDATE,  "
+                    "  sr.ACTL_RESP_TS as LAST_UPDATE,  "
                     "  e.NAME as SUPPORT_PROGRAM,"
                     "  sr.X_SR_SUB_TYPE as SUBTYPE, "
                     "  e.ENTL_PRIORITY_NUM as SERVICE_LEVEL, "
