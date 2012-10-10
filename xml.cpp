@@ -382,7 +382,7 @@ QString XML::sr( QueueItem qi )
     if ( !qi.bugId.isEmpty() )
     {
         xml += "    <bug>" + qi.bugId + "</bug>\n";
-        xml += "    <bug_desc>" + qi.bugDesc + "</bug_desc>\n";
+        xml += "    <bug_desc><![CDATA[" + qi.bugDesc + "]]></bug_desc>\n";
     }
     
     xml += "    <geo><![CDATA[" + qi.geo + "]]></geo>\n";
