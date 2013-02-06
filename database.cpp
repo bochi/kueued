@@ -408,9 +408,14 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
                     "  sr.DESC_TEXT as DETAILED_DESC, "
                     "  sr.X_ALT_CONTACT, "
                     "  sr.X_DEFECT_NUM, "
-                    "  ext.X_ORACLE_CUSTOMER_ID "
+                    "  ext.X_ORACLE_CUSTOMER_ID, "
+                    "  owner.login as OWNER, "
+                    "  subowner.login as SUBOWNER "
                     "from "
-                    "  siebel.s_srv_req sr, "
+                    "  siebel.s_srv_req sr"
+                    "  LEFT OUTER JOIN siebel.s_user owner ON sr.owner_emp_id = owner.row_id,"
+                    "  siebel.s_srv_req_x srx"
+                    "  LEFT OUTER JOIN siebel.s_user subowner ON srx.attrib_07 = subowner.row_id,"
                     "  siebel.s_user u, "
                     "  siebel.s_contact c, "
                     "  siebel.s_contact g, "
@@ -420,7 +425,9 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
                     "  siebel.s_prod_int prd, "
                     "  siebel.s_org_ext_x flag "
                     "where "
-                    "  sr.owner_emp_id = u.row_id "
+                    "  ( sr.owner_emp_id = u.row_id"
+                    "  or srx.attrib_07 = u.row_id )"
+                    "  and srx.row_id = sr.row_id"
                     "  and u.row_id = c.row_id "
                     "  and g.row_id = sr.CST_CON_ID  "
                     "  and u.login = :engineer "
@@ -516,6 +523,8 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
         i.alt_contact = query.value( 25 ).toString();
         i.bugId = query.value( 26 ).toString();
         i.cstNum = query.value( 27 ).toString();
+        i.owner = query.value( 28 ).toString();
+        i.subOwner = query.value( 29 ).toString();
         
         if ( !i.bugId.isEmpty() )
         {

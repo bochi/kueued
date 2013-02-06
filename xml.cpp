@@ -326,7 +326,7 @@ QString XML::sr( QueueItem qi )
     else
     {
         xml += "    <srtype>sr</srtype>\n";
-        xml += "    <cus_account><![CDATA[" + qi.customer + "]]></cus_account>\n";
+       xml += "     <cus_account><![CDATA[" + qi.customer + "]]></cus_account>\n";
         xml += "    <cus_num><![CDATA[" + qi.cstNum + "]]></cus_num>\n";
         
         if ( ( !qi.contact_firstname.isEmpty() ) && ( qi.contact_firstname != "1" ) && ( qi.contact_firstname != "0" ) )
@@ -370,6 +370,13 @@ QString XML::sr( QueueItem qi )
         }
     }
 
+    xml += "    <owner><![CDATA[" + qi.owner + "]]></owner>\n";
+    
+    if ( !qi.subOwner.isEmpty() )
+    {
+        xml += "    <subowner><![CDATA[" + qi.subOwner + "]]></subowner>\n";
+    }
+    
     xml += "    <severity><![CDATA[" + qi.severity + "]]></severity>\n";
     xml += "    <status><![CDATA[" + qi.status + "]]></status>\n";
     xml += "    <bdesc><![CDATA[" + qi.brief_desc + "]]></bdesc>\n";

@@ -155,6 +155,8 @@ class QueueItem
         QString bugId;
         QString bugDesc;
         QString cstNum;
+        QString owner;
+        QString subOwner;
         bool isCr;
         bool critsit;
         bool high_value;
