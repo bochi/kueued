@@ -370,12 +370,12 @@ QString XML::sr( QueueItem qi )
         }
     }
 
-    xml += "    <owner><![CDATA[" + qi.owner + "]]></owner>\n";
+    /*xml += "    <owner><![CDATA[" + qi.owner + "]]></owner>\n";
     
     if ( !qi.subOwner.isEmpty() )
     {
         xml += "    <subowner><![CDATA[" + qi.subOwner + "]]></subowner>\n";
-    }
+    }*/
     
     xml += "    <severity><![CDATA[" + qi.severity + "]]></severity>\n";
     xml += "    <status><![CDATA[" + qi.status + "]]></status>\n";
