@@ -355,7 +355,7 @@ QString Database::getCreator(const QString& sr, const QString& dbname )
     }
 }
 
-QList< QueueItem > Database::getUserQueue( const QString& engineer, const QString& dbname, const QString& mysqlname )
+QList< QueueItem > Database::getUserQueue( const QString& engineer, const QString& dbname, const QString& mysqlname, bool newVersion )
 {
     QSqlDatabase db;
     QSqlDatabase mysqldb;
@@ -373,7 +373,9 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
     QSqlQuery query( db );
     QList< QueueItem > list;
 
-    query.prepare( "select "
+    QString q;
+    
+    q +=        ( "select "
                     "  sr.sr_num as ID, "
                     "  case "
                     "    when sr.BU_ID = '0-R9NH' then 'Default Organization' "
@@ -424,20 +426,30 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
                     "  siebel.s_org_ext ext, "
                     "  siebel.s_prod_int prd, "
                     "  siebel.s_org_ext_x flag "
-                    "where "
-                    //"  ( sr.owner_emp_id = u.row_id"
-                    //"  or srx.attrib_07 = u.row_id )"
-                    "  sr.owner_emp_id = u.row_id"
-                    "  and srx.row_id = sr.row_id"
-                    "  and u.row_id = c.row_id "
-                    "  and g.row_id = sr.CST_CON_ID  "
-                    "  and u.login = :engineer "
-                    "  and sr.sr_stat_id = 'Open' "
-                    "  and sr.agree_id = e.row_id "
-                    "  and e.svc_calendar_id = cal.row_id "
-                    "  and sr.cst_ou_id = ext.row_id "
-                    "  and sr.X_PROD_FEATURE_ID = prd.row_id "
-                    "  and ext.row_id = flag.row_id" );
+                    "where " );
+    
+    if ( newVersion )
+    {
+        q +=  ( "  ( sr.owner_emp_id = u.row_id"
+                "  or srx.attrib_07 = u.row_id )" );
+    }
+    else
+    {
+        q +=    "  sr.owner_emp_id = u.row_id";
+    }
+    
+    q += ( "  and srx.row_id = sr.row_id"
+           "  and u.row_id = c.row_id "
+           "  and g.row_id = sr.CST_CON_ID  "
+           "  and u.login = :engineer "
+           "  and sr.sr_stat_id = 'Open' "
+           "  and sr.agree_id = e.row_id "
+           "  and e.svc_calendar_id = cal.row_id "
+           "  and sr.cst_ou_id = ext.row_id "
+           "  and sr.X_PROD_FEATURE_ID = prd.row_id "
+           "  and ext.row_id = flag.row_id" );
+    
+    query.prepare( q );
         
     query.bindValue( ":engineer", engineer );
     if ( !query.exec() ) qDebug() << query.lastError().text();
