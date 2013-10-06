@@ -707,7 +707,7 @@ QueueItem Database::getSrInfo( const QString& sr, const QString& dbname, const Q
         }
             
         i.service_level = query.value( 10 ).toInt();
-        i.brief_desc = query.value( 11 ).toString();
+        i.brief_desc = query.value( 11 ).toString().replace( "]]>", "]]&gt;" );;
         
         if ( query.value( 12 ).toString() == "Y" )
         {
@@ -727,7 +727,7 @@ QueueItem Database::getSrInfo( const QString& sr, const QString& dbname, const Q
             i.high_value = false;
         }
         
-        i.detailed_desc = query.value( 24 ).toString();
+        i.detailed_desc = query.value( 24 ).toString().replace( "]]>", "]]&gt;" );;
         i.alt_contact = query.value( 25 ).toString();
         
 	    QString b = query.value(26).toString();
