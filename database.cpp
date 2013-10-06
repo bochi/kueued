@@ -530,6 +530,8 @@ q+=(                "  and srx.row_id = sr.row_id"
             
         i.service_level = query.value( 10 ).toInt();
         i.brief_desc = query.value( 11 ).toString().replace( "]]>", "]]&gt;" ).toAscii().toHex();
+        QByteArray array = i.brief_desc.toAscii();
+        qDebug() << array.toHex();
         
         if ( query.value( 12 ).toString() == "Y" )
         {
