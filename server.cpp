@@ -41,6 +41,7 @@ Server::Server( quint16 port, QObject* parent )
     
     QThreadPool::globalInstance()->setExpiryTimeout( -1 );
     QThreadPool::globalInstance()->setMaxThreadCount( 16 ); 
+    
     listen( QHostAddress::Any, port );   
 }
 
@@ -53,20 +54,6 @@ void Server::incomingConnection( int socket )
 {
     ServerThread* q = new ServerThread( socket );
     QThreadPool::globalInstance()->start( q );
-//    qDebug() << "Threads: " << QThreadPool::globalInstance()->activeThreadCount();
-//    connect( q, SIGNAL( finished() ), 
-  //           this, SLOT( deleteThread() ) );
-    
-    //q->start();
-}
-
-void Server::deleteThread()
-{
-    QThread* t = qobject_cast<QThread*>( sender() );
-    t->quit();
-    qDebug() << t->wait() ;
-    
-    delete t;
 }
 
 #include "server.moc"
