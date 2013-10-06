@@ -549,7 +549,7 @@ q+=(                "  and srx.row_id = sr.row_id"
             i.high_value = false;
         }
         
-        i.detailed_desc = query.value( 24 ).toString().replace( "]]>", "]]&gt;" ).replace( QByteArray::fromHex( "1b" ), "" );
+        i.detailed_desc = query.value( 24 ).toString().replace( "]]>", "]]&gt;" ).replace("\x1b", "");
         i.alt_contact = query.value( 25 ).toString();
         i.bugId = query.value( 26 ).toString();
         i.cstNum = query.value( 27 ).toString();
