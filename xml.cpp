@@ -138,7 +138,7 @@ QString XML::qmon( QList<SiebelItem> list )
         
         if ( !si.bugId.isEmpty() )
         {
-            xml += "    <bug>" + si.bugId + "</bug>\n";
+            xml += "    <bug><![CDATA[" + si.bugId + "]]></bug>\n";
             //xml += "    <bug_desc>" + si.bugDesc + "</bug_desc>\n";
         }
         
@@ -370,12 +370,12 @@ QString XML::sr( QueueItem qi )
         }
     }
 
-    /*xml += "    <owner><![CDATA[" + qi.owner + "]]></owner>\n";
+    xml += "    <owner><![CDATA[" + qi.owner + "]]></owner>\n";
     
     if ( !qi.subOwner.isEmpty() )
     {
         xml += "    <subowner><![CDATA[" + qi.subOwner + "]]></subowner>\n";
-    }*/
+    }
     
     xml += "    <severity><![CDATA[" + qi.severity + "]]></severity>\n";
     xml += "    <status><![CDATA[" + qi.status + "]]></status>\n";
@@ -388,8 +388,8 @@ QString XML::sr( QueueItem qi )
     
     if ( !qi.bugId.isEmpty() )
     {
-        xml += "    <bug>" + qi.bugId + "</bug>\n";
-        xml += "    <bug_desc><![CDATA[" + qi.bugDesc + "]]></bug_desc>\n";
+        xml += "    <bug><![CDATA[" + qi.bugId + "]]></bug>\n";
+        if ( !qi.bugDesc.isEmpty() ) xml += "    <bug_desc><![CDATA[" + qi.bugDesc + "]]></bug_desc>\n";
     }
     
     xml += "    <geo><![CDATA[" + qi.geo + "]]></geo>\n";

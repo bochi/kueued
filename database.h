@@ -77,7 +77,9 @@ class Database : public QObject
         static QList< BomgarItem > getChats( const QString& = QString::Null() );  
         
         static QStringList srInfo( const QString&, const QString& = QString::Null() );
-        static QString getBugDesc( const QString&, const QString& );
+        static QString getBugDesc( QString, const QString& );
+
+        static bool isBugID( const QString& );
 };
 
 class SiebelItem 

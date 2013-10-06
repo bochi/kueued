@@ -37,10 +37,10 @@
 #include <QtNetwork>
 #include <QTime>
 
-ServerThread::ServerThread( int sd, QObject *parent ) : QThread(parent)
+ServerThread::ServerThread( int sd, QObject *parent ) : QRunnable()
 {
     mSocket = sd;
-    mTime.start();
+    //mTime.start();
 }
 
 ServerThread::~ServerThread()
@@ -63,26 +63,59 @@ ServerThread::~ServerThread()
         QSqlDatabase::removeDatabase( mSiebelDB );
     }
     
-    Debug::print( "serverthread", "Destroying " +  QString::number( currentThreadId() ) + ", thread took " + QString::number( mTime.elapsed() / 1000 ) + " sec" );
+    //Debug::print( "serverthread", "Destroying " + mThreadID + ", thread took " + QString::number( mTime.elapsed() / 1000 ) + " sec" );
 }
 
 
 void ServerThread::run()
 {
+    mThreadID = QString::number( QThread::currentThreadId() );
+
+    mMysqlDB = "mysqlDB-" + mThreadID;
+    mSiebelDB = "siebelDB-" + mThreadID;
+    mQmonDB = "qmonDB-" + mThreadID;
+
+
+    if ( QSqlDatabase::database( mMysqlDB ).isOpen() )
+    {
+        Debug::print( "serverthread", "MySQL in thread " + mThreadID + " still open, waiting..." );
+
+
+        while ( QSqlDatabase::database( mMysqlDB ).isOpen() )
+        {
+            //QSqlDatabase::database( mMysqlDB ).close();
+            //QSqlDatabase::removeDatabase( mMysqlDB );
+        }
+
+        Debug::print( "serverthread", "OK, removing " + mMysqlDB );
+ //       QSqlDatabase::removeDatabase( mMysqlDB );
+    }
+
+    if ( QSqlDatabase::database( mSiebelDB ).isOpen() )
+    {
+        Debug::print( "serverthread", "Siebel in thread " + mThreadID + " still open, waiting..." );
+
+        while ( QSqlDatabase::database( mSiebelDB ).isOpen() )
+        {  
+	    //QSqlDatabase::database( mSiebelDB ).close();
+	    //QSqlDatabase::removeDatabase( mSiebelDB );
+        }
+
+        Debug::print( "serverthread", "OK, removing " + mSiebelDB );
+   //     QSqlDatabase::removeDatabase( mSiebelDB );
+    }
+
     QString cmd;
     QString dm;
 
-    Debug::print( "serverthread", "New Server Thread " + QString::number( currentThreadId() ) );
+    QString active = QString::number( QThreadPool::globalInstance()->activeThreadCount() );
+    QString max = QString::number( QThreadPool::globalInstance()->maxThreadCount());
+
+   //Debug::print( "serverthread - " + QString::number( QThreadPool::globalInstance()->activeThreadCount() ) + "/" + QString::number( QThreadPool::globalInstance()->maxThreadCount()) , "New Server Thread " + mThreadID );
     
     char hostname[ 1024 ];
     gethostname( hostname, sizeof( hostname ) );
     mHostname = hostname;
-    
-    QString tid = QString::number( QThread::currentThreadId() );
-    
-    mMysqlDB = "mysqlDB-" + tid;
-    mSiebelDB = "siebelDB-" + tid;
-    mQmonDB = "qmonDB-" + tid;
     
     QTcpSocket* socket= new QTcpSocket;
     
@@ -93,7 +126,7 @@ void ServerThread::run()
         
     if ( socket->waitForReadyRead() )
     {
-        Debug::print( "serverthread", "Socket " + QString::number( mSocket ) + " connected" );
+ //       Debug::print( "serverthread", "Socket " + QString::number( mSocket ) + " connected" );
     }
     else
     {
@@ -118,11 +151,11 @@ void ServerThread::run()
         
         if ( dm.isEmpty() )
         {
-            Debug::log( "serverthread", " - " + r.trimmed() );
+            Debug::log( "serverthread - " + active + "/" + max, " - " + r.trimmed() );
         }
         else
         {
-            Debug::log( "serverthread", dm + r.trimmed() );
+            Debug::log( "serverthread - " + active + "/" + max, dm + r.trimmed() );
         }
 
         QStringList tokens = r.split( QRegExp( "[ \r\n][ \r\n]*" ) );
@@ -628,6 +661,7 @@ void ServerThread::run()
                 
                 out << "</chat>";
                 out.flush();
+                socket->close();
                 
             }
             else if ( cmd.startsWith( "/pseudoQ" ) )
@@ -712,11 +746,21 @@ void ServerThread::run()
                 
                 QString q = cmd.remove( "/userqueue" );
 
-                if ( q.remove( "/" ).isEmpty() )
-                {  
-                    out << "Please specify engineer";
+                if ( q.startsWith( "/full/" ) )
+		{
+		    QString eng = q.remove( "/full/" ).remove( "/" ).toUpper();
+                    //Debug::print( "full", eng + "   " + q ); 
+                    out << xml();
+
+                    out << XML::queue( Database::getUserQueue( eng, mSiebelDB, mMysqlDB, true ) );
+                    out.flush();
+                    //Debug::print( "server", "Userqueue for " + eng + " took " + QString::number( uqTimer.elapsed() / 1000 ) + " sec");
                 }
-                else
+                else if ( q.remove( "/" ).isEmpty() )
+		{
+		    out << "Please specify engineer.";
+		}
+		else
                 {
                     QString eng = q.remove( "/" ).toUpper();
                     
@@ -724,10 +768,11 @@ void ServerThread::run()
 
                     out << XML::queue( Database::getUserQueue( eng, mSiebelDB, mMysqlDB ) );
                     out.flush();
-                    Debug::print( "server", "Userqueue for " + eng + " took " + QString::number( uqTimer.elapsed() / 1000 ) + " sec");
+                    //Debug::print( "server", "Userqueue for " + eng + " took " + QString::number( uqTimer.elapsed() / 1000 ) + " sec");
                 }
                 
                 out.flush();
+                socket->close();
             }
             else if ( cmd.startsWith( "/stats" ) )
             {    
@@ -971,7 +1016,7 @@ void ServerThread::run()
             
             if ( socket->waitForBytesWritten() )
             {
-                Debug::print( "serverthread", "Wrote to socket " + QString::number( mSocket ) );
+                //Debug::print( "serverthread", "Wrote to socket " + QString::number( mSocket ) );
                 
                 socket->disconnectFromHost();
                 
@@ -1004,7 +1049,7 @@ bool ServerThread::openMysqlDB()
         }
         else
         {
-            Debug::print( "database", "Opened DB " + mysqlDB.connectionName() );
+    //        Debug::print( "database", "Opened DB " + mysqlDB.connectionName() );
             return true;
         }
     }
@@ -1032,7 +1077,7 @@ bool ServerThread::openQmonDB()
         }
         else
         {
-            Debug::print( "database", "Opened DB " + qmonDB.connectionName() );
+   //         Debug::print( "database", "Opened DB " + qmonDB.connectionName() );
             return true;
         }
     }
@@ -1062,7 +1107,7 @@ bool ServerThread::openSiebelDB()
         }
         else
         {
-            Debug::print( "database", "Opened DB " + siebelDB.connectionName() );
+     //       Debug::print( "database", "Opened DB " + siebelDB.connectionName() );
             return true;
         }
     }

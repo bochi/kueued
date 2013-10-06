@@ -34,7 +34,6 @@
 Kueued::Kueued()
 {
     Debug::print( "kueued", "Constructing" );
-    
     mDB = new Database;
     mServer = new Server( 8080, this );    
 }

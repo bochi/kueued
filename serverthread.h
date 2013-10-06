@@ -29,15 +29,14 @@
 #include <QThread>
 #include <QTcpSocket>
 #include <QTime>
+#include <QRunnable>
 
 #include "network.h"
 
 class Network;
 
-class ServerThread : public QThread
+class ServerThread : public QRunnable
 {
-    Q_OBJECT
-
     public:
         ServerThread( int sd = 0, QObject *parent = 0L );
         ~ServerThread();
@@ -48,6 +47,7 @@ class ServerThread : public QThread
         int mSocket;
         QString mMysqlDB;
         QString mSiebelDB;
+        QString mThreadID;
         QString mQmonDB;
         QString mEngineer;
         QString mHostname;

@@ -108,6 +108,8 @@ void Database::insertSiebelItemIntoDB( SiebelItem item, const QString& dbname )
         db = QSqlDatabase::database( dbname );
     }
     
+    db.transaction();
+    
     QSqlQuery query( db );
     
     query.prepare( "INSERT INTO QMON_SIEBEL( ID, QUEUE, GEO, HOURS, STATUS, SEVERITY, SOURCE, RESPOND_VIA, "
@@ -170,7 +172,7 @@ void Database::insertSiebelItemIntoDB( SiebelItem item, const QString& dbname )
     cquery.bindValue( ":oracle_id", item.cstNum );
     
     if ( !cquery.exec() ) qDebug() << cquery.lastError().text();                  
-    
+    db.commit();
     Debug::logQuery( cquery, db.connectionName() );
 }
 
@@ -196,6 +198,9 @@ void Database::updateSiebelItem( SiebelItem item, const QString& dbname, const Q
     {
         db1 = QSqlDatabase::database( dbname1 );
     }
+    
+    db.transaction();
+    db1.transaction();
     
     QSqlQuery query( db );
     
@@ -260,7 +265,7 @@ void Database::updateSiebelItem( SiebelItem item, const QString& dbname, const Q
     cquery.bindValue( ":id", item.id );
 
     if ( !cquery.exec() ) qDebug() << cquery.lastError().text();
-    
+    db.commit();
     Debug::logQuery( cquery, db.connectionName() );
 }
 
@@ -277,12 +282,15 @@ QString Database::getDetDesc( const QString& sr, const QString& dbname )
         db = QSqlDatabase::database( dbname );
     }
     
+    db.transaction();
     QSqlQuery query( db );
 
     query.prepare( "SELECT DESC_TEXT FROM SIEBEL.S_SRV_REQ WHERE SR_NUM = :sr" );
     
     query.bindValue( ":sr", sr );
     if ( !query.exec() ) qDebug() << query.lastError().text();
+    
+    db.commit();
     
     if ( query.next() )
     {
@@ -309,6 +317,8 @@ void Database::updateSiebelQueue( SiebelItem si, const QString& dbname )
         db = QSqlDatabase::database( dbname );
     }
     
+    db.transaction();
+    
     QSqlQuery query( db );
     
     query.prepare( "UPDATE QMON_SIEBEL SET QUEUE = :queue, INQUEUE = :inqueue WHERE id = :id" );
@@ -318,6 +328,8 @@ void Database::updateSiebelQueue( SiebelItem si, const QString& dbname )
     query.bindValue( ":id", si.id );
                 
     if ( !query.exec() ) qDebug() << query.lastError().text();
+    
+    db.commit();
     
     Debug::logQuery( query, db.connectionName() );
 }
@@ -335,6 +347,8 @@ QString Database::getCreator(const QString& sr, const QString& dbname )
         db = QSqlDatabase::database( dbname );
     }
     
+    db.transaction();
+    
     QSqlQuery query( db );
     
     query.prepare( "SELECT LOGIN FROM SIEBEL.S_USER WHERE PAR_ROW_ID = ( SELECT CREATED_BY FROM SIEBEL.S_SRV_REQ WHERE SR_NUM = :sr )" );
@@ -343,6 +357,8 @@ QString Database::getCreator(const QString& sr, const QString& dbname )
     
     if ( !query.exec() ) qDebug() << query.lastError().text();
 
+    db.commit();
+    
     Debug::logQuery( query, db.connectionName() );
     
     if ( query.next() )
@@ -355,7 +371,7 @@ QString Database::getCreator(const QString& sr, const QString& dbname )
     }
 }
 
-QList< QueueItem > Database::getUserQueue( const QString& engineer, const QString& dbname, const QString& mysqlname, bool newVersion )
+QList< QueueItem > Database::getUserQueue( const QString& engineer, const QString& dbname, const QString& mysqlname, bool subowner )
 {
     QSqlDatabase db;
     QSqlDatabase mysqldb;
@@ -370,12 +386,12 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
         mysqldb = QSqlDatabase::database( mysqlname );
     }
     
+    db.transaction();
+    mysqldb.transaction();
+    
     QSqlQuery query( db );
     QList< QueueItem > list;
-
-    QString q;
-    
-    q +=        ( "select "
+    QString q( "select "
                     "  sr.sr_num as ID, "
                     "  case "
                     "    when sr.BU_ID = '0-R9NH' then 'Default Organization' "
@@ -427,28 +443,29 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
                     "  siebel.s_prod_int prd, "
                     "  siebel.s_org_ext_x flag "
                     "where " );
-    
-    if ( newVersion )
-    {
-        q +=  ( "  ( sr.owner_emp_id = u.row_id"
-                "  or srx.attrib_07 = u.row_id )" );
-    }
-    else
-    {
-        q +=    "  sr.owner_emp_id = u.row_id";
-    }
-    
-    q += ( "  and srx.row_id = sr.row_id"
-           "  and u.row_id = c.row_id "
-           "  and g.row_id = sr.CST_CON_ID  "
-           "  and u.login = :engineer "
-           "  and sr.sr_stat_id = 'Open' "
-           "  and sr.agree_id = e.row_id "
-           "  and e.svc_calendar_id = cal.row_id "
-           "  and sr.cst_ou_id = ext.row_id "
-           "  and sr.X_PROD_FEATURE_ID = prd.row_id "
-           "  and ext.row_id = flag.row_id" );
-    
+
+if ( subowner )
+{
+    q += ("  ( sr.owner_emp_id = u.row_id"
+          "  or srx.attrib_07 = u.row_id )" );
+}
+else
+{
+    q += (          "  sr.owner_emp_id = u.row_id" );
+}
+
+
+q+=(                "  and srx.row_id = sr.row_id"
+                    "  and u.row_id = c.row_id "
+                    "  and g.row_id = sr.CST_CON_ID  "
+                    "  and u.login = :engineer "
+                    "  and sr.sr_stat_id = 'Open' "
+                    "  and sr.agree_id = e.row_id "
+                    "  and e.svc_calendar_id = cal.row_id "
+                    "  and sr.cst_ou_id = ext.row_id "
+                    "  and sr.X_PROD_FEATURE_ID = prd.row_id "
+                    "  and ext.row_id = flag.row_id" );
+
     query.prepare( q );
         
     query.bindValue( ":engineer", engineer );
@@ -539,7 +556,7 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
         i.owner = query.value( 28 ).toString();
         i.subOwner = query.value( 29 ).toString();
         
-        if ( !i.bugId.isEmpty() )
+	if ( !i.bugId.isEmpty() )
         {
             i.bugDesc = getBugDesc( i.bugId, mysqlname );
         }
@@ -547,6 +564,9 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
         list.append( i );
     }
         
+    db.commit();
+    mysqldb.commit();
+    
     return list;
 }
 
@@ -554,7 +574,7 @@ QueueItem Database::getSrInfo( const QString& sr, const QString& dbname, const Q
 {
     QSqlDatabase db;
     QSqlDatabase mysqldb;
-    
+     
     if ( dbname.isNull() ) 
     {
         db = QSqlDatabase::database( "siebelDB" );
@@ -564,6 +584,9 @@ QueueItem Database::getSrInfo( const QString& sr, const QString& dbname, const Q
         db = QSqlDatabase::database( dbname );
         mysqldb = QSqlDatabase::database( mysqlname );
     }
+    
+    db.transaction();
+    mysqldb.transaction();
     
     QSqlQuery query( db );
     QueueItem i;
@@ -706,16 +729,37 @@ QueueItem Database::getSrInfo( const QString& sr, const QString& dbname, const Q
         
         i.detailed_desc = query.value( 24 ).toString();
         i.alt_contact = query.value( 25 ).toString();
-        i.bugId = query.value( 26 ).toString();
+        
+	    QString b = query.value(26).toString();
+
+        if ( isBugID( b ) ) i.bugId = query.value( 26 ).toString();
+
         i.cstNum = query.value( 27 ).toString();
         
-        if ( !i.bugId.isEmpty() )
+        if ( !i.bugId.isEmpty() && isBugID( i.bugId ) )
         {
             i.bugDesc = getBugDesc( i.bugId, mysqlname );
         }
     }
-        
+    
+    db.commit();
+    mysqldb.commit();
+    
     return i;
+}
+
+bool Database::isBugID( const QString& bug )
+{
+    QRegExp reg( "^[0-9]{6}$" );
+
+    if ( reg.exactMatch( bug.trimmed() ) )
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 QString Database::getSrStatus( const QString& sr, const QString& dbname )
@@ -731,6 +775,8 @@ QString Database::getSrStatus( const QString& sr, const QString& dbname )
         db = QSqlDatabase::database( dbname );
     }
     
+    db.transaction();
+    
     QSqlQuery query( db );
     QueueItem i;
 
@@ -743,6 +789,7 @@ QString Database::getSrStatus( const QString& sr, const QString& dbname )
         qDebug() << query.lastError().text();
     }
     
+    db.commit();
     Debug::logQuery( query, db.connectionName() );
     
     if ( query.next() )
@@ -778,6 +825,9 @@ void Database::updatePseudoQueues( const QString& qDb, const QString& mDb )
         mdb = QSqlDatabase::database( mDb );
     }
     
+    qdb.transaction();
+    mdb.transaction();
+    
     QSqlQuery query( qdb );
     QSqlQuery inQuery( mdb );
     
@@ -790,6 +840,9 @@ void Database::updatePseudoQueues( const QString& qDb, const QString& mDb )
           inQuery.bindValue( ":queuename", query.value(0).toString() );
           inQuery.exec();
     }
+    
+    qdb.commit();
+    mdb.commit();
 }
 
 QStringList Database::getPseudoQueues( const QString& dbname )
@@ -806,6 +859,8 @@ QStringList Database::getPseudoQueues( const QString& dbname )
         db = QSqlDatabase::database( dbname );
     }
     
+    db.transaction();
+    
     QSqlQuery query( db );
     query.exec( "SELECT * FROM PSEUDOQ ORDER BY QUEUENAME ASC" );
     
@@ -813,6 +868,8 @@ QStringList Database::getPseudoQueues( const QString& dbname )
     {
         list.append( query.value( 0 ).toString() );
     }
+    
+    db.commit();
     
     return list;
 }
@@ -833,6 +890,7 @@ void Database::deleteSiebelItemFromDB( const QString& id, const QString& dbname 
         db = QSqlDatabase::database( dbname );
     }
     
+    db.transaction();
     QSqlQuery query( db );
     
     query.prepare( "DELETE FROM QMON_SIEBEL WHERE ID = :id" );
@@ -849,6 +907,7 @@ void Database::deleteSiebelItemFromDB( const QString& id, const QString& dbname 
     
     if ( !cquery.exec() ) qDebug() << cquery.lastError().text();
     
+    db.commit();
     Debug::logQuery( cquery, db.connectionName() );
 }
 
@@ -865,6 +924,7 @@ QStringList Database::getQmonSiebelList( const QString& dbname)
         db = QSqlDatabase::database( dbname );
     }
     
+    db.transaction();
     QSqlQuery query( db );
    
     QStringList l;
@@ -873,6 +933,7 @@ QStringList Database::getQmonSiebelList( const QString& dbname)
     
     if ( !query.exec() ) qDebug() << query.lastError().text();
     
+    db.commit();
     Debug::logQuery( query, db.connectionName() );
 
     while( query.next() )
@@ -896,6 +957,7 @@ QStringList Database::getSrnumsForQueue( const QString& queue, const QString& ge
         db = QSqlDatabase::database( dbname );
     }
     
+    db.transaction();
     QSqlQuery query( db );
    
     QStringList l;
@@ -913,6 +975,7 @@ QStringList Database::getSrnumsForQueue( const QString& queue, const QString& ge
         l.append( query.value( 0 ).toString() );
     }
     
+    db.commit();
     return l;    
 }
 
@@ -929,6 +992,7 @@ bool Database::siebelExistsInDB( const QString& id, const QString& dbname )
         db = QSqlDatabase::database( dbname );
     }
     
+    db.transaction();
     QSqlQuery query( db );
     
     query.prepare( "SELECT ID FROM QMON_SIEBEL WHERE ( ID = :id )" );
@@ -937,6 +1001,7 @@ bool Database::siebelExistsInDB( const QString& id, const QString& dbname )
     if ( !query.exec() ) qDebug() << query.lastError().text();
     
     Debug::logQuery( query, db.connectionName() );
+    db.commit();
     
     if ( query.next() )
     {
@@ -961,6 +1026,7 @@ bool Database::siebelQueueChanged( SiebelItem si, const QString& dbname )
         db = QSqlDatabase::database( dbname );
     }
     
+    db.transaction();
     QSqlQuery query( db );
     
     query.prepare( "SELECT QUEUE FROM QMON_SIEBEL WHERE ( ID = :id )" );
@@ -968,6 +1034,7 @@ bool Database::siebelQueueChanged( SiebelItem si, const QString& dbname )
     
     if ( !query.exec() ) qDebug() << query.lastError().text();
 
+    db.commit();
     Debug::logQuery( query, db.connectionName() );
     
     if ( query.next() )
@@ -1000,6 +1067,7 @@ bool Database::siebelSeverityChanged( SiebelItem si, const QString& dbname )
         db = QSqlDatabase::database( dbname );
     }
     
+    db.transaction();
     QSqlQuery query( db );
     
     query.prepare( "SELECT SEVERITY FROM QMON_SIEBEL WHERE ( ID = :id )" );
@@ -1007,6 +1075,7 @@ bool Database::siebelSeverityChanged( SiebelItem si, const QString& dbname )
     
     if ( !query.exec() ) qDebug() << query.lastError().text();
 
+    db.commit();
     Debug::logQuery( query, db.connectionName() );
     
     if ( query.next() )
@@ -1039,6 +1108,7 @@ bool Database::isChat( const QString& id, const QString& dbname )
         db = QSqlDatabase::database( dbname );
     }
     
+    db.transaction();
     QSqlQuery query( db );
     
     query.prepare( "SELECT ID FROM QMON_CHAT WHERE ( SR = :id )" );
@@ -1047,6 +1117,7 @@ bool Database::isChat( const QString& id, const QString& dbname )
     if ( !query.exec() ) qDebug() << query.lastError().text();
     
     Debug::logQuery( query, db.connectionName() );
+    db.commit();
     
     if ( query.next() )
     {
@@ -1071,12 +1142,15 @@ QString Database::getQmonBdesc( const QString& id, const QString& dbname )
         db = QSqlDatabase::database( dbname );
     }
     
+    db.transaction();
     QSqlQuery query( db );
     
     query.prepare( "SELECT BDESC FROM QMON_SIEBEL WHERE ( ID = :id )" );
     query.bindValue( ":id", id );
     
     if ( !query.exec() ) qDebug() << query.lastError().text();
+    
+    db.commit();
     
     Debug::logQuery( query, db.connectionName() );
     
@@ -1105,6 +1179,7 @@ void Database::updateBomgarItemInDB( BomgarItem bi, const QString& dbname )
         db = QSqlDatabase::database( dbname );
     }
     
+    db.transaction();
     QSqlQuery query( db );
     
     query.prepare( "INSERT INTO QMON_CHAT( ID, SR, NAME, DATE ) VALUES ( :id, :sr, :name, :date )" );
@@ -1115,7 +1190,7 @@ void Database::updateBomgarItemInDB( BomgarItem bi, const QString& dbname )
     query.bindValue( ":date", bi.date );
     
     if ( !query.exec() ) qDebug() << query.lastError().text();
-    
+    db.commit();
     Debug::logQuery( query, db.connectionName() );   
 }
 
@@ -1134,13 +1209,14 @@ void Database::deleteBomgarItemFromDB( const QString& id, const QString& dbname 
         db = QSqlDatabase::database( dbname );
     }
     
+    db.transaction();
     QSqlQuery query( db );
     
     query.prepare( "DELETE FROM QMON_CHAT WHERE ID = :id" );
     query.bindValue( ":id", id );
     
     if ( !query.exec() ) qDebug() << query.lastError().text();
-    
+    db.commit();
     Debug::logQuery( query, db.connectionName() );    
 }
 
@@ -1158,6 +1234,7 @@ QList< SiebelItem > Database::getSrsForQueue( const QString& queue, const QStrin
         db = QSqlDatabase::database( dbname );
     }
     
+    db.transaction();
     QSqlQuery query( db );
     
     QList< SiebelItem > list;
@@ -1258,6 +1335,7 @@ QList< SiebelItem > Database::getSrsForQueue( const QString& queue, const QStrin
         list.append( si );        
     }
         
+    db.commit();
     return list;
 }
 
@@ -1275,6 +1353,7 @@ QStringList Database::getCurrentBomgars( const QString& dbname )
         db = QSqlDatabase::database( dbname );
     }
     
+    db.transaction();
     QSqlQuery query( db );
 
     query.prepare( "SELECT SR, NAME FROM QMON_CHAT" );
@@ -1289,6 +1368,7 @@ QStringList Database::getCurrentBomgars( const QString& dbname )
         list.append( tmp );
     }
 
+    db.commit();
     return list;
 }
 
@@ -1305,6 +1385,7 @@ QStringList Database::getQmonBomgarList( const QString& dbname )
         db = QSqlDatabase::database( dbname );
     }
     
+    db.transaction();
     QSqlQuery query( db );
     QStringList l;
     
@@ -1319,6 +1400,7 @@ QStringList Database::getQmonBomgarList( const QString& dbname )
         l.append( query.value( 0 ).toString() );
     }
     
+    db.commit();
     return l;    
 }
 
@@ -1335,13 +1417,14 @@ bool Database::bomgarExistsInDB( const QString& id, const QString& dbname )
         db = QSqlDatabase::database( dbname );
     }
     
+    db.transaction();
     QSqlQuery query( db );
     
     query.prepare( "SELECT ID FROM QMON_CHAT WHERE ( ID = :id )" );
     query.bindValue( ":id", id );
     
     if ( !query.exec() ) qDebug() << query.lastError().text();
-    
+    db.commit();
     Debug::logQuery( query, db.connectionName() );
     
     if ( query.next() )
@@ -1369,6 +1452,7 @@ void Database::updateBomgarQueue( BomgarItem bi, const QString& dbname )
         db = QSqlDatabase::database( dbname );
     }
     
+    db.transaction();
     QSqlQuery query( db );
     
     query.prepare( "UPDATE QMON_CHAT SET NAME = :name WHERE ID = :id" );
@@ -1376,7 +1460,7 @@ void Database::updateBomgarQueue( BomgarItem bi, const QString& dbname )
     query.bindValue( ":id", bi.id );
     
     if ( !query.exec() ) qDebug() << query.lastError().text();
-    
+    db.commit();
     Debug::logQuery( query, db.connectionName() );   
 }
 
@@ -1393,13 +1477,14 @@ QString Database::getBomgarQueue( const QString& id, const QString& dbname )
         db = QSqlDatabase::database( dbname );
     }
     
+    db.transaction();
     QSqlQuery query( db );
     
     query.prepare( "SELECT NAME FROM QMON_CHAT WHERE ( SR = :id )" );
     query.bindValue( ":id", id );
     
     if ( !query.exec() ) qDebug() << query.lastError().text();
-    
+    db.commit();
     Debug::logQuery( query, db.connectionName() );
     
     if( query.next() ) 
@@ -1425,6 +1510,7 @@ QString Database::getBomgarQueueById( const QString& id, const QString& dbname )
         db = QSqlDatabase::database( dbname );
     }
     
+    db.transaction();
     QSqlQuery query( db );
     
     query.prepare( "SELECT NAME FROM QMON_CHAT WHERE ( ID = :id )" );
@@ -1436,10 +1522,12 @@ QString Database::getBomgarQueueById( const QString& id, const QString& dbname )
     
     if( query.next() ) 
     {
+        db.commit();
         return query.value( 0 ).toString();
     }
     else
     {
+        db.commit();
         return "NOCHAT";
     }
 }
@@ -1466,6 +1554,7 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
         db = QSqlDatabase::database( dbname );
     }
     
+    db.transaction();
     QSqlQuery query( db );
     
     QList< SiebelItem > list;
@@ -1763,6 +1852,7 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
         list.append( si );
     }
 
+    db.commit();
     return list;
 }
 
@@ -1779,6 +1869,7 @@ QStringList Database::srInfo( const QString& sr, const QString& dbname )
         db = QSqlDatabase::database( dbname );
     }
     
+    db.transaction();
     QSqlQuery query( db );
     
     query.prepare( "SELECT SR_TITLE, g.FST_NAME, g.LAST_NAME, ext.NAME "
@@ -1799,6 +1890,7 @@ QStringList Database::srInfo( const QString& sr, const QString& dbname )
         info.append( query.value( 3 ).toString() );
     }
 
+    db.commit();
     return info;
 }
 
@@ -1815,6 +1907,7 @@ QList< BomgarItem > Database::getChats( const QString& dbname )
         db = QSqlDatabase::database( dbname );
     }
     
+    db.transaction();
     QSqlQuery query( db );
     
     QList< BomgarItem > list;
@@ -1835,7 +1928,8 @@ QList< BomgarItem > Database::getChats( const QString& dbname )
      
         list.append( bi );
     }
-        
+     
+    db.commit();
     return list;
 }
 
@@ -1862,11 +1956,17 @@ QString Database::formatPhone( QString p, const QString& f )
     return p;
 }
 
-QString Database::getBugDesc( const QString& bug, const QString& dbname )
+QString Database::getBugDesc( QString bug, const QString& dbname )
 {
     QSqlDatabase db;
     QString desc;
-    
+    bug = bug.trimmed();   
+
+    if ( !isBugID( bug ) )
+    {
+        return QString::Null();
+    }
+ 
     if ( dbname.isNull() ) 
     {
         db = QSqlDatabase::database( "mysqlDB" );
@@ -1876,6 +1976,7 @@ QString Database::getBugDesc( const QString& bug, const QString& dbname )
         db = QSqlDatabase::database( dbname );
     }
     
+    db.transaction();
     QSqlQuery query( db );
     
     query.prepare( "SELECT TITLE FROM BUG WHERE ( ID = :bug )" );
@@ -1884,8 +1985,11 @@ QString Database::getBugDesc( const QString& bug, const QString& dbname )
                 
     if ( !query.exec() ) qDebug() << query.lastError().text();
         
+    db.commit();
+    
     if ( query.size() == 0 )
     {
+        Debug::print( "database", "Could not find bug " + bug + " in the db, fetching info..." );
         Network* net = new Network;
         QEventLoop loop;
         QString xml;

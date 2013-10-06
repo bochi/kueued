@@ -40,7 +40,7 @@ Server::Server( quint16 port, QObject* parent )
     Debug::print( "server", "Constructing " + QString::number( thread()->currentThreadId() ) );
     
     QThreadPool::globalInstance()->setExpiryTimeout( -1 );
-    
+    QThreadPool::globalInstance()->setMaxThreadCount( 16 ); 
     listen( QHostAddress::Any, port );   
 }
 
@@ -51,20 +51,20 @@ Server::~Server()
 
 void Server::incomingConnection( int socket )
 {
-    ServerThread* q = new ServerThread( socket, this );
+    ServerThread* q = new ServerThread( socket );
+    QThreadPool::globalInstance()->start( q );
+//    qDebug() << "Threads: " << QThreadPool::globalInstance()->activeThreadCount();
+//    connect( q, SIGNAL( finished() ), 
+  //           this, SLOT( deleteThread() ) );
     
-    connect( q, SIGNAL( finished() ), 
-             this, SLOT( deleteThread() ) );
-    
-    q->start();
+    //q->start();
 }
 
 void Server::deleteThread()
 {
     QThread* t = qobject_cast<QThread*>( sender() );
-    Debug::print( "server", "Deleting ServerThread " + QString::number( t->currentThreadId() ) );
     t->quit();
-    t->wait();
+    qDebug() << t->wait() ;
     
     delete t;
 }
