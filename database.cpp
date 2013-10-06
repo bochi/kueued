@@ -530,6 +530,8 @@ q+=(                "  and srx.row_id = sr.row_id"
             
         i.service_level = query.value( 10 ).toInt();
         i.brief_desc = query.value( 11 ).toString().replace( "]]>", "]]&gt;" ).toAscii().toHex();
+        QByteArray array = QString( "" ).toAscii();
+        qDebug() << array.toHex();
         
         if ( query.value( 12 ).toString() == "Y" )
         {
@@ -549,7 +551,7 @@ q+=(                "  and srx.row_id = sr.row_id"
             i.high_value = false;
         }
         
-        i.detailed_desc = query.value( 24 ).toString().replace( "]]>", "]]&gt;" ).replace( QByteArray::fromHex( "201b20" ), "" );
+        i.detailed_desc = query.value( 24 ).toString().replace( "]]>", "]]&gt;" ).toAscii().toHex();
         i.alt_contact = query.value( 25 ).toString();
         i.bugId = query.value( 26 ).toString();
         i.cstNum = query.value( 27 ).toString();
