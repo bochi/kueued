@@ -509,7 +509,7 @@ void ServerThread::run()
                 QTime timer;
                 timer.start();
               
-                Debug::log( "serverthread", "Starting DB update..." );
+                Debug::log( "serverthread - " + active + "/" + max, "Starting DB update..." );
               
                 if ( full )
                 {
