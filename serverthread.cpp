@@ -146,114 +146,6 @@ void ServerThread::run()
                 out.flush();
                 socket->close();
             }
-            if ( cmd.startsWith( "/ptf" ) )
-            {
-                QString q = cmd.remove( "/ptf" );
-                
-                out << text();
-                
-                if ( q.remove( "/" ).isEmpty() )
-                {  
-                    out << "No filename given";
-                }
-                else
-                {
-                    Network* net = new Network();
-                    
-                    QEventLoop loop;
-                    QNetworkReply* r;
-                    QString res;
-                    QString id;
-                    
-                    r = net->get( QUrl( Settings::l3Server() + "/api/1/rpm/?filename=" + q + "&username=" + Settings::l3User() + "&api_key=" + Settings::l3ApiKey() ) );
-                    r->ignoreSslErrors();
-                       
-                    QObject::connect( r, SIGNAL( finished() ), 
-                                      &loop, SLOT( quit() ) );
-    
-                    loop.exec();
-                        
-                    res = r->readAll();
-                    
-                    if ( res.contains( "build" ) )
-                    {
-                        QStringList values = res.split( "," );
-                        
-                        for ( int i = 0; i < values.size(); ++i )
-                        {
-                            if ( values.at( i ).contains( "build" ) )
-                            {
-                                id = values.at( i ).split( "build\": " ).at( 1 );
-                                id.remove( "/api/1/build/" );
-                                id.remove( "/" );
-                                id.remove( "\"" );
-                            }
-                        }
-                                            
-                        r = net->get( QUrl( Settings::l3Server() + "/api/1/publish/?build=" + id + "&username=" + Settings::l3User() + "&api_key=" + Settings::l3ApiKey() ) );
-                        r->ignoreSslErrors();
-                        
-                        QObject::connect( r, SIGNAL( finished() ), 
-                                        &loop, SLOT( quit() ) );
-
-                        loop.exec();
-  
-                        QString url = r->readAll();
-  
-                        if ( url.contains( "url\":" ) )
-                        {
-                            url = url.split( "url\": " ).at( 1 );
-                            url.remove( "}" );
-                            url.remove( "]" );
-                            url.remove( "\"" );
-                        
-                            if ( url.contains( "you.novell.com" ) )
-                            {
-                                QFile ptf( url.replace( "https://you.novell.com/update", "/srv/www/htdocs/ptf/old" ) );
-                                Debug::log( "serverthread", ptf.fileName() );
-                                
-                                if ( ptf.exists() )
-                                {
-                                    url.replace( "/srv/www/htdocs/ptf/old", "http://kueue.hwlab.suse.de/ptf/old" );
-                                    out << url + "/" + q;
-                                }
-                                else
-                                {
-                                    out << "Unable to find " + q;
-                                }
-                            }
-                            else
-                            {
-                                QFile ptf( url.replace( "https://ptf.suse.com", "/srv/www/htdocs/ptf" ) );
-                                Debug::log( "serverthread", ptf.fileName() );
-                                
-                                if ( ptf.exists() )
-                                {
-                                    url.replace( "/srv/www/htdocs/ptf", "http://kueue.hwlab.suse.de/ptf" );
-                                    out << url + "/" + q;
-                                }
-                                else
-                                {
-                                    out << "Unable to find " + q;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            out << "Unable to find " + q;
-                        }
-                    }
-                    else
-                    {
-                        out << "Unable to find " + q;
-                    }
-                        
-                    delete net;
-                }
-                
-                out.flush(); 
-                socket->close();
-            }
             if ( cmd.startsWith( "/qmon" ) )
             {
                 openMysqlDB();
@@ -295,120 +187,6 @@ void ServerThread::run()
                 
                 out.flush();
                 
-            }
-            else if ( cmd.startsWith( "/rpmversions" ) )
-            {  
-                QString q = cmd.remove( "/rpmversions" );
-
-                out << text();
-
-                if ( q.remove( "/" ).isEmpty() )
-                {  
-                    out << "Syntax:\n\n";
-                    out << "/rpmversions/PRODUCT|PACKAGE\n\n";
-                    out << "Valid products:\n\n";
-                    out << "  * SLES11-SP(1|2)-(i386|x86_64)\n";
-                }
-                else if ( !q.contains( "|" ) )
-                {  
-                    out << "Please specify packagename";
-                }
-                else
-                {  
-                    QProcess p;
-                    QStringList args;
-                    
-                    args.append( q.remove( "/" ).split( "|" ).at( 0 ) );
-                    args.append( q.remove( "/" ).split( "|" ).at( 1 ) );
-                    
-                    p.start( "/usr/bin/pversions", args );
-                    
-                    if (  !p.waitForFinished ( -1 ) )
-                    {
-                        return;
-                    }
-                
-                    QString o = p.readAllStandardOutput(); 
-                    QStringList l = o.split( "][" );
-                    
-                    for ( int i = 0; i < l.size(); ++i ) 
-                    {
-                        QString x = l.at( i );
-                        x.remove( "[" ).remove( "]" );
-                        out << x + "\n";
-                    }
-                }
-                
-                out.flush();
-            }
-            else if ( cmd.startsWith( "/validversion" ) )
-            {  
-                QString q = cmd.remove( "/validversion" );
-                QStringList split = q.remove( "/" ).split( "|" );
- 
-                out << text();
-
-                if ( ( q.remove( "/" ).isEmpty() ) || ( split.size() < 3 ) )
-                {  
-                    out << "Syntax:\n\n";
-                    out << "/validversion/PRODUCT|PACKAGE|VERSION\n\n";
-                    out << "Valid products:\n\n";
-                    out << "  * SLES11-SP(1|2)-(i386|x86_64)\n\n";
-                    out << "Result:\n\n";
-                    out << "  * 0 (invalid version)\n";
-                    out << "  * 1 (valid version)\n";
-                }
-                else
-                {  
-                    QProcess p;
-                    QStringList args;
-                 
-                    args.append( split.at( 0 ) );
-                    args.append( split.at( 1 ) );
-                    
-                    p.start( "/usr/bin/pversions", args );
-                    
-                    if (  !p.waitForFinished ( -1 ) )
-                    {
-                        return;
-                    }
-                
-                    QString r = "0";
-                    QString o = p.readAllStandardOutput(); 
-                    QStringList l;
-                    
-                    if ( o.contains( "][" ) )
-                    {
-                        l = o.split( "][" );
-                        
-                        for ( int i = 0; i < l.size(); ++i ) 
-                        {
-                            
-                            QString x = l.at( i );
-                            x.remove( "[" ).remove( "]" );
-                            
-                            if ( x.trimmed() == split.at( 2 ).trimmed() )
-                            {
-                                r = "1";
-                            }
-                        }
-                    }
-                    else
-                    {
-                        QString x = o.remove( "[" ).remove( "]" ).trimmed();
-
-                        if ( x == split.at( 2 ) )
-                        {
-                            r = "1";
-                        }
-                    }
-                    
-
-                    
-                    out << r;
-                }
-                
-                out.flush();
             }
             else if ( cmd.startsWith( "/srinfo" ) )
             {  
@@ -708,20 +486,19 @@ void ServerThread::run()
                 QString q = cmd.remove( "/userqueue" );
 
                 if ( q.startsWith( "/full/" ) )
-		{
-		    QString eng = q.remove( "/full/" ).remove( "/" ).toUpper();
-                    //Debug::print( "full", eng + "   " + q ); 
+		        {
+		            QString eng = q.remove( "/full/" ).remove( "/" ).toUpper();
+                   
                     out << xml();
 
                     out << XML::queue( Database::getUserQueue( eng, mSiebelDB, mMysqlDB, true ) );
                     out.flush();
-                    //Debug::print( "server", "Userqueue for " + eng + " took " + QString::number( uqTimer.elapsed() / 1000 ) + " sec");
                 }
                 else if ( q.remove( "/" ).isEmpty() )
-		{
-		    out << "Please specify engineer.";
-		}
-		else
+                {
+		            out << "Please specify engineer.";
+                }
+                else
                 {
                     QString eng = q.remove( "/" ).toUpper();
                     
@@ -729,7 +506,6 @@ void ServerThread::run()
 
                     out << XML::queue( Database::getUserQueue( eng, mSiebelDB, mMysqlDB ) );
                     out.flush();
-                    //Debug::print( "server", "Userqueue for " + eng + " took " + QString::number( uqTimer.elapsed() / 1000 ) + " sec");
                 }
                 
                 out.flush();
@@ -752,7 +528,6 @@ void ServerThread::run()
                     
                     if ( wf == "00000" )
                     {
-
                         out << "Invalid engineer";
                     }
                     else
@@ -977,8 +752,6 @@ void ServerThread::run()
             
             if ( socket->waitForBytesWritten() )
             {
-                //Debug::print( "serverthread", "Wrote to socket " + QString::number( mSocket ) );
-                
                 socket->disconnectFromHost();
                 
                 if ( socket->state() != QAbstractSocket::UnconnectedState )

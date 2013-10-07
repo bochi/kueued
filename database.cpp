@@ -95,7 +95,7 @@ Database::~Database()
 
 void Database::insertSiebelItemIntoDB( SiebelItem item, const QString& dbname )
 {
-    Debug::log( "database", "Inserting SiebelItem for " + item.id + " " + item.queue );
+    Debug::print( "database", "Inserting SiebelItem for " + item.id + " " + item.queue );
 
     QSqlDatabase db;
     
@@ -304,7 +304,7 @@ QString Database::getDetDesc( const QString& sr, const QString& dbname )
 
 void Database::updateSiebelQueue( SiebelItem si, const QString& dbname )
 {
-    Debug::log( "database", "Updating Siebel queue for " + si.id + " to " + si.queue );
+    Debug::print( "database", "Updating Siebel queue for " + si.id + " to " + si.queue );
     
     QSqlDatabase db;
     
@@ -877,7 +877,7 @@ QStringList Database::getPseudoQueues( const QString& dbname )
 
 void Database::deleteSiebelItemFromDB( const QString& id, const QString& dbname )
 {
-    Debug::log( "database", "Deleting SiebelItem " + id );
+    Debug::print( "database", "Deleting SiebelItem " + id );
     
     QSqlDatabase db;
     
@@ -1166,7 +1166,7 @@ QString Database::getQmonBdesc( const QString& id, const QString& dbname )
 
 void Database::updateBomgarItemInDB( BomgarItem bi, const QString& dbname )
 {
-    Debug::log( "database", "Inserting BomgarItem " + bi.id + " " + bi.sr );
+    Debug::print( "database", "Inserting BomgarItem " + bi.id + " " + bi.sr );
         
     QSqlDatabase db;
     
@@ -1196,7 +1196,7 @@ void Database::updateBomgarItemInDB( BomgarItem bi, const QString& dbname )
 
 void Database::deleteBomgarItemFromDB( const QString& id, const QString& dbname )
 {
-    Debug::log( "database", "Deleting BomgarItem " + id );
+    Debug::print( "database", "Deleting BomgarItem " + id );
     
     QSqlDatabase db;
     
@@ -1439,7 +1439,7 @@ bool Database::bomgarExistsInDB( const QString& id, const QString& dbname )
 
 void Database::updateBomgarQueue( BomgarItem bi, const QString& dbname )
 {
-    Debug::log( "database", "Updating BomgarQueue for " + bi.id + " " + bi.sr + " to " + bi.name );
+    Debug::print( "database", "Updating BomgarQueue for " + bi.id + " " + bi.sr + " to " + bi.name );
     
     QSqlDatabase db;
     
