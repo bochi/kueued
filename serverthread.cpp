@@ -74,9 +74,6 @@ void ServerThread::run()
     QString cmd;
     QString dm;
 
-    QString active = QString::number( QThreadPool::globalInstance()->activeThreadCount() );
-    QString max = QString::number( QThreadPool::globalInstance()->maxThreadCount());
-
     char hostname[ 1024 ];
     gethostname( hostname, sizeof( hostname ) );
     mHostname = hostname;
@@ -115,11 +112,11 @@ void ServerThread::run()
         
         if ( dm.isEmpty() )
         {
-            Debug::log( "serverthread - " + active + "/" + max, " - " + r.trimmed() );
+            Debug::log( "serverthread", " - " + r.trimmed() );
         }
         else
         {
-            Debug::log( "serverthread - " + active + "/" + max, dm + r.trimmed() );
+            Debug::log( "serverthread", dm + r.trimmed() );
         }
 
         QStringList tokens = r.split( QRegExp( "[ \r\n][ \r\n]*" ) );
@@ -509,7 +506,7 @@ void ServerThread::run()
                 QTime timer;
                 timer.start();
               
-                Debug::log( "serverthread - " + active + "/" + max, "Starting DB update..." );
+                Debug::log( "serverthread", "Starting DB update..." );
               
                 if ( full )
                 {
@@ -603,7 +600,7 @@ void ServerThread::run()
                 socket->close();
                 
                 Debug::print( "serverthread", "Unity update finished, took " + QString::number( timer.elapsed() / 1000 ) + " sec" );
-                Debug::log( "serverthread - " + active + "/" + max, "DB Update finished" );
+                Debug::log( "serverthread", "DB Update finished" );
             }
             else if ( cmd.startsWith( "/chat" ) )
             {

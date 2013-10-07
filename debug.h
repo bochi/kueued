@@ -63,7 +63,7 @@ namespace Debug
         
         QTextStream out(&file);
 
-        QString t = "[" + QDateTime::currentDateTime().toString( "MM/dd hh:mm:ss" ) + "] [" + QThreadPool::globalInstance()->activeThreadCount() + "] [" + c.toUpper() + "] ";
+        QString t = "[" + QDateTime::currentDateTime().toString( "MM/dd hh:mm:ss" ) + "] [" + QString::number( QThreadPool::globalInstance()->activeThreadCount() ) + "] [" + c.toUpper() + "] ";
         
         if ( msg.contains( "%7C" ) )
         {
