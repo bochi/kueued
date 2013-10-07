@@ -49,9 +49,17 @@ namespace Debug
     
     static void log( const QString& c, QString msg )
     {   
-        char hostname[ 1024 ];
-        gethostname( hostname, sizeof( hostname ) );
-        QString host = hostname;
+        int atc =  QThreadPool::globalInstance()->activeThreadCount();
+        QString threads;
+        
+        if ( atc < 10 )
+        {
+            threads = "0" + QString::number( atc );
+        }
+        else
+        {
+            threads = QString::number( atc );
+        }
         
         QFile file( "/var/log/kueued/kueued.log" );
         
@@ -63,7 +71,7 @@ namespace Debug
         
         QTextStream out(&file);
 
-        QString t = "[" + QDateTime::currentDateTime().toString( "MM/dd hh:mm:ss" ) + "] [" + QString::number( QThreadPool::globalInstance()->activeThreadCount() ) + "] [" + c.toUpper() + "] ";
+        QString t = "[" + QDateTime::currentDateTime().toString( "MM/dd hh:mm:ss" ) + "] [" + threads + "] [" + c.toUpper() + "] ";
         
         if ( msg.contains( "%7C" ) )
         {
