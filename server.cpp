@@ -40,7 +40,7 @@ Server::Server( quint16 port, QObject* parent )
     Debug::print( "server", "Constructing " + QString::number( thread()->currentThreadId() ) );
     
     QThreadPool::globalInstance()->setExpiryTimeout( -1 );
-    QThreadPool::globalInstance()->setMaxThreadCount( 16 ); 
+    QThreadPool::globalInstance()->setMaxThreadCount( 32 ); 
     
     listen( QHostAddress::Any, port );   
 }
