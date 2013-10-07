@@ -529,7 +529,7 @@ q+=(                "  and srx.row_id = sr.row_id"
         }
             
         i.service_level = query.value( 10 ).toInt();
-        i.brief_desc = query.value( 11 ).toString().replace( "]]>", "]]&gt;" );
+        i.brief_desc = Qt::escape( query.value( 11 ).toString().replace( "]]>", "]]&gt;" ) );
         
         if ( query.value( 12 ).toString() == "Y" )
         {

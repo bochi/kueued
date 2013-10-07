@@ -42,7 +42,7 @@ namespace Debug
             gethostname( hostname, sizeof( hostname ) );
             QString host = hostname;
 
-            QString t = "[" + QDateTime::currentDateTime().toString( "MM/dd hh:mm:ss" ) + "] [" + host.toUpper() + "] [" + c.toUpper() + "] ";
+            QString t = "[" + QDateTime::currentDateTime().toString( "MM/dd hh:mm:ss" ) + "] [" + QThreadPool::globalInstance()->activeThreadCount() + "] [" + host.toUpper() + "] [" + c.toUpper() + "] ";
             std::cout << t.toStdString() << msg.toStdString() << std::endl;
         }
     }
