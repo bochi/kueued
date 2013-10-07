@@ -284,7 +284,7 @@ void ServerThread::run()
                 QTime timer;
                 timer.start();
               
-                Debug::log( "serverthread", "Starting DB update..." );
+                Debug::print( "serverthread", "Starting DB update..." );
               
                 if ( full )
                 {
@@ -378,7 +378,7 @@ void ServerThread::run()
                 socket->close();
                 
                 Debug::print( "serverthread", "Unity update finished, took " + QString::number( timer.elapsed() / 1000 ) + " sec" );
-                Debug::log( "serverthread", "DB Update finished" );
+                Debug::print( "serverthread", "DB Update finished" );
             }
             else if ( cmd.startsWith( "/chat" ) )
             {
