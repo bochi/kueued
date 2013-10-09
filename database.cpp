@@ -727,17 +727,7 @@ QueueItem Database::getSrInfo( const QString& sr, const QString& dbname, const Q
             i.high_value = false;
         }
         
-        QString dd = query.value( 24 ).toString().replace( "]]>", "]]&gt;" );
-                        
-        QRegExp rx("\\x001b");
-        rx.setMinimal(true);
-        int s = -1;
-        while((s = rx.indexIn(dd, s+1))>=0){
-            dd.replace(s, rx.cap(0).length(), "");
-            s+= rx.cap(1).length();
-        }
-        
-        i.detailed_desc = dd;
+        i.detailed_desc = escapeString( query.value( 24 ).toString().replace( "]]>", "]]&gt;" ) );
         i.alt_contact = query.value( 25 ).toString();
         
 	    QString b = query.value(26).toString();
@@ -2039,6 +2029,21 @@ QString Database::getBugDesc( QString bug, const QString& dbname )
     {
         return "No description - something went wrong :-(";
     }
+}
+
+QString Database::escapeString(QString str)
+{
+    QRegExp rx("\\x001b");
+    rx.setMinimal(true);
+    int s = -1;
+    
+    while( ( s = rx.indexIn( str, s+1 ) ) >= 0 )
+    {
+        str.replace(s, rx.cap(0).length(), "");
+        s+= rx.cap( 1 ).length();
+    }
+    
+    return str;
 }
 
 #include "database.moc"

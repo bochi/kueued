@@ -80,6 +80,8 @@ class Database : public QObject
         static QString getBugDesc( QString, const QString& );
 
         static bool isBugID( const QString& );
+        
+        static QString escapeString( QString );
 };
 
 class SiebelItem 
