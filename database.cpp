@@ -2033,7 +2033,7 @@ QString Database::getBugDesc( QString bug, const QString& dbname )
 
 QString Database::escapeString(QString str)
 {
-    QRegExp rx("\\x001b");
+    QRegExp rx("(\\x001b|\\x0011)");
     rx.setMinimal(true);
     int s = -1;
     
