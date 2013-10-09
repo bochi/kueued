@@ -727,7 +727,17 @@ QueueItem Database::getSrInfo( const QString& sr, const QString& dbname, const Q
             i.high_value = false;
         }
         
-        i.detailed_desc = query.value( 24 ).toString().replace( "]]>", "]]&gt;" );;
+        QString dd = query.value( 24 ).toString().replace( "]]>", "]]&gt;" );
+                        
+        QRegExp rx("\\x001b");
+        rx.setMinimal(true);
+        int s = -1;
+        while((s = rx.indexIn(dd, s+1))>=0){
+            dd.replace(s, rx.cap(0).length(), "");
+            s+= rx.cap(1).length();
+        }
+        
+        i.detailed_desc = dd;
         i.alt_contact = query.value( 25 ).toString();
         
 	    QString b = query.value(26).toString();
