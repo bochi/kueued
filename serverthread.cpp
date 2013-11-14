@@ -211,7 +211,7 @@ void ServerThread::run()
                 else
                 {  
                     out << text();
-                    out << Database::getSrForCr( q );
+                    out << Database::getSrForCr( q, mReportDB );
                 }
                 
                 out.flush();
