@@ -212,17 +212,19 @@ QString Database::getSrForCr( const QString& cr, const QString& dbname )
     
     QSqlQuery query( db );
     
-    query.prepare( "SELECT dx.SR_NUM FROM SIEBEL.SBL_SR_REL re, SIEBEL.OLAP_SR_DX2 dx "
+    /*query.prepare( "SELECT dx.SR_NUM FROM SBL_SR_REL re, OLAP_SR_DX2 dx "
                    "WHERE re.REL_SR_ID = (SELECT ROW_ID FROM OLAP_SR_DX2 WHERE SR_NUM = :cr) "
-                   "AND re.SR_ID = dx.ROW_ID" );
+                   "AND re.SR_ID = dx.ROW_ID" );*/
+    
+    query.prepare( "SELECT TABLE_NAME FROM ALL_ALL_TABLES" )
         
-    query.bindValue( ":cr", cr );
+    //query.bindValue( ":cr", cr );
     
     if ( !query.exec() ) qDebug() << query.lastError().text();
     
     db.commit();
     
-    if ( query.next() )
+    while ( query.next() )
     {
         return query.value( 0 ).toString();
     }
