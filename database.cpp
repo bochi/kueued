@@ -798,7 +798,7 @@ QueueItem Database::getSrInfo( const QString& sr, const QString& dbname, const Q
         {
             i.isCr = true;
             i.creator = getCreator( i.id, dbname );
-            i.crsr = getSrForCr( i.id, mysqlname, )
+            //i.crsr = getSrForCr( i.id, mysqlname, )
         }
         else
         {
