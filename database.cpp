@@ -195,6 +195,41 @@ void Database::insertSiebelItemIntoDB( SiebelItem item, const QString& dbname )
     Debug::logQuery( cquery, db.connectionName() );
 }
 
+QString Database::getSrForCrMysql( const QString& cr, const QString& dbname )
+{
+    QSqlDatabase db;
+    QString sr;
+    
+    if ( dbname.isNull() ) 
+    {
+        db = QSqlDatabase::database( "mysqlDB" );
+    }
+    else
+    {
+        db = QSqlDatabase::database( dbname );
+    }
+    
+    db.transaction();
+    
+    QSqlQuery query( db );
+    
+    query.prepare( "SELECT SR FROM CRSR WHERE ( CR = :cr )" );
+    query.bindValue( ":cr", cr );
+    
+    if ( !query.exec() ) qDebug() << query.lastError().text();
+    
+    if ( query.next() )
+    {
+        return query.value( 0 ).toString();
+    }
+    else
+    {
+        qDebug() << "NOTHING IN MY";
+        return QString::Null();
+    }
+}
+
+
 QString Database::getSrForCrReport( const QString& cr, const QString& dbname, const QString& dbname1 )
 {
     QSqlDatabase db;
@@ -244,6 +279,8 @@ QString Database::getSrForCrReport( const QString& cr, const QString& dbname, co
         query1.bindValue( ":sr", sr );
         
         if ( !query1.exec() ) qDebug() << query1.lastError().text();
+        
+        return sr;
     }
     else
     {

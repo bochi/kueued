@@ -198,7 +198,7 @@ void ServerThread::run()
             else if ( cmd.startsWith( "/srforcr" ) )
             {  
                 openReportDB();
-                //openMysqlDB();
+                openMysqlDB();
                 
                 QRegExp srnr( "^[0-9]{11}$" );
                 QString q = cmd.remove( "/srforcr" );
@@ -210,8 +210,18 @@ void ServerThread::run()
                 }
                 else
                 {  
+                    QString sr;
+                    
+                    sr = Database::getSrForCrMysql( q, mMysqlDB );
+                    
+                    if ( sr == QString::Null() )
+                    {
+                        openReportDB();
+                        sr = Database::getSrForCrReport( q, mReportDB, mMysqlDB );
+                    }
+                    
                     out << text();
-                    out << Database::getSrForCr( q, mReportDB );
+                    out << sr;
                 }
                 
                 out.flush();
