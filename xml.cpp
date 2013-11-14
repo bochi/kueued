@@ -61,6 +61,7 @@ QString XML::qmon( QList<SiebelItem> list )
         {
             xml += "    <srtype>cr</srtype>\n";
             xml += "    <creator>" + si.creator + "</creator>\n";
+            xml += "    <crsr>" + si.crsr + "</crsr>\n";
             
         }
         else
@@ -197,6 +198,7 @@ QString XML::qmonDate( QList<SiebelItem> list )
         {
             xml += "    <srtype>cr</srtype>\n";
             xml += "    <creator>" + si.creator + "</creator>\n";
+            xml += "    <crsr>" + si.crsr + "</crsr>\n";
             
         }
         else

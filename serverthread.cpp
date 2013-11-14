@@ -144,7 +144,7 @@ void ServerThread::run()
             {
                 Database::openMysqlDB( mMysqlDB );
                 
-                QString x = XML::qmonDate( Database::getSrsForQueue( "NONE", mMysqlDB ) );
+                QString x = XML::qmonDate( Database::getSrsForQueue( "NONE", mMysqlDB, mReportDB ) );
 
                 out << xml();
                 
@@ -157,7 +157,7 @@ void ServerThread::run()
             {
                 Database::openMysqlDB( mMysqlDB );
                 
-                QString x = XML::qmon( Database::getSrsForQueue( "NONE", mMysqlDB ) );
+                QString x = XML::qmon( Database::getSrsForQueue( "NONE", mMysqlDB, mReportDB ) );
 
                 out << xml();
                 
@@ -231,7 +231,7 @@ void ServerThread::run()
                 else
                 {  
                     out << xml();
-                    out << XML::sr( Database::getSrInfo( q.remove( "/" ), mSiebelDB, mMysqlDB ) );
+                    out << XML::sr( Database::getSrInfo( q.remove( "/" ), mSiebelDB, mMysqlDB, mReportDB ) );
                 }
                 
                 out.flush();
@@ -531,7 +531,7 @@ void ServerThread::run()
                     
                     out << xml();
 
-                    out << XML::queue( Database::getUserQueue( eng, mSiebelDB, mMysqlDB ) );
+                    out << XML::queue( Database::getUserQueue( eng, mSiebelDB, mMysqlDB, mReportDB ) );
                     out.flush();
                 }
                 

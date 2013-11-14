@@ -195,7 +195,7 @@ void Database::insertSiebelItemIntoDB( SiebelItem item, const QString& dbname )
     Debug::logQuery( cquery, db.connectionName() );
 }
 
-QString Database::getSrForCr(const QString& cr, const QString& mysqlname, const QString& reportname )
+QString Database::getSrForCr( const QString& cr, const QString& mysqlname, const QString& reportname )
 {
     QString sr = getSrForCrMysql( cr, mysqlname );
     
@@ -698,7 +698,7 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
     return list;
 }
 
-QueueItem Database::getSrInfo( const QString& sr, const QString& dbname, const QString& mysqlname )
+QueueItem Database::getSrInfo( const QString& sr, const QString& dbname, const QString& mysqlname, const QString& reportname )
 {
     QSqlDatabase db;
     QSqlDatabase mysqldb;
@@ -797,7 +797,7 @@ QueueItem Database::getSrInfo( const QString& sr, const QString& dbname, const Q
         {
             i.isCr = true;
             i.creator = getCreator( i.id, dbname );
-            //i.crsr = getSrForCr( i.id, mysqlname, )
+            i.crsr = getSrForCr( i.id, mysqlname, reportname );
         }
         else
         {
@@ -1350,7 +1350,7 @@ void Database::deleteBomgarItemFromDB( const QString& id, const QString& dbname 
 }
 
 
-QList< SiebelItem > Database::getSrsForQueue( const QString& queue, const QString& dbname )
+QList< SiebelItem > Database::getSrsForQueue( const QString& queue, const QString& dbname, const QString& reportname )
 {
     QSqlDatabase db;
     
@@ -1433,6 +1433,7 @@ QList< SiebelItem > Database::getSrsForQueue( const QString& queue, const QStrin
         {
             si.isCr = true;
             si.creator = query.value( 24 ).toString();
+            si.crsr = getSrForCr( si.id, dbname, reportname );
         }
         else
         {
