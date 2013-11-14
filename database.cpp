@@ -243,7 +243,7 @@ QString Database::getSrForCrMysql( const QString& cr, const QString& dbname )
 }
 
 
-QString Database::getSrForCrReport( const QString& cr, const QString& dbname, const QString& dbname1 )
+QString Database::getSrForCrReport( const QString& cr, const QString& dbname1, const QString& dbname )
 {
     QSqlDatabase db;
     QSqlDatabase db1;
