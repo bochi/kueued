@@ -885,7 +885,7 @@ bool ServerThread::openReportDB()
     if ( !QSqlDatabase::database( mReportDB ).isOpen() )
     {
         QSqlDatabase reportDB = QSqlDatabase::addDatabase( "QOCI", mReportDB );
-        
+        Debug::print( "database", Settings::reportDatabase() + " " + Settings::reportHost() + " " + Settings::reportUser() + " " + Settings::reportPassword() );
         reportDB.setDatabaseName( Settings::reportDatabase() );
         reportDB.setHostName( Settings::reportHost() );
         reportDB.setPort( 1521 );
