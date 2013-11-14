@@ -54,6 +54,7 @@ class Database : public QObject
         static QString getQmonBdesc( const QString&, const QString& = QString::Null() );
         static QString getDetDesc( const QString&, const QString& = QString::Null() );
         static QString getCreator( const QString&, const QString& = QString::Null() );
+        static QString getSrForCr( const QString&, const QString& = QString::Null(), const QString& = QString::Null() );
         static QString getSrForCrMysql( const QString&, const QString& = QString::Null() );
         static QString getSrForCrReport( const QString&, const QString& = QString::Null(), const QString& = QString::Null() );
         

@@ -29,6 +29,7 @@
 #include "serverthread.h"
 #include "database.h"
 #include "network.h"
+#include "../kueue/data/data.h"
 
 #include <iostream>
 #include <QtSql>
@@ -209,18 +210,8 @@ void ServerThread::run()
                 }
                 else
                 {  
-                    QString sr;
-                    
-                    sr = Database::getSrForCrMysql( q, mMysqlDB );
-                    
-                    if ( sr == QString::Null() )
-                    {
-                        openReportDB();
-                        sr = Database::getSrForCrReport( q, mReportDB, mMysqlDB );
-                    }
-                    
                     out << text();
-                    out << sr;
+                    out << Database::getSrForCr( q );
                 }
                 
                 out.flush();
