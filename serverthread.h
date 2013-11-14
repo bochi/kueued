@@ -58,11 +58,6 @@ class ServerThread : public QRunnable
         
         QString text();
         QString xml();
-        
-        bool openMysqlDB();
-        bool openSiebelDB();
-        bool openQmonDB();
-        bool openReportDB();
 };
 
 

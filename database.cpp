@@ -2176,4 +2176,121 @@ QString Database::escapeString(QString str)
     return str;
 }
 
+bool Database::openMysqlDB( const QString& name )
+{
+    if ( !QSqlDatabase::database( name ).isOpen() )
+    {
+        QSqlDatabase mysqlDB = QSqlDatabase::addDatabase( "QMYSQL", name );
+        
+        mysqlDB.setHostName( Settings::mysqlHost() );
+        mysqlDB.setDatabaseName( Settings::mysqlDatabase() );
+        mysqlDB.setUserName( Settings::mysqlUser() );
+        mysqlDB.setPassword( Settings::mysqlPassword() );
+        
+        if ( !mysqlDB.open() )
+        {
+            Debug::print( "database", "Failed to open the database " + mysqlDB.lastError().text() );
+            return false;
+        }
+        else
+        {
+            Debug::print( "database", "Opened DB " + mysqlDB.connectionName() );
+            return true;
+        }
+    }
+    else
+    {
+        Debug::print( "database", "DB already open in this thread " + name );
+        return true;
+    }
+}
+
+bool Database::openQmonDB( const QString& name )
+{
+    if ( !QSqlDatabase::database( name ).isOpen() )
+    {
+        QSqlDatabase qmonDB = QSqlDatabase::addDatabase( "QODBC", name );
+        
+        qmonDB.setDatabaseName( Settings::qmonDbDatabase() );
+        qmonDB.setUserName( Settings::qmonDbUser() );
+        qmonDB.setPassword( Settings::qmonDbPassword() );
+        
+        if ( !qmonDB.open() )
+        {
+            Debug::print( "database", "Failed to open the Qmon DB " + qmonDB.lastError().text() );
+            return false;
+        }
+        else
+        {
+            Debug::print( "database", "Opened DB " + qmonDB.connectionName() );
+            return true;
+        }
+    }
+    else
+    {
+        Debug::print( "database", "DB already open in this thread " + name );
+        return true;
+    }
+}
+
+bool Database::openSiebelDB( const QString& name )
+{
+    if ( !QSqlDatabase::database( name ).isOpen() )
+    {
+        QSqlDatabase siebelDB = QSqlDatabase::addDatabase( "QOCI", name );
+        
+        siebelDB.setDatabaseName( Settings::siebelDatabase() );
+        siebelDB.setHostName( Settings::siebelHost() );
+        siebelDB.setPort( 1521 );
+        siebelDB.setUserName( Settings::siebelUser() );
+        siebelDB.setPassword( Settings::siebelPassword() );
+        
+        if ( !siebelDB.open() )
+        {
+            Debug::print( "database", "Failed to open the Siebel DB " + siebelDB.lastError().text() );
+            return false;
+        }
+        else
+        {
+            Debug::print( "database", "Opened DB " + siebelDB.connectionName() );
+            return true;
+        }
+    }
+    else
+    {
+        Debug::print( "database", "DB already open in this thread " + name );
+        return true;
+    }
+}
+
+bool Database::openReportDB( const QString& name )
+{
+    if ( !QSqlDatabase::database( name ).isOpen() )
+    {
+        QSqlDatabase reportDB = QSqlDatabase::addDatabase( "QOCI", name );
+        Debug::print( "database", Settings::reportDatabase() + " " + Settings::reportHost() + " " + Settings::reportUser() + " " + Settings::reportPassword() );
+        reportDB.setDatabaseName( Settings::reportDatabase() );
+        reportDB.setHostName( Settings::reportHost() );
+        reportDB.setPort( 1521 );
+        reportDB.setUserName( Settings::reportUser() );
+        reportDB.setPassword( Settings::reportPassword() );
+        
+        if ( !reportDB.open() )
+        {
+            Debug::print( "database", "Failed to open the report DB " + reportDB.lastError().text() );
+            return false;
+        }
+        else
+        {
+            Debug::print( "database", "Opened DB " + reportDB.connectionName() );
+            return true;
+        }
+    }
+    else
+    {
+        Debug::print( "database", "DB already open in this thread " + name );
+        return true;
+    }
+}
+
 #include "database.moc"

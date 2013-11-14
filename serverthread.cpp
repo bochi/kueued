@@ -142,7 +142,7 @@ void ServerThread::run()
             
             if ( cmd.startsWith( "/qmon_date" ) )
             {
-                openMysqlDB();
+                Database::openMysqlDB( mMysqlDB );
                 
                 QString x = XML::qmonDate( Database::getSrsForQueue( "NONE", mMysqlDB ) );
 
@@ -155,7 +155,7 @@ void ServerThread::run()
             }
             if ( cmd.startsWith( "/qmon" ) )
             {
-                openMysqlDB();
+                Database::openMysqlDB( mMysqlDB );
                 
                 QString x = XML::qmon( Database::getSrsForQueue( "NONE", mMysqlDB ) );
 
@@ -168,7 +168,7 @@ void ServerThread::run()
             }
             else if ( cmd.startsWith( "/srnrs" ) )
             {  
-                openMysqlDB();
+                Database::openMysqlDB( mMysqlDB );
                                 
                 QString q = cmd.remove( "/srnrs" );
 
@@ -197,7 +197,7 @@ void ServerThread::run()
             }
             else if ( cmd.startsWith( "/srforcr" ) )
             {  
-                openMysqlDB();
+                Database::openMysqlDB( mMysqlDB );
                 
                 QRegExp srnr( "^[0-9]{11}$" );
                 QString q = cmd.remove( "/srforcr" );
@@ -217,8 +217,8 @@ void ServerThread::run()
             }
             else if ( cmd.startsWith( "/srinfo" ) )
             {  
-                openSiebelDB();
-                openMysqlDB();
+                Database::openSiebelDB( mSiebelDB );
+                Database::openMysqlDB( mMysqlDB );
                 
                 QRegExp srnr( "^[0-9]{11}$" );
                 QString q = cmd.remove( "/srinfo" );
@@ -238,7 +238,7 @@ void ServerThread::run()
             }
             else if ( cmd.startsWith( "/srstatus" ) )
             {  
-                openSiebelDB();
+                Database::openSiebelDB( mSiebelDB );
                 
                 QRegExp srnr( "^[0-9]{11}$" );
                 QString q = cmd.remove( "/srstatus" );
@@ -275,7 +275,7 @@ void ServerThread::run()
                 }
                 else
                 {  
-                    openSiebelDB();
+                    Database::openSiebelDB( mSiebelDB );
                 
                     out << text();
                                 
@@ -303,9 +303,9 @@ void ServerThread::run()
                     full = false;
                 }
                 
-                openMysqlDB();
-                openSiebelDB();
-                openQmonDB();
+                Database::openMysqlDB( mMysqlDB );
+                Database::openSiebelDB( mSiebelDB );
+                Database::openQmonDB( mQmonDB );
                 
                 int btime;
                 QTime timer;
@@ -409,7 +409,7 @@ void ServerThread::run()
             }
             else if ( cmd.startsWith( "/chat" ) )
             {
-                openMysqlDB();
+                Database::openMysqlDB( mMysqlDB );
                 
                 QStringList l = Database::getCurrentBomgars();
               
@@ -432,7 +432,7 @@ void ServerThread::run()
             }
             else if ( cmd.startsWith( "/pseudoQ" ) )
             {
-                openMysqlDB();
+                Database::openMysqlDB( mMysqlDB );
                 
                 QStringList pl = Database::getPseudoQueues( mMysqlDB );
                 
@@ -504,8 +504,8 @@ void ServerThread::run()
             }
             else if ( cmd.startsWith( "/userqueue" ) )
             {    
-                openSiebelDB();
-                openMysqlDB();
+                Database::openSiebelDB( mSiebelDB );
+                Database::openMysqlDB( mMysqlDB );
                 
                 QTime uqTimer;
                 uqTimer.start();
@@ -559,7 +559,7 @@ void ServerThread::run()
                     }
                     else
                     {
-                        openSiebelDB();
+                        Database::openSiebelDB( mSiebelDB );
                         
                         Statistics statz;
                         
@@ -792,122 +792,7 @@ void ServerThread::run()
     }    
 }
 
-bool ServerThread::openMysqlDB()
-{
-    if ( !QSqlDatabase::database( mMysqlDB ).isOpen() )
-    {
-        QSqlDatabase mysqlDB = QSqlDatabase::addDatabase( "QMYSQL", mMysqlDB );
-       
-        mysqlDB.setHostName( Settings::mysqlHost() );
-        mysqlDB.setDatabaseName( Settings::mysqlDatabase() );
-        mysqlDB.setUserName( Settings::mysqlUser() );
-        mysqlDB.setPassword( Settings::mysqlPassword() );
-        
-        if ( !mysqlDB.open() )
-        {
-            Debug::print( "database", "Failed to open the database " + mysqlDB.lastError().text() );
-            return false;
-        }
-        else
-        {
-            Debug::print( "database", "Opened DB " + mysqlDB.connectionName() );
-            return true;
-        }
-    }
-    else
-    {
-        Debug::print( "database", "DB already open in this thread " + mMysqlDB );
-        return true;
-    }
-}
 
-bool ServerThread::openQmonDB()
-{
-    if ( !QSqlDatabase::database( mQmonDB ).isOpen() )
-    {
-        QSqlDatabase qmonDB = QSqlDatabase::addDatabase( "QODBC", mQmonDB );
-        
-        qmonDB.setDatabaseName( Settings::qmonDbDatabase() );
-        qmonDB.setUserName( Settings::qmonDbUser() );
-        qmonDB.setPassword( Settings::qmonDbPassword() );
-        
-        if ( !qmonDB.open() )
-        {
-            Debug::print( "database", "Failed to open the Qmon DB " + qmonDB.lastError().text() );
-            return false;
-        }
-        else
-        {
-            Debug::print( "database", "Opened DB " + qmonDB.connectionName() );
-            return true;
-        }
-    }
-    else
-    {
-        Debug::print( "database", "DB already open in this thread " + mQmonDB );
-        return true;
-    }
-}
-
-bool ServerThread::openSiebelDB()
-{
-    if ( !QSqlDatabase::database( mSiebelDB ).isOpen() )
-    {
-        QSqlDatabase siebelDB = QSqlDatabase::addDatabase( "QOCI", mSiebelDB );
-
-        siebelDB.setDatabaseName( Settings::siebelDatabase() );
-        siebelDB.setHostName( Settings::siebelHost() );
-        siebelDB.setPort( 1521 );
-        siebelDB.setUserName( Settings::siebelUser() );
-        siebelDB.setPassword( Settings::siebelPassword() );
-
-        if ( !siebelDB.open() )
-        {
-            Debug::print( "database", "Failed to open the Siebel DB " + siebelDB.lastError().text() );
-            return false;
-        }
-        else
-        {
-            Debug::print( "database", "Opened DB " + siebelDB.connectionName() );
-            return true;
-        }
-    }
-    else
-    {
-        Debug::print( "database", "DB already open in this thread " + mSiebelDB );
-        return true;
-    }
-}
-
-bool ServerThread::openReportDB()
-{
-    if ( !QSqlDatabase::database( mReportDB ).isOpen() )
-    {
-        QSqlDatabase reportDB = QSqlDatabase::addDatabase( "QOCI", mReportDB );
-        Debug::print( "database", Settings::reportDatabase() + " " + Settings::reportHost() + " " + Settings::reportUser() + " " + Settings::reportPassword() );
-        reportDB.setDatabaseName( Settings::reportDatabase() );
-        reportDB.setHostName( Settings::reportHost() );
-        reportDB.setPort( 1521 );
-        reportDB.setUserName( Settings::reportUser() );
-        reportDB.setPassword( Settings::reportPassword() );
-        
-        if ( !reportDB.open() )
-        {
-            Debug::print( "database", "Failed to open the report DB " + reportDB.lastError().text() );
-            return false;
-        }
-        else
-        {
-            Debug::print( "database", "Opened DB " + reportDB.connectionName() );
-            return true;
-        }
-    }
-    else
-    {
-        Debug::print( "database", "DB already open in this thread " + mReportDB );
-        return true;
-    }
-}
 
 QString ServerThread::text()
 {

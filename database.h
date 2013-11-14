@@ -85,6 +85,11 @@ class Database : public QObject
         static bool isBugID( const QString& );
         
         static QString escapeString( QString );
+        
+        static bool openMysqlDB( const QString& );
+        static bool openSiebelDB( const QString& );
+        static bool openQmonDB( const QString& );
+        static bool openReportDB( const QString& );
 };
 
 class SiebelItem 
