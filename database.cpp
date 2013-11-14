@@ -195,9 +195,11 @@ void Database::insertSiebelItemIntoDB( SiebelItem item, const QString& dbname )
     Debug::logQuery( cquery, db.connectionName() );
 }
 
-QString Database::getSrForCr( const QString& cr, const QString& dbname )
+QString Database::getSrForCrReport( const QString& cr, const QString& dbname, const QString& dbname1 )
 {
     QSqlDatabase db;
+    QSqlDatabase db1;
+    QString sr;
     
     if ( dbname.isNull() ) 
     {
@@ -206,6 +208,15 @@ QString Database::getSrForCr( const QString& cr, const QString& dbname )
     else
     {
         db = QSqlDatabase::database( dbname );
+    }
+    
+    if ( dbname1.isNull() ) 
+    {
+        db1 = QSqlDatabase::database( "mysqlDB" );
+    }
+    else
+    {
+        db1 = QSqlDatabase::database( dbname1 );
     }
     
     db.transaction();
@@ -224,12 +235,22 @@ QString Database::getSrForCr( const QString& cr, const QString& dbname )
     
     if ( query.next() )
     {
-        return query.value( 0 ).toString();
+        sr = query.value( 0 ).toString();
+        
+        QSqlQuery query1( db1 );
+        
+        query1.prepare( "INSERT INTO CRSR( CR, SR ) VALUES ( :cr, :sr )" );
+        query1.bindValue( ":cr", cr );
+        query1.bindValue( ":sr", sr );
+        
+        if ( !query1.exec() ) qDebug() << query1.lastError().text();
     }
     else
     {
-        return "ERROR";
+        sr = "ERROR";
     }
+    
+    return sr;
 }
 
 
