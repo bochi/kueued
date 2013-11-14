@@ -54,6 +54,7 @@ class Database : public QObject
         static QString getQmonBdesc( const QString&, const QString& = QString::Null() );
         static QString getDetDesc( const QString&, const QString& = QString::Null() );
         static QString getCreator( const QString&, const QString& = QString::Null() );
+        static QString getSrForCr( const QString&, const QString& = QString::Null() );
         
         static void updateBomgarItemInDB( BomgarItem, const QString& = QString::Null() );
         static void deleteBomgarItemFromDB( const QString&, const QString& = QString::Null() );

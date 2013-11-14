@@ -70,6 +70,7 @@ void ServerThread::run()
     mMysqlDB = "mysqlDB-" + mThreadID;
     mSiebelDB = "siebelDB-" + mThreadID;
     mQmonDB = "qmonDB-" + mThreadID;
+    mReportDB = "reportDB-" + mThreadID;
 
     QString cmd;
     QString dm;
@@ -187,6 +188,27 @@ void ServerThread::run()
                 
                 out.flush();
                 
+            }
+            else if ( cmd.startsWith( "/srforcr" ) )
+            {  
+                openReportDB();
+                //openMysqlDB();
+                
+                QRegExp srnr( "^[0-9]{11}$" );
+                QString q = cmd.remove( "/srforcr" );
+                
+                if ( ( q.remove( "/" ).isEmpty() ) || ( !srnr.exactMatch( q.remove( "/" ) ) ) )
+                {  
+                    out << text();
+                    out << "No SR number";
+                }
+                else
+                {  
+                    out << text();
+                    out << Database::getSrForCr( q );
+                }
+                
+                out.flush();
             }
             else if ( cmd.startsWith( "/srinfo" ) )
             {  
@@ -848,6 +870,36 @@ bool ServerThread::openSiebelDB()
     else
     {
         Debug::print( "database", "DB already open in this thread " + mSiebelDB );
+        return true;
+    }
+}
+
+bool ServerThread::openReportDB()
+{
+    if ( !QSqlDatabase::database( mReportDB ).isOpen() )
+    {
+        QSqlDatabase reportDB = QSqlDatabase::addDatabase( "QOCI", mReportDB );
+        
+        reportDB.setDatabaseName( Settings::reportDatabase() );
+        reportDB.setHostName( Settings::reportHost() );
+        reportDB.setPort( 1521 );
+        reportDB.setUserName( Settings::reportUser() );
+        reportDB.setPassword( Settings::reportPassword() );
+        
+        if ( !reportDB.open() )
+        {
+            Debug::print( "database", "Failed to open the report DB " + reportDB.lastError().text() );
+            return false;
+        }
+        else
+        {
+            Debug::print( "database", "Opened DB " + reportDB.connectionName() );
+            return true;
+        }
+    }
+    else
+    {
+        Debug::print( "database", "DB already open in this thread " + mReportDB );
         return true;
     }
 }

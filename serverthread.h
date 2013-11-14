@@ -47,6 +47,7 @@ class ServerThread : public QRunnable
         int mSocket;
         QString mMysqlDB;
         QString mSiebelDB;
+        QString mReportDB;
         QString mThreadID;
         QString mQmonDB;
         QString mEngineer;
@@ -61,6 +62,7 @@ class ServerThread : public QRunnable
         bool openMysqlDB();
         bool openSiebelDB();
         bool openQmonDB();
+        bool openReportDB();
 };
 
 

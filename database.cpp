@@ -195,6 +195,44 @@ void Database::insertSiebelItemIntoDB( SiebelItem item, const QString& dbname )
     Debug::logQuery( cquery, db.connectionName() );
 }
 
+QString Database::getSrForCr( const QString& cr, const QString& dbname )
+{
+    QSqlDatabase db;
+    
+    if ( dbname.isNull() ) 
+    {
+        db = QSqlDatabase::database( "reportDB" );
+    }
+    else
+    {
+        db = QSqlDatabase::database( dbname );
+    }
+    
+    db.transaction();
+    
+    QSqlQuery query( db );
+    
+    query.prepare( "SELECT dx.SR_NUM FROM SBL_SR_REL re, OLAP_SR_DX2 dx "
+                   "WHERE re.REL_SR_ID = (SELECT ROW_ID FROM OLAP_SR_DX2 WHERE SR_NUM = :cr) "
+                   "AND re.SR_ID = dx.ROW_ID" );
+        
+    query.bindValue( ":cr", cr );
+    
+    if ( !query.exec() ) qDebug() << query.lastError().text();
+    
+    db.commit();
+    
+    if ( query.next() )
+    {
+        return query.value( 0 ).toString();
+    }
+    else
+    {
+        return "ERROR";
+    }
+}
+
+
 void Database::updateSiebelItem( SiebelItem item, const QString& dbname, const QString& dbname1 )
 {
     QSqlDatabase db;
