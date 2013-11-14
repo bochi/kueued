@@ -73,7 +73,7 @@ Database::Database()
 
     reportDB.setDatabaseName( Settings::reportDatabase() );
     reportDB.setHostName( Settings::reportHost() );
-    reportDB.setPort( Settings::reportPort() );
+    reportDB.setPort( 1521 );
     reportDB.setUserName( Settings::reportUser() );
     reportDB.setPassword( Settings::reportPassword() );
 

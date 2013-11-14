@@ -61,6 +61,12 @@ ServerThread::~ServerThread()
         QSqlDatabase::database( mSiebelDB ).close();
         QSqlDatabase::removeDatabase( mSiebelDB );
     }
+    
+    if ( QSqlDatabase::database( mReportDB ).isOpen() )
+    {
+        QSqlDatabase::database( mReportDB ).close();
+        QSqlDatabase::removeDatabase( mReportDB );
+    }
 }
 
 void ServerThread::run()
