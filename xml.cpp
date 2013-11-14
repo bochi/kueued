@@ -322,6 +322,7 @@ QString XML::sr( QueueItem qi )
     {
         xml += "    <srtype>cr</srtype>\n";
         xml += "    <creator>" + qi.creator + "</creator>\n";
+        xml += "    <crsr> " + qi.crsr + "</crsr>\n";
     }
     else
     {

@@ -238,7 +238,6 @@ QString Database::getSrForCrMysql( const QString& cr, const QString& dbname )
     }
     else
     {
-        qDebug() << "NOTHING IN MY";
         return QString::Null();
     }
 }
@@ -620,6 +619,7 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
         {
             i.isCr = true;
             i.creator = getCreator( i.id, dbname );
+            i.crsr = getSrForCr( i.id, mysqlname, dbname );
         }
         else
         {

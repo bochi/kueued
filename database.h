@@ -164,6 +164,7 @@ class QueueItem
         QString cstNum;
         QString owner;
         QString subOwner;
+        QString crsr;
         bool isCr;
         bool critsit;
         bool high_value;
