@@ -518,7 +518,7 @@ void ServerThread::run()
                    
                     out << xml();
 
-                    out << XML::queue( Database::getUserQueue( eng, mSiebelDB, mMysqlDB, true ) );
+                    out << XML::queue( Database::getUserQueue( eng, mSiebelDB, mMysqlDB, mReportDB, true ) );
                     out.flush();
                 }
                 else if ( q.remove( "/" ).isEmpty() )

@@ -322,12 +322,12 @@ QString XML::sr( QueueItem qi )
     {
         xml += "    <srtype>cr</srtype>\n";
         xml += "    <creator>" + qi.creator + "</creator>\n";
-        xml += "    <crsr> " + qi.crsr + "</crsr>\n";
+        xml += "    <crsr>" + qi.crsr + "</crsr>\n";
     }
     else
     {
         xml += "    <srtype>sr</srtype>\n";
-       xml += "     <cus_account><![CDATA[" + qi.customer + "]]></cus_account>\n";
+        xml += "    <cus_account><![CDATA[" + qi.customer + "]]></cus_account>\n";
         xml += "    <cus_num><![CDATA[" + qi.cstNum + "]]></cus_num>\n";
         
         if ( ( !qi.contact_firstname.isEmpty() ) && ( qi.contact_firstname != "1" ) && ( qi.contact_firstname != "0" ) )

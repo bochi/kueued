@@ -73,7 +73,7 @@ class Database : public QObject
         static QString convertTime( const QString& );
         static QString formatPhone( QString, const QString& );
         
-        static QList< QueueItem > getUserQueue( const QString&, const QString& = QString::Null(), const QString& = QString::Null(), bool = false );
+        static QList< QueueItem > getUserQueue( const QString&, const QString& = QString::Null(), const QString& = QString::Null(), const QString& = QString::Null(), bool = false );
         static QueueItem getSrInfo( const QString&, const QString& = QString::Null(), const QString& = QString::Null() );
         static QString getSrStatus( const QString&, const QString& = QString::Null() );
         static QList< SiebelItem > getQmonSrs( const QString& = QString::Null() );
@@ -127,6 +127,7 @@ class SiebelItem
         QString alt_contact;
         QString bugId;
         QString cstNum;
+        QString crsr;
         bool isCr;
         bool isChat;
         bool critsit;

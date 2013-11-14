@@ -499,7 +499,7 @@ QString Database::getCreator(const QString& sr, const QString& dbname )
     }
 }
 
-QList< QueueItem > Database::getUserQueue( const QString& engineer, const QString& dbname, const QString& mysqlname, bool subowner )
+QList< QueueItem > Database::getUserQueue( const QString& engineer, const QString& dbname, const QString& mysqlname, const QString& reportname, bool subowner )
 {
     QSqlDatabase db;
     QSqlDatabase mysqldb;
@@ -619,7 +619,7 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
         {
             i.isCr = true;
             i.creator = getCreator( i.id, dbname );
-            i.crsr = getSrForCr( i.id, mysqlname, dbname );
+            i.crsr = getSrForCr( i.id, mysqlname, reportname );
         }
         else
         {
@@ -798,6 +798,7 @@ QueueItem Database::getSrInfo( const QString& sr, const QString& dbname, const Q
         {
             i.isCr = true;
             i.creator = getCreator( i.id, dbname );
+            i.crsr = getSrForCr( i.id, mysqlname, )
         }
         else
         {
