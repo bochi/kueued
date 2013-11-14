@@ -29,7 +29,6 @@
 #include "serverthread.h"
 #include "database.h"
 #include "network.h"
-#include "../kueue/data/data.h"
 
 #include <iostream>
 #include <QtSql>
