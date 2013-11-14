@@ -195,15 +195,15 @@ void Database::insertSiebelItemIntoDB( SiebelItem item, const QString& dbname )
     Debug::logQuery( cquery, db.connectionName() );
 }
 
-QString Database::getSrForCr(const QString& cr, const QString& dbname, const QString& dbname1 )
+QString Database::getSrForCr(const QString& cr, const QString& mysqlname, const QString& reportname )
 {
-    QString sr = getSrForCrMysql( cr, dbname );
+    QString sr = getSrForCrMysql( cr, mysqlname );
     
     if ( sr == QString::Null() )
     {
-        QSqlDatabase db = QSqlDatabase::database( "dbname1" );
+        QSqlDatabase db = QSqlDatabase::database( reportname );
         db.open();
-        sr = getSrForCrReport( cr, dbname, dbname1 );
+        sr = getSrForCrReport( cr, mysqlname, reportname );
     }
         
     return sr;
