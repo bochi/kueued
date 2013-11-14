@@ -197,7 +197,6 @@ void ServerThread::run()
             }
             else if ( cmd.startsWith( "/srforcr" ) )
             {  
-                openReportDB();
                 openMysqlDB();
                 
                 QRegExp srnr( "^[0-9]{11}$" );
