@@ -68,6 +68,19 @@ Database::Database()
     {
         Debug::print( "database", "Failed to open the Siebel DB " + siebelDB.lastError().text() );
     }
+    
+    QSqlDatabase reportDB = QSqlDatabase::addDatabase( "QOCI", "reportDB" );
+
+    reportDB.setDatabaseName( Settings::reportDatabase() );
+    reportDB.setHostName( Settings::reportHost() );
+    reportDB.setPort( Settings::reportPort() );
+    reportDB.setUserName( Settings::reportUser() );
+    reportDB.setPassword( Settings::reportPassword() );
+
+    if ( !siebelDB.open() )
+    {
+        Debug::print( "database", "Failed to open the Report DB " + reportDB.lastError().text() );
+    }
 }
 
 Database::~Database()
@@ -89,7 +102,13 @@ Database::~Database()
         QSqlDatabase::database( "siebelDB" ).close();
         QSqlDatabase::removeDatabase( "siebelDB" );
     }
-    
+
+    if ( QSqlDatabase::database( "reportDB" ).isOpen() )
+    {
+        QSqlDatabase::database( "reportDB" ).close();
+        QSqlDatabase::removeDatabase( "reportDB" );
+    }
+ 
     Debug::print( "database", "Destroying" );
 }
 
@@ -444,18 +463,18 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
                     "  siebel.s_org_ext_x flag "
                     "where " );
 
-if ( subowner )
-{
-    q += ("  ( sr.owner_emp_id = u.row_id"
-          "  or srx.attrib_07 = u.row_id )" );
-}
-else
-{
-    q += (          "  sr.owner_emp_id = u.row_id" );
-}
+    if ( subowner )
+    {
+        q += ("  ( sr.owner_emp_id = u.row_id"
+              "  or srx.attrib_07 = u.row_id )" );
+    }
+    else
+    {
+        q += (          "  sr.owner_emp_id = u.row_id" );
+    }
 
 
-q+=(                "  and srx.row_id = sr.row_id"
+    q+=(            "  and srx.row_id = sr.row_id"
                     "  and u.row_id = c.row_id "
                     "  and g.row_id = sr.CST_CON_ID  "
                     "  and u.login = :engineer "

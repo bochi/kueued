@@ -40,10 +40,10 @@ class Settings
         static QString mysqlUser();
         static QString mysqlPassword();
         static QString mysqlDatabase();
-        static QString oracleHost();
-        static QString oracleUser();
-        static QString oraclePassword();
-        static QString oracleDatabase();
+        static QString reportHost();
+        static QString reportUser();
+        static QString reportPassword();
+        static QString reportDatabase();
         static QString latestVersion();
         static QString siebelHost();
         static QString siebelUser();
@@ -58,7 +58,7 @@ class Settings
         static QString l3Server();
         static QString l3User();
         static QString l3ApiKey();
-        static int oraclePort();
+        static int reportPort();
         static int timezoneCorrection();
         static bool logQueries();
         static bool debugLog();

@@ -62,28 +62,28 @@ QString Settings::mysqlPassword()
     return settings.value( "mysqlPassword" ).toString();
 }
 
-QString Settings::oracleHost()
+QString Settings::reportHost()
 {
     QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
-    return settings.value( "oracleHost" ).toString();
+    return settings.value( "reportHost" ).toString();
 }
 
-QString Settings::oracleUser()
+QString Settings::reportUser()
 {
     QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
-    return settings.value( "oracleUser" ).toString();
+    return settings.value( "reportUser" ).toString();
 }
 
-QString Settings::oraclePassword()
+QString Settings::reportPassword()
 {
     QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
-    return settings.value( "oraclePassword" ).toString();
+    return settings.value( "reportPassword" ).toString();
 }
 
-QString Settings::oracleDatabase()
+QString Settings::reportDatabase()
 {
     QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
-    return settings.value( "oracleDatabase" ).toString();
+    return settings.value( "reportDatabase" ).toString();
 }
 
 QString Settings::latestVersion()
