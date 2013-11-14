@@ -92,11 +92,11 @@ QString Settings::latestVersion()
     return settings.value( "latestVersion" ).toString();
 }
 
-int Settings::oraclePort()
+/*int Settings::oraclePort()
 {
     QSettings settings( "/etc/kueued.conf", QSettings::NativeFormat);
     return settings.value( "oraclePort" ).toInt();
-}
+}*/
 
 int Settings::timezoneCorrection()
 {
