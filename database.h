@@ -43,7 +43,7 @@ class Database : public QObject
     
         static void insertSiebelItemIntoDB( SiebelItem, const QString& = QString::Null() );
         static void updateSiebelQueue( SiebelItem, const QString& = QString::Null() );
-        static void updateSiebelItem( SiebelItem, const QString& = QString::Null(), const QString& = QString::Null() );
+        static void updateSiebelItem( SiebelItem, const QString& = QString::Null(), const QString& = QString::Null(), const QString& = QString::Null() );
         static void deleteSiebelItemFromDB( const QString&, const QString& = QString::Null() );
         static QStringList getQmonSiebelList( const QString& = QString::Null());
         static QStringList getOracleSrList( const QString& = QString::Null() );
@@ -76,7 +76,7 @@ class Database : public QObject
         static QList< QueueItem > getUserQueue( const QString&, const QString& = QString::Null(), const QString& = QString::Null(), const QString& = QString::Null(), bool = false );
         static QueueItem getSrInfo( const QString&, const QString& = QString::Null(), const QString& = QString::Null(), const QString& = QString::Null() );
         static QString getSrStatus( const QString&, const QString& = QString::Null() );
-        static QList< SiebelItem > getQmonSrs( const QString& = QString::Null() );
+        static QList< SiebelItem > getQmonSrs( const QString& = QString::Null(), const QString& = QString::Null(), const QString& = QString::Null() );
         static QList< BomgarItem > getChats( const QString& = QString::Null() );  
         
         static QStringList srInfo( const QString&, const QString& = QString::Null() );

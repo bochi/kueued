@@ -366,7 +366,7 @@ void ServerThread::run()
 
                 out << "Bomgar update took " +  QString::number( btime ) + " sec\n";
                 
-                QList<SiebelItem> ql = Database::getQmonSrs( mSiebelDB );
+                QList<SiebelItem> ql = Database::getQmonSrs( mSiebelDB, mMysqlDB, mReportDB );
                 QStringList newList;
                     
                 for ( int i = 0; i < ql.size(); ++i ) 
@@ -384,7 +384,7 @@ void ServerThread::run()
                             Database::updateSiebelQueue( ql.at( i ), mMysqlDB );
                         }
                                 
-                        Database::updateSiebelItem( ql.at( i ), mMysqlDB, mSiebelDB );
+                        Database::updateSiebelItem( ql.at( i ), mMysqlDB, mSiebelDB, mReportDB );
                     }
                 }
                 

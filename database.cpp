@@ -134,11 +134,11 @@ void Database::insertSiebelItemIntoDB( SiebelItem item, const QString& dbname )
     query.prepare( "INSERT INTO QMON_SIEBEL( ID, QUEUE, GEO, HOURS, STATUS, SEVERITY, SOURCE, RESPOND_VIA, "
                    "                         CREATED, LAST_UPDATE, INQUEUE, SLA, SUPPORT_PROGRAM, SUPPORT_PROGRAM_LONG, "
                    "                         ROUTING_PRODUCT, SUPPORT_GROUP_ROUTING, INT_TYPE, SUBTYPE, SERVICE_LEVEL, "
-                   "                         BRIEF_DESC, CRITSIT, HIGH_VALUE, DETAILED_DESC, CATEGORY, CREATOR, ROW_ID ) "
+                   "                         BRIEF_DESC, CRITSIT, HIGH_VALUE, DETAILED_DESC, CATEGORY, CREATOR, ROW_ID, CRSR ) "
                    " VALUES "
                    "( :id, :queue, :geo, :hours, :status, :severity, :source, :respond_via, :created, :last_update, :inqueue, "
                    "  :sla, :support_program, :support_program_long, :routing_product, :support_group_routing, :int_type, :subtype, "
-                   "  :service_level, :brief_desc, :critsit, :high_value,  :detailed_desc, :category, :creator, :row_id )" );
+                   "  :service_level, :brief_desc, :critsit, :high_value,  :detailed_desc, :category, :creator, :row_id, :crsr )" );
 
     query.bindValue( ":id", item.id );
     query.bindValue( ":queue", item.queue );
@@ -166,6 +166,7 @@ void Database::insertSiebelItemIntoDB( SiebelItem item, const QString& dbname )
     query.bindValue( ":category", item.category );
     query.bindValue( ":creator", item.creator );
     query.bindValue( ":row_id", item.row_id );
+    query.bindValue( ":crsr", item.crsr );
     
     if ( !query.exec() ) qDebug() << query.lastError().text();
     
@@ -303,7 +304,7 @@ QString Database::getSrForCrReport( const QString& cr, const QString& dbname1, c
 }
 
 
-void Database::updateSiebelItem( SiebelItem item, const QString& dbname, const QString& dbname1 )
+void Database::updateSiebelItem( SiebelItem item, const QString& dbname, const QString& dbname1, const QString& repname )
 {
     QSqlDatabase db;
     QSqlDatabase db1;
@@ -338,7 +339,7 @@ void Database::updateSiebelItem( SiebelItem item, const QString& dbname, const Q
                    "                       SUPPORT_GROUP_ROUTING = :support_group_routing, INT_TYPE = :int_type,"
                    "                       SUBTYPE = :subtype, SERVICE_LEVEL = :service_level, BRIEF_DESC = :brief_desc,"
                    "                       CRITSIT = :critsit, HIGH_VALUE = :high_value, DETAILED_DESC = :detailed_desc, "
-                   "                       CATEGORY = :category, CREATOR = :creator, ROW_ID = :row_id WHERE ID = :id" );
+                   "                       CATEGORY = :category, CREATOR = :creator, ROW_ID = :row_id, CRSR = :crsr WHERE ID = :id" );
     
     query.bindValue( ":geo", item.geo );
     query.bindValue( ":hours", item.hours );
@@ -365,7 +366,9 @@ void Database::updateSiebelItem( SiebelItem item, const QString& dbname, const Q
     if ( item.subtype == "Collaboration" )
     {
         query.bindValue( ":creator", getCreator( item.id, dbname1 ) );
+        query.bindValue( ":crsr", getSrForCr( item.id, dbname, repname ) );
     }
+    
     query.bindValue( ":row_id", item.row_id );
     query.bindValue( ":id", item.id );
 
@@ -1373,14 +1376,14 @@ QList< SiebelItem > Database::getSrsForQueue( const QString& queue, const QStrin
         query.prepare( "SELECT ID, QUEUE, GEO, HOURS, STATUS, SEVERITY, SOURCE, RESPOND_VIA, CREATED, LAST_UPDATE, "
                        "INQUEUE, SLA, SUPPORT_PROGRAM, SUPPORT_PROGRAM_LONG, ROUTING_PRODUCT, SUPPORT_GROUP_ROUTING, "
                        "INT_TYPE, SUBTYPE, SERVICE_LEVEL, BRIEF_DESC, CRITSIT, HIGH_VALUE, DETAILED_DESC, CATEGORY, "
-                       "CREATOR, ROW_ID from QMON_SIEBEL ORDER BY CREATED ASC" );
+                       "CREATOR, ROW_ID, CRSR from QMON_SIEBEL ORDER BY CREATED ASC" );
     }
     else
     {
         query.prepare( "SELECT ID, QUEUE, GEO, HOURS, STATUS, SEVERITY, SOURCE, RESPOND_VIA, CREATED, LAST_UPDATE, "
                        "INQUEUE, SLA, SUPPORT_PROGRAM, SUPPORT_PROGRAM_LONG, ROUTING_PRODUCT, SUPPORT_GROUP_ROUTING, "
                        "INT_TYPE, SUBTYPE, SERVICE_LEVEL, BRIEF_DESC, CRITSIT, HIGH_VALUE, DETAILED_DESC, CATEGORY, "
-                       "CREATOR, ROW_ID from QMON_SIEBEL WHERE ( QUEUE = :queue ) ORDER BY CREATED ASC" );
+                       "CREATOR, ROW_ID, CRSR from QMON_SIEBEL WHERE ( QUEUE = :queue ) ORDER BY CREATED ASC" );
         
         query.bindValue( ":queue", queue );
     }
@@ -1418,6 +1421,7 @@ QList< SiebelItem > Database::getSrsForQueue( const QString& queue, const QStrin
         si.detailed_desc = query.value( 22 ).toString().replace( "]]>", "]]&gt;" );
         si.category = query.value( 23 ).toString();
         si.row_id = query.value( 25 ).toString();
+        si.crsr = query.value( 26 ).toString();
         
         if ( getBomgarQueue( query.value( 0 ).toString(), dbname ) == "NOCHAT" )
         {
@@ -1671,7 +1675,7 @@ QString Database::convertTime( const QString& dt )
     return ( d.toString("yyyy-MM-dd hh:mm:ss") );
 }
 
-QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
+QList< SiebelItem > Database::getQmonSrs( const QString& dbname, const QString& mysqlname, const QString& repname )
 {
     QSqlDatabase db;
     
@@ -1915,6 +1919,7 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname )
         {
             si.isCr = true;
             si.creator = getCreator( si.id, dbname );
+            si.crsr = getSrForCr( si.id, mysqlname, repname );
         }
         else
         {
@@ -2268,7 +2273,7 @@ bool Database::openReportDB( const QString& name )
     if ( !QSqlDatabase::database( name ).isOpen() )
     {
         QSqlDatabase reportDB = QSqlDatabase::addDatabase( "QOCI", name );
-        Debug::print( "database", Settings::reportDatabase() + " " + Settings::reportHost() + " " + Settings::reportUser() + " " + Settings::reportPassword() );
+
         reportDB.setDatabaseName( Settings::reportDatabase() );
         reportDB.setHostName( Settings::reportHost() );
         reportDB.setPort( 1521 );
