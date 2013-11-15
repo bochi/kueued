@@ -144,7 +144,7 @@ void ServerThread::run()
             {
                 Database::openMysqlDB( mMysqlDB );
                 
-                QString x = XML::qmonDate( Database::getSrsForQueue( "NONE", mMysqlDB, mReportDB ) );
+                QString x = XML::qmonDate( Database::getSrsForQueue( "NONE", mMysqlDB ) );
 
                 out << xml();
                 
@@ -157,7 +157,7 @@ void ServerThread::run()
             {
                 Database::openMysqlDB( mMysqlDB );
                 
-                QString x = XML::qmon( Database::getSrsForQueue( "NONE", mMysqlDB, mReportDB ) );
+                QString x = XML::qmon( Database::getSrsForQueue( "NONE", mMysqlDB ) );
 
                 out << xml();
                 
@@ -366,7 +366,7 @@ void ServerThread::run()
 
                 out << "Bomgar update took " +  QString::number( btime ) + " sec\n";
                 
-                QList<SiebelItem> ql = Database::getQmonSrs( mSiebelDB, mMysqlDB, mReportDB );
+                QList<SiebelItem> ql = Database::getQmonSrs( mSiebelDB, mMysqlDB );
                 QStringList newList;
                     
                 for ( int i = 0; i < ql.size(); ++i ) 
@@ -384,7 +384,7 @@ void ServerThread::run()
                             Database::updateSiebelQueue( ql.at( i ), mMysqlDB );
                         }
                                 
-                        Database::updateSiebelItem( ql.at( i ), mMysqlDB, mSiebelDB, mReportDB );
+                        Database::updateSiebelItem( ql.at( i ), mMysqlDB, mSiebelDB );
                     }
                 }
                 

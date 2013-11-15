@@ -60,7 +60,7 @@ class Database : public QObject
         
         static void updateBomgarItemInDB( BomgarItem, const QString& = QString::Null() );
         static void deleteBomgarItemFromDB( const QString&, const QString& = QString::Null() );
-        static QList< SiebelItem > getSrsForQueue( const QString& = "NONE", const QString& = QString::Null(), const QString& = QString::Null() );
+        static QList< SiebelItem > getSrsForQueue( const QString& = "NONE", const QString& = QString::Null() );
         static QStringList getQmonBomgarList( const QString& = QString::Null() );
         static bool bomgarExistsInDB( const QString&, const QString& = QString::Null() );
         static QString getBomgarQueue( const QString&, const QString& = QString::Null() );
@@ -76,10 +76,10 @@ class Database : public QObject
         static QList< QueueItem > getUserQueue( const QString&, const QString& = QString::Null(), const QString& = QString::Null(), const QString& = QString::Null(), bool = false );
         static QueueItem getSrInfo( const QString&, const QString& = QString::Null(), const QString& = QString::Null(), const QString& = QString::Null() );
         static QString getSrStatus( const QString&, const QString& = QString::Null() );
-        static QList< SiebelItem > getQmonSrs( const QString& = QString::Null(), const QString& = QString::Null(), const QString& = QString::Null() );
+        static QList< SiebelItem > getQmonSrs( const QString& = QString::Null(), const QString& = QString::Null() );
         static QList< BomgarItem > getChats( const QString& = QString::Null() );  
         
-        static QStringList srInfo( const QString&, const QString& = QString::Null() );
+        static QStringList srInfo( const QString&, const QString& );
         static QString getBugDesc( QString, const QString& );
 
         static bool isBugID( const QString& );
