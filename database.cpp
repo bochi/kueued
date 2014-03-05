@@ -334,7 +334,7 @@ void Database::getLTSScustomers()
                     "INNER JOIN  NTSDM.SBL_ENTITLEMENT SBL_ENTITLEMENT ON SBL_AGREE.AGREEMENT_NUM = SBL_ENTITLEMENT.AGREEMENT_NUMBER "
                     "WHERE       SBL_AGREE.AGREEMENT_STATUS = 'Active' "
                     "AND         SBL_ENTITLEMENT.ENTITLEMENT_END_DATE >= TO_DATE('05-03-2014 00:00:00', 'DD-MM-YYYY HH24:MI:SS') "
-                    "AND        (SBL_ENTITLEMENT.ENTITLEMENT_NAME LIKE '%Long Term Service Pack%' 
+                    "AND        (SBL_ENTITLEMENT.ENTITLEMENT_NAME LIKE '%Long Term Service Pack%'"
                     "OR          SBL_ENTITLEMENT.ENTITLEMENT_NAME LIKE '%LTSS%')" );
         
       
