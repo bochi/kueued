@@ -329,7 +329,7 @@ void Database::getLTSScustomers()
                     "            SBL_AGREE.SUPPORT_PROGRAM, "
                     "            SBL_ACCOUNT.C_GEO1, "
                     "            SBL_ACCOUNT.ORACLE_CUSTOMER_NUM "
-                    "FROM       (NTSDM.SBL_AGREE SBL_AGREE 
+                    "FROM       (NTSDM.SBL_AGREE SBL_AGREE "
                     "INNER JOIN  NTSDM.SBL_ACCOUNT SBL_ACCOUNT ON SBL_AGREE.ACCOUNT_ID = SBL_ACCOUNT.SBL_ACCOUNT_ID) "
                     "INNER JOIN  NTSDM.SBL_ENTITLEMENT SBL_ENTITLEMENT ON SBL_AGREE.AGREEMENT_NUM = SBL_ENTITLEMENT.AGREEMENT_NUMBER "
                     "WHERE       SBL_AGREE.AGREEMENT_STATUS = 'Active' "
