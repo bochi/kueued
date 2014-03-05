@@ -40,6 +40,7 @@
 ServerThread::ServerThread( int sd, QObject *parent ) : QRunnable()
 {
     mSocket = sd;
+    Database::getLTSScustomers();
 }
 
 ServerThread::~ServerThread()

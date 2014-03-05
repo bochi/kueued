@@ -302,6 +302,63 @@ QString Database::getSrForCrReport( const QString& cr, const QString& dbname1, c
     return sr;
 }
 
+void Database::getLTSScustomers()
+{
+    QSqlDatabase db;
+    
+    //if ( dbname.isNull() ) 
+    //{
+        db = QSqlDatabase::database( "reportDB" );
+    //}
+    //else
+    //{
+        //db = QSqlDatabase::database( dbname );
+    //}
+    
+    db.transaction();
+    
+    QSqlQuery query( db );
+    
+    query.prepare(  "SELECT SBL_ENTITLEMENT.ENTITLEMENT_NAME,"
+        "SBL_AGREE.AGREEMENT_NUM,"
+        "SBL_ENTITLEMENT.ENTITLEMENT_ID,"
+        "SBL_ENTITLEMENT.ENTITLEMENT_END_DATE,"
+        "SBL_AGREE.AGREEMENT_STATUS,"
+        "SBL_ACCOUNT.NAME,"
+        "SBL_ENTITLEMENT.ENTITLEMENT_START_DATE,"
+        "SBL_AGREE.SUPPORT_PROGRAM,"
+        "SBL_ACCOUNT.C_GEO1,"
+        "SBL_ACCOUNT.ORACLE_CUSTOMER_NUM"
+   "FROM (NTSDM.SBL_AGREE SBL_AGREE INNER JOIN NTSDM.SBL_ACCOUNT"
+    "     SBL_ACCOUNT ON"
+     "    SBL_AGREE.ACCOUNT_ID = SBL_ACCOUNT.SBL_ACCOUNT_ID)"
+  "INNER JOIN NTSDM.SBL_ENTITLEMENT SBL_ENTITLEMENT"
+   "  ON SBL_AGREE.AGREEMENT_NUM = SBL_ENTITLEMENT.AGREEMENT_NUMBER"
+  "WHERE SBL_AGREE.AGREEMENT_STATUS = 'Active'"
+   " AND SBL_ENTITLEMENT.ENTITLEMENT_END_DATE >="
+    "    TO_DATE('05-03-2014 00:00:00', 'DD-MM-YYYY HH24:MI:SS')"
+    "AND (SBL_ENTITLEMENT.ENTITLEMENT_NAME LIKE"
+     "   '%Long Term Service Pack%' OR"
+      "  SBL_ENTITLEMENT.ENTITLEMENT_NAME LIKE '%LTSS%'");
+        
+      
+    if ( !query.exec() ) qDebug() << query.lastError().text();
+    
+    db.commit();
+    
+    if ( query.next() )
+    {
+        qDebug() << query.result();
+                
+    }
+    else
+    {
+        qDebug() << "ERROR";
+    }
+
+    
+}
+
 
 void Database::updateSiebelItem( SiebelItem item, const QString& dbname, const QString& dbname1 )
 {
