@@ -39,6 +39,7 @@ class XML
         static QString qmon( QList<SiebelItem> );
         static QString qmonDate( QList<SiebelItem> );
         static QString queue( QList<QueueItem> );
+        static QString ltssCust( QList<LTSScustomer> );
         static QString sr( QueueItem );
         static QString stats( Statistics );
     

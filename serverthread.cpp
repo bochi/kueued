@@ -158,11 +158,11 @@ void ServerThread::run()
             {
                 Database::openReportDB( mReportDB );
                 
-                Database::getLTSScustomers( mReportDB );
+                QString x = XML::ltssCust( Database::getLTSScustomers( mReportDB ) );
                 
-                //out << xml();
+                out << xml();
                 
-                out << "lala";
+                out << x;
                 out.flush();
                 
                 socket->close();

@@ -313,6 +313,36 @@ QString XML::queue( QList<QueueItem> list )
     return xml;
 }
 
+QString XML::ltssCust( QList<LTSScustomer> list )
+{   
+    QString xml;
+    
+    xml += "<ltsscustomers>\n";
+    
+    for ( int i = 0; i < list.size(); ++i ) 
+    {
+        LTSScustomer cu = list.at( i );
+        
+        xml += "  <customer>\n";
+        xml += "    <account_name><![CDATA[" + cu.account_name + "]]></account_name>\n";
+        xml += "    <oracle_customer_nr><![CDATA[" + cu.oracle_customer_nr + "]]></oracle_customer_nr>\n";
+        xml += "    <geo><![CDATA[" + cu.geo + "]]></geo>\n";
+        xml += "    <support_program><![CDATA[" + cu.support_program + "]]></support_program>\n";
+        xml += "    <agreement_nr><![CDATA[" + cu.agreement_nr + "]]></agreement_nr>\n";
+        xml += "    <agreement_status><![CDATA[" + cu.agreement_status + "]]></agreement_status>\n";
+        xml += "    <entitlement_id><![CDATA[" + cu.entitlement_id + "]]></entitlement_id>\n";
+        xml += "    <entitlement_name><![CDATA[" + cu.entitlement_name + "]]></entitlement_name>\n";
+        xml += "    <entitlement_start_date><![CDATA[" + cu.entitlement_start_date + "]]></entitlement_start_date>\n";
+        xml += "    <entitlement_end_date><![CDATA[" + cu.entitlement_end_date + "]]></entitlement_end_date>\n";
+        xml += "  </customer>\n";
+    }
+    
+    xml += "</ltsscustomers>\n";
+    
+    return xml;
+}
+
+
 QString XML::sr( QueueItem qi )
 {
     QString xml;
