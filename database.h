@@ -194,4 +194,19 @@ class PseudoQueueItem
         QString queuename;
 };
 
+class LTSScustomer
+{
+    public:
+        QString entitlement_name;
+        QString agreement_nr;
+        QString entitlement_id;
+        QString entitlement_end_date;
+        QString agreement_status;
+        QString account_name;
+        QString entitlement_start_date;
+        QString support_program;
+        QString geo;
+        QString oracle_customer_nr;
+};
+
 #endif

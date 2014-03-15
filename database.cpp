@@ -355,7 +355,6 @@ void Database::getLTSScustomers()
     
 }
 
-
 void Database::updateSiebelItem( SiebelItem item, const QString& dbname, const QString& dbname1 )
 {
     QSqlDatabase db;
