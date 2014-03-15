@@ -302,22 +302,23 @@ QString Database::getSrForCrReport( const QString& cr, const QString& dbname1, c
     return sr;
 }
 
-void Database::getLTSScustomers()
+QList< LTSScustomer > Database::getLTSScustomers( const QString& dbname )
 {
     QSqlDatabase db;
     
-    //if ( dbname.isNull() ) 
-    //{
+    if ( dbname.isNull() ) 
+    {
         db = QSqlDatabase::database( "reportDB" );
-    //}
-    //else
-    //{
-        //db = QSqlDatabase::database( dbname );
-    //}
+    }
+    else
+    {
+        db = QSqlDatabase::database( dbname );
+    }
     
     db.transaction();
     
     QSqlQuery query( db );
+    QDate today = QDate::currentDate();
     
     query.prepare(  "SELECT      SBL_ENTITLEMENT.ENTITLEMENT_NAME, "
                     "            SBL_AGREE.AGREEMENT_NUM, "
@@ -340,19 +341,29 @@ void Database::getLTSScustomers()
       
     if ( !query.exec() ) qDebug() << query.lastError().text();
     
+    QList< LTSScustomer > list;
+    
+    while ( query.next() ) 
+    {
+        LTSScustomer lc;
+        
+        lc.entitlement_name = query.value( 0 ).toString();
+        lc.agreement_nr = query.value( 1 ).toString();
+        lc.entitlement_id = query.value( 2 ).toString();
+        lc.entitlement_end_date = query.value( 3 ).toString();
+        lc.agreement_status = query.value( 4 ).toString();
+        lc.account_name = query.value( 5 ).toString();
+        lc.entitlement_start_date = query.value( 6 ).toString();
+        lc.support_program = query.value( 7 ).toString();
+        lc.geo = query.value( 8 ).toString();
+        lc.oracle_customer_nr = query.value( 9 ).toString();
+        
+        list.append( lc );        
+        qDebug() << "ADDED" << lc.account_name;
+    }
+    
     db.commit();
-    
-    if ( query.next() )
-    {
-        qDebug() << query.result();
-                
-    }
-    else
-    {
-        qDebug() << "ERROR";
-    }
-
-    
+    return list;
 }
 
 void Database::updateSiebelItem( SiebelItem item, const QString& dbname, const QString& dbname1 )

@@ -154,6 +154,19 @@ void ServerThread::run()
                 out.flush();
                 socket->close();
             }
+            if ( cmd.startsWith( "/ltsscustomers" ) )
+            {
+                Database::openReportDB( mReportDB );
+                
+                Database::getLTSScustomers( mReportDB );
+                
+                //out << xml();
+                
+                out << "lala";
+                out.flush();
+                
+                socket->close();
+            }
             if ( cmd.startsWith( "/qmon" ) )
             {
                 Database::openMysqlDB( mMysqlDB );
