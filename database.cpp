@@ -319,6 +319,8 @@ QList< LTSScustomer > Database::getLTSScustomers( const QString& dbname )
     
     QSqlQuery query( db );
     QDate today = QDate::currentDate();
+    QString todayDate = today.toString( "dd-MM-yyyy" );
+    qDebug() << "TODAYDATE" << todayDate;
     
     query.prepare(  "SELECT      SBL_ENTITLEMENT.ENTITLEMENT_NAME, "
                     "            SBL_AGREE.AGREEMENT_NUM, "
@@ -334,7 +336,7 @@ QList< LTSScustomer > Database::getLTSScustomers( const QString& dbname )
                     "INNER JOIN  NTSDM.SBL_ACCOUNT SBL_ACCOUNT ON SBL_AGREE.ACCOUNT_ID = SBL_ACCOUNT.SBL_ACCOUNT_ID) "
                     "INNER JOIN  NTSDM.SBL_ENTITLEMENT SBL_ENTITLEMENT ON SBL_AGREE.AGREEMENT_NUM = SBL_ENTITLEMENT.AGREEMENT_NUMBER "
                     "WHERE       SBL_AGREE.AGREEMENT_STATUS = 'Active' "
-                    "AND         SBL_ENTITLEMENT.ENTITLEMENT_END_DATE >= TO_DATE('05-03-2014 00:00:00', 'DD-MM-YYYY HH24:MI:SS') "
+                    "AND         SBL_ENTITLEMENT.ENTITLEMENT_END_DATE >= TO_DATE('" + todayDate + "00:00:00', 'DD-MM-YYYY HH24:MI:SS') "
                     "AND        (SBL_ENTITLEMENT.ENTITLEMENT_NAME LIKE '%Long Term Service Pack%'"
                     "OR          SBL_ENTITLEMENT.ENTITLEMENT_NAME LIKE '%LTSS%')" );
         
