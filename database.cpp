@@ -834,7 +834,7 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
             i.bugDesc = getBugDesc( i.bugId, mysqlname );
         }
         
-        Database::checkLTSSbyId( i.cstNum, mysqlname );
+        //Database::checkLTSSbyId( i.cstNum, mysqlname );
         list.append( i );
     }
         
