@@ -355,8 +355,7 @@ QList< LTSScustomer > Database::getLTSScustomersExt( const QString& dbname )
     QSqlQuery query( db );
     QDate today = QDate::currentDate();
     QString todayDate = today.toString( "dd-MM-yyyy" );
-    qDebug() << "TODAYDATE" << todayDate;
-    
+        
     query.prepare(  "SELECT      SBL_ENTITLEMENT.ENTITLEMENT_NAME, "
                     "            SBL_AGREE.AGREEMENT_NUM, "
                     "            SBL_ENTITLEMENT.ENTITLEMENT_ID, "
