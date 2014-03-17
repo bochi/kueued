@@ -77,6 +77,7 @@ class Database : public QObject
         
         static QList< LTSScustomer > getLTSScustomersExt( const QString& );
         static QList< LTSScustomer > getLTSScustomers( const QString& );
+        static bool checkLTSSbyId( const QString&, const QString& );
         
         static QList< QueueItem > getUserQueue( const QString&, const QString& = QString::Null(), const QString& = QString::Null(), const QString& = QString::Null(), bool = false );
         static QueueItem getSrInfo( const QString&, const QString& = QString::Null(), const QString& = QString::Null(), const QString& = QString::Null() );

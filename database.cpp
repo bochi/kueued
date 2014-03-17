@@ -195,6 +195,41 @@ void Database::insertSiebelItemIntoDB( SiebelItem item, const QString& dbname )
     Debug::logQuery( cquery, db.connectionName() );
 }
 
+bool Database::checkLTSSbyId( const QString& id, const QString& dbname )
+{
+    QSqlDatabase db;
+    
+    if ( dbname.isNull() ) 
+    {
+        db = QSqlDatabase::database( "mysqlDB" );
+    }
+    else
+    {
+        db = QSqlDatabase::database( dbname );
+    }
+    
+    db.transaction();
+    
+    QSqlQuery query( db );
+    
+    query.prepare( "SELECT ACCOUNT_NAME FROM LTSSCUSTOMERS WHERE ( ORACLE_CUSTOMER_NR = :id )" );
+    query.bindValue( ":id", id );
+    
+    if ( !query.exec() ) qDebug() << query.lastError().text();
+    
+    if ( query.next() )
+    {
+        qDebug() << "LTSS!!!";
+        return true;
+    }
+    else
+    {
+        qDebug() << "NO LTSS";        
+        return false;
+    }
+}
+
+
 QString Database::getSrForCr( const QString& cr, const QString& mysqlname, const QString& reportname )
 {
     QString sr = getSrForCrMysql( cr, mysqlname );
@@ -800,6 +835,7 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
             i.bugDesc = getBugDesc( i.bugId, mysqlname );
         }
         
+        Database::checkLTSSbyId( i.cstNum, mysqlname );
         list.append( i );
     }
         
