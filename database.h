@@ -68,6 +68,7 @@ class Database : public QObject
         static QString getBomgarQueueById( const QString&, const QString& = QString::Null() );
         static void updateBomgarQueue( BomgarItem, const QString& = QString::Null() );
         static void updatePseudoQueues( const QString& = QString::Null(), const QString& = QString::Null() );
+        static void updateLTSScustomers( const QString& = QString::Null(), const QString& = QString::Null() );
         static QStringList getPseudoQueues( const QString& =  QString::Null() );
         static QStringList getCurrentBomgars( const QString& = QString::Null() );
         static QStringList getSrnumsForQueue( const QString&, const QString&, const QString& = QString::Null() );

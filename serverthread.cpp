@@ -321,6 +321,8 @@ void ServerThread::run()
                 Database::openSiebelDB( mSiebelDB );
                 Database::openQmonDB( mQmonDB );
                 
+                if ( full ) Database::openReportDB( mReportDB );
+                
                 int btime;
                 QTime timer;
                 timer.start();
@@ -341,6 +343,10 @@ void ServerThread::run()
                     out << text();
                     
                     out << "PseudoQ update took " +  QString::number( btime ) + " sec\n";
+                    
+                    Database::updateLTSScustomers( mReportDB, mMysqlDB );
+                    
+                    out << "LTSS Customer List updated.\n";
                 }
                     
                 Debug::print( "serverthread", "Starting Bomgar update..." );

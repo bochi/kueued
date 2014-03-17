@@ -361,7 +361,6 @@ QList< LTSScustomer > Database::getLTSScustomers( const QString& dbname )
         lc.oracle_customer_nr = query.value( 9 ).toString();
         
         list.append( lc );        
-        qDebug() << "ADDED" << lc.account_name;
     }
     
     db.commit();
@@ -1036,6 +1035,65 @@ void Database::updatePseudoQueues( const QString& qDb, const QString& mDb )
     }
     
     qdb.commit();
+    mdb.commit();
+}
+
+void Database::updateLTSScustomers( const QString& rDb, const QString& mDb )
+{
+    QSqlDatabase mdb;
+    QList< LTSScustomer > list;
+    
+    if ( rDb.isNull() ) 
+    {
+        list = getLTSScustomers( "reportDB" );
+    }
+    else
+    {
+        list = getLTSScustomers( rDb );
+    }
+    
+    if ( mDb.isNull() ) 
+    {
+        mdb = QSqlDatabase::database( "mysqlDB" );
+    }
+    else
+    {
+        mdb = QSqlDatabase::database( mDb );
+    }
+    
+    mdb.transaction();
+    
+    QSqlQuery delquery( mdb );
+    
+    delquery.prepare( "DELETE FROM LTSSCUSTOMERS" );
+    delquery.exec();
+    
+    for ( int i = 0; i < list.size(); ++i )
+    {  
+        LTSScustomer c = list.at( i );
+        QSqlQuery query( mdb );
+        
+        query.prepare( "INSERT INTO LTSSCUSTOMERS( ACCOUNT_NAME, ORACLE_CUSTOMER_NR, GEO, "
+                       "                           SUPPORT_PROGRAM, AGREEMENT_NR, AGREEMENT_STATUS, ENTITLEMENT_ID, "
+                       "                           ENTITLEMENT_NAME, ENTITLEMENT_START_DATE, ENTITLEMENT_END_DATE )"
+                       "VALUES (                   :account_name, :oracle_customer_nr, :geo, :support_program, "
+                       "                           :agreement_nr, :agreement_status, :entitlement_id, :entitlement_name, "
+                       "                           :entitlement_start_date, :entitlement_end_date )" );
+                       
+        query.bindValue( ":account_name", c.account_name );
+        query.bindValue( ":oracle_customer_nr", c.oracle_customer_nr );
+        query.bindValue( ":geo", c.geo );
+        query.bindValue( ":support_program", c.support_program );
+        query.bindValue( ":agreement_nr", c.agreement_nr );
+        query.bindValue( ":agreement_status", c.agreement_status );
+        query.bindValue( ":entitlement_id", c.entitlement_id );
+        query.bindValue( ":entitlement_name", c.entitlement_name );
+        query.bindValue( ":entitlement_start_date", c.entitlement_start_date );
+        query.bindValue( ":entitlement_end_date", c.entitlement_end_date );
+        
+        if ( !query.exec() ) qDebug() << query.lastError().text();
+    }
+    
     mdb.commit();
 }
 
