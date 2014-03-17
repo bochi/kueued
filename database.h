@@ -75,6 +75,7 @@ class Database : public QObject
         static QString convertTime( const QString& );
         static QString formatPhone( QString, const QString& );
         
+        static QList< LTSScustomer > getLTSScustomersExt( const QString& );
         static QList< LTSScustomer > getLTSScustomers( const QString& );
         
         static QList< QueueItem > getUserQueue( const QString&, const QString& = QString::Null(), const QString& = QString::Null(), const QString& = QString::Null(), bool = false );

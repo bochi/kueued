@@ -302,7 +302,7 @@ QString Database::getSrForCrReport( const QString& cr, const QString& dbname1, c
     return sr;
 }
 
-QList< LTSScustomer > Database::getLTSScustomers( const QString& dbname )
+QList< LTSScustomer > Database::getLTSScustomersExt( const QString& dbname )
 {
     QSqlDatabase db;
     
@@ -341,6 +341,52 @@ QList< LTSScustomer > Database::getLTSScustomers( const QString& dbname )
                     "OR          SBL_ENTITLEMENT.ENTITLEMENT_NAME LIKE '%LTSS%')" );
         
       
+    if ( !query.exec() ) qDebug() << query.lastError().text();
+    
+    QList< LTSScustomer > list;
+    
+    while ( query.next() ) 
+    {
+        LTSScustomer lc;
+        
+        lc.entitlement_name = query.value( 0 ).toString();
+        lc.agreement_nr = query.value( 1 ).toString();
+        lc.entitlement_id = query.value( 2 ).toString();
+        lc.entitlement_end_date = query.value( 3 ).toString();
+        lc.agreement_status = query.value( 4 ).toString();
+        lc.account_name = query.value( 5 ).toString();
+        lc.entitlement_start_date = query.value( 6 ).toString();
+        lc.support_program = query.value( 7 ).toString();
+        lc.geo = query.value( 8 ).toString();
+        lc.oracle_customer_nr = query.value( 9 ).toString();
+        
+        list.append( lc );        
+    }
+    
+    db.commit();
+    return list;
+}
+
+QList< LTSScustomer > Database::getLTSScustomers( const QString& dbname )
+{
+    QSqlDatabase db;
+    
+    if ( dbname.isNull() ) 
+    {
+        db = QSqlDatabase::database( "mysqlDB" );
+    }
+    else
+    {
+        db = QSqlDatabase::database( dbname );
+    }
+    
+    db.transaction();
+    
+    QSqlQuery query( db );
+    
+    query.prepare( "" );
+    
+    
     if ( !query.exec() ) qDebug() << query.lastError().text();
     
     QList< LTSScustomer > list;
@@ -1045,11 +1091,11 @@ void Database::updateLTSScustomers( const QString& rDb, const QString& mDb )
     
     if ( rDb.isNull() ) 
     {
-        list = getLTSScustomers( "reportDB" );
+        list = getLTSScustomersExt( "reportDB" );
     }
     else
     {
-        list = getLTSScustomers( rDb );
+        list = getLTSScustomersExt( rDb );
     }
     
     if ( mDb.isNull() ) 

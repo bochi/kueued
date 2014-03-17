@@ -299,6 +299,30 @@ void ServerThread::run()
                 
                 socket->close();
             }
+            else if ( cmd.startsWith( "/ltssupdate" ) )
+            {
+                Database::openMysqlDB( mMysqlDB );
+                Database::openReportDB( mReportDB );
+                
+                int btime;
+                QTime timer;
+                timer.start();
+                
+                Debug::print( "serverthread", "Starting LTSS update..." );
+                
+                Database::updateLTSScustomers( mReportDB, mMysqlDB );
+                btime = timer.elapsed() / 1000;
+                
+                Debug::print( "serverthread", "LTSS update finished, took " + QString::number( btime ) + " sec" );
+                
+                out << text();
+                
+                out << "LTSS update took " +  QString::number( btime ) + " sec\n";   
+                out << "LTSS Customer List updated.\n";
+
+                out.flush();
+                socket->close();
+            }
             else if ( cmd.startsWith( "/updateDB" ) )
             {
                 bool full = false;
@@ -321,8 +345,6 @@ void ServerThread::run()
                 Database::openSiebelDB( mSiebelDB );
                 Database::openQmonDB( mQmonDB );
                 
-                if ( full ) Database::openReportDB( mReportDB );
-                
                 int btime;
                 QTime timer;
                 timer.start();
@@ -343,10 +365,6 @@ void ServerThread::run()
                     out << text();
                     
                     out << "PseudoQ update took " +  QString::number( btime ) + " sec\n";
-                    
-                    Database::updateLTSScustomers( mReportDB, mMysqlDB );
-                    
-                    out << "LTSS Customer List updated.\n";
                 }
                     
                 Debug::print( "serverthread", "Starting Bomgar update..." );
