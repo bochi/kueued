@@ -32,6 +32,7 @@ class SiebelItem;
 class BomgarItem;
 class QueueItem;
 class PseudoQueueItem;
+class LTSScustomer;
 
 class Database : public QObject
 {
@@ -67,13 +68,16 @@ class Database : public QObject
         static QString getBomgarQueueById( const QString&, const QString& = QString::Null() );
         static void updateBomgarQueue( BomgarItem, const QString& = QString::Null() );
         static void updatePseudoQueues( const QString& = QString::Null(), const QString& = QString::Null() );
+        static void updateLTSScustomers( const QString& = QString::Null(), const QString& = QString::Null() );
         static QStringList getPseudoQueues( const QString& =  QString::Null() );
         static QStringList getCurrentBomgars( const QString& = QString::Null() );
         static QStringList getSrnumsForQueue( const QString&, const QString&, const QString& = QString::Null() );
         static QString convertTime( const QString& );
         static QString formatPhone( QString, const QString& );
         
-        static void getLTSScustomers();
+        static QList< LTSScustomer > getLTSScustomersExt( const QString& );
+        static QList< LTSScustomer > getLTSScustomers( const QString& );
+        static bool checkLTSSbyId( const QString&, const QString& );
         
         static QList< QueueItem > getUserQueue( const QString&, const QString& = QString::Null(), const QString& = QString::Null(), const QString& = QString::Null(), bool = false );
         static QueueItem getSrInfo( const QString&, const QString& = QString::Null(), const QString& = QString::Null(), const QString& = QString::Null() );

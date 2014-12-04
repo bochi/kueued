@@ -154,6 +154,19 @@ void ServerThread::run()
                 out.flush();
                 socket->close();
             }
+            if ( cmd.startsWith( "/ltsscustomers" ) )
+            {
+                Database::openReportDB( mReportDB );
+                
+                QString x = XML::ltssCust( Database::getLTSScustomers( mReportDB ) );
+                
+                out << xml();
+                
+                out << x;
+                out.flush();
+                
+                socket->close();
+            }
             if ( cmd.startsWith( "/qmon" ) )
             {
                 Database::openMysqlDB( mMysqlDB );
@@ -284,6 +297,30 @@ void ServerThread::run()
                     out.flush();
                 }
                 
+                socket->close();
+            }
+            else if ( cmd.startsWith( "/ltssupdate" ) )
+            {
+                Database::openMysqlDB( mMysqlDB );
+                Database::openReportDB( mReportDB );
+                
+                int btime;
+                QTime timer;
+                timer.start();
+                
+                Debug::print( "serverthread", "Starting LTSS update..." );
+                
+                Database::updateLTSScustomers( mReportDB, mMysqlDB );
+                btime = timer.elapsed() / 1000;
+                
+                Debug::print( "serverthread", "LTSS update finished, took " + QString::number( btime ) + " sec" );
+                
+                out << text();
+                
+                out << "LTSS update took " +  QString::number( btime ) + " sec\n";   
+                out << "LTSS Customer List updated.\n";
+
+                out.flush();
                 socket->close();
             }
             else if ( cmd.startsWith( "/updateDB" ) )

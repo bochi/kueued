@@ -195,6 +195,41 @@ void Database::insertSiebelItemIntoDB( SiebelItem item, const QString& dbname )
     Debug::logQuery( cquery, db.connectionName() );
 }
 
+bool Database::checkLTSSbyId( const QString& id, const QString& dbname )
+{
+    QSqlDatabase db;
+    
+    if ( dbname.isNull() ) 
+    {
+        db = QSqlDatabase::database( "mysqlDB" );
+    }
+    else
+    {
+        db = QSqlDatabase::database( dbname );
+    }
+    
+    db.transaction();
+    
+    QSqlQuery query( db );
+    
+    query.prepare( "SELECT ACCOUNT_NAME FROM LTSSCUSTOMERS WHERE ( ORACLE_CUSTOMER_NR = :id )" );
+    query.bindValue( ":id", id );
+    
+    if ( !query.exec() ) qDebug() << query.lastError().text();
+    
+    if ( query.next() )
+    {
+        qDebug() << "LTSS!!!";
+        return true;
+    }
+    else
+    {
+        qDebug() << "NO LTSS";        
+        return false;
+    }
+}
+
+
 QString Database::getSrForCr( const QString& cr, const QString& mysqlname, const QString& reportname )
 {
     QString sr = getSrForCrMysql( cr, mysqlname );
@@ -302,23 +337,25 @@ QString Database::getSrForCrReport( const QString& cr, const QString& dbname1, c
     return sr;
 }
 
-void Database::getLTSScustomers()
+QList< LTSScustomer > Database::getLTSScustomersExt( const QString& dbname )
 {
     QSqlDatabase db;
     
-    //if ( dbname.isNull() ) 
-    //{
+    if ( dbname.isNull() ) 
+    {
         db = QSqlDatabase::database( "reportDB" );
-    //}
-    //else
-    //{
-        //db = QSqlDatabase::database( dbname );
-    //}
+    }
+    else
+    {
+        db = QSqlDatabase::database( dbname );
+    }
     
     db.transaction();
     
     QSqlQuery query( db );
-    
+    QDate today = QDate::currentDate();
+    QString todayDate = today.toString( "dd-MM-yyyy" );
+        
     query.prepare(  "SELECT      SBL_ENTITLEMENT.ENTITLEMENT_NAME, "
                     "            SBL_AGREE.AGREEMENT_NUM, "
                     "            SBL_ENTITLEMENT.ENTITLEMENT_ID, "
@@ -333,26 +370,81 @@ void Database::getLTSScustomers()
                     "INNER JOIN  NTSDM.SBL_ACCOUNT SBL_ACCOUNT ON SBL_AGREE.ACCOUNT_ID = SBL_ACCOUNT.SBL_ACCOUNT_ID) "
                     "INNER JOIN  NTSDM.SBL_ENTITLEMENT SBL_ENTITLEMENT ON SBL_AGREE.AGREEMENT_NUM = SBL_ENTITLEMENT.AGREEMENT_NUMBER "
                     "WHERE       SBL_AGREE.AGREEMENT_STATUS = 'Active' "
-                    "AND         SBL_ENTITLEMENT.ENTITLEMENT_END_DATE >= TO_DATE('05-03-2014 00:00:00', 'DD-MM-YYYY HH24:MI:SS') "
+                    "AND         SBL_ENTITLEMENT.ENTITLEMENT_END_DATE >= TO_DATE('" + todayDate + "00:00:00', 'DD-MM-YYYY HH24:MI:SS') "
                     "AND        (SBL_ENTITLEMENT.ENTITLEMENT_NAME LIKE '%Long Term Service Pack%'"
                     "OR          SBL_ENTITLEMENT.ENTITLEMENT_NAME LIKE '%LTSS%')" );
         
       
     if ( !query.exec() ) qDebug() << query.lastError().text();
     
-    db.commit();
+    QList< LTSScustomer > list;
     
-    if ( query.next() )
+    while ( query.next() ) 
     {
-        qDebug() << query.result();
-                
+        LTSScustomer lc;
+        
+        lc.entitlement_name = query.value( 0 ).toString();
+        lc.agreement_nr = query.value( 1 ).toString();
+        lc.entitlement_id = query.value( 2 ).toString();
+        lc.entitlement_end_date = query.value( 3 ).toString();
+        lc.agreement_status = query.value( 4 ).toString();
+        lc.account_name = query.value( 5 ).toString();
+        lc.entitlement_start_date = query.value( 6 ).toString();
+        lc.support_program = query.value( 7 ).toString();
+        lc.geo = query.value( 8 ).toString();
+        lc.oracle_customer_nr = query.value( 9 ).toString();
+        
+        list.append( lc );        
+    }
+    
+    db.commit();
+    return list;
+}
+
+QList< LTSScustomer > Database::getLTSScustomers( const QString& dbname )
+{
+    QSqlDatabase db;
+    
+    if ( dbname.isNull() ) 
+    {
+        db = QSqlDatabase::database( "mysqlDB" );
     }
     else
     {
-        qDebug() << "ERROR";
+        db = QSqlDatabase::database( dbname );
     }
-
     
+    db.transaction();
+    
+    QSqlQuery query( db );
+    
+    query.prepare( "" );
+    
+    
+    if ( !query.exec() ) qDebug() << query.lastError().text();
+    
+    QList< LTSScustomer > list;
+    
+    while ( query.next() ) 
+    {
+        LTSScustomer lc;
+        
+        lc.entitlement_name = query.value( 0 ).toString();
+        lc.agreement_nr = query.value( 1 ).toString();
+        lc.entitlement_id = query.value( 2 ).toString();
+        lc.entitlement_end_date = query.value( 3 ).toString();
+        lc.agreement_status = query.value( 4 ).toString();
+        lc.account_name = query.value( 5 ).toString();
+        lc.entitlement_start_date = query.value( 6 ).toString();
+        lc.support_program = query.value( 7 ).toString();
+        lc.geo = query.value( 8 ).toString();
+        lc.oracle_customer_nr = query.value( 9 ).toString();
+        
+        list.append( lc );        
+    }
+    
+    db.commit();
+    return list;
 }
 
 void Database::updateSiebelItem( SiebelItem item, const QString& dbname, const QString& dbname1 )
@@ -742,6 +834,7 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
             i.bugDesc = getBugDesc( i.bugId, mysqlname );
         }
         
+        //Database::checkLTSSbyId( i.cstNum, mysqlname );
         list.append( i );
     }
         
@@ -1023,6 +1116,65 @@ void Database::updatePseudoQueues( const QString& qDb, const QString& mDb )
     }
     
     qdb.commit();
+    mdb.commit();
+}
+
+void Database::updateLTSScustomers( const QString& rDb, const QString& mDb )
+{
+    QSqlDatabase mdb;
+    QList< LTSScustomer > list;
+    
+    if ( rDb.isNull() ) 
+    {
+        list = getLTSScustomersExt( "reportDB" );
+    }
+    else
+    {
+        list = getLTSScustomersExt( rDb );
+    }
+    
+    if ( mDb.isNull() ) 
+    {
+        mdb = QSqlDatabase::database( "mysqlDB" );
+    }
+    else
+    {
+        mdb = QSqlDatabase::database( mDb );
+    }
+    
+    mdb.transaction();
+    
+    QSqlQuery delquery( mdb );
+    
+    delquery.prepare( "DELETE FROM LTSSCUSTOMERS" );
+    delquery.exec();
+    
+    for ( int i = 0; i < list.size(); ++i )
+    {  
+        LTSScustomer c = list.at( i );
+        QSqlQuery query( mdb );
+        
+        query.prepare( "INSERT INTO LTSSCUSTOMERS( ACCOUNT_NAME, ORACLE_CUSTOMER_NR, GEO, "
+                       "                           SUPPORT_PROGRAM, AGREEMENT_NR, AGREEMENT_STATUS, ENTITLEMENT_ID, "
+                       "                           ENTITLEMENT_NAME, ENTITLEMENT_START_DATE, ENTITLEMENT_END_DATE )"
+                       "VALUES (                   :account_name, :oracle_customer_nr, :geo, :support_program, "
+                       "                           :agreement_nr, :agreement_status, :entitlement_id, :entitlement_name, "
+                       "                           :entitlement_start_date, :entitlement_end_date )" );
+                       
+        query.bindValue( ":account_name", c.account_name );
+        query.bindValue( ":oracle_customer_nr", c.oracle_customer_nr );
+        query.bindValue( ":geo", c.geo );
+        query.bindValue( ":support_program", c.support_program );
+        query.bindValue( ":agreement_nr", c.agreement_nr );
+        query.bindValue( ":agreement_status", c.agreement_status );
+        query.bindValue( ":entitlement_id", c.entitlement_id );
+        query.bindValue( ":entitlement_name", c.entitlement_name );
+        query.bindValue( ":entitlement_start_date", c.entitlement_start_date );
+        query.bindValue( ":entitlement_end_date", c.entitlement_end_date );
+        
+        if ( !query.exec() ) qDebug() << query.lastError().text();
+    }
+    
     mdb.commit();
 }
 
