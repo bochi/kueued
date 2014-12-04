@@ -712,7 +712,7 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
         i.service_level = query.value( 10 ).toInt();
         i.brief_desc = query.value( 11 ).toString().replace( "]]>", "]]&gt;" );
         
-        if ( query.value( 12 ).toString() == "Y" )
+        if ( query.value( 12 ).toString() == "Y"  && !i.isCr )
         {
             i.critsit = true;
         }
