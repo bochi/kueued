@@ -158,7 +158,7 @@ void ServerThread::run()
             {
                 Database::openReportDB( mReportDB );
                 
-                QString x = XML::ltssCust( Database::getLTSScustomers( mReportDB ) );
+                QString x = XML::ltssCust( Database::getLTSScustomersExt( mReportDB ) );
                 
                 out << xml();
                 
@@ -519,8 +519,8 @@ void ServerThread::run()
                     QString o;
                     QNetworkReply* ass;
                             
-                    ass = net->get( QUrl( "http://proetus.provo.novell.com/qmon/assign.asp?sr=" + q.remove( "/" ).split( "|" ).at( 0 ) + 
-                                               "&owner=" + q.remove( "/" ).split( "|" ).at( 1 ) ) );
+                    ass = net->get( QUrl( "http://proetus.provo.novell.com/qmon/assign2.asp?sr=" + q.remove( "/" ).split( "|" ).at( 0 ) + 
+                                               "&owner=" + q.remove( "/" ).split( "|" ).at( 1 ) + "&force=1" ) );
                     
                     QObject::connect( ass, SIGNAL( finished() ), 
                                       &loop, SLOT( quit() ) );
