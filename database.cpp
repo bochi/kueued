@@ -1892,7 +1892,7 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname, const QString& 
     
     QList< SiebelItem > list;
     
-    query.prepare( "SELECT T10.SR_NUM                                                        ID,"
+    query.prepare( "SELECT T10.SR_NUM  ID,"
 "       T11.LOGIN                                                         QUEUE,"
 "       CASE"
 "         WHEN T10.BU_ID = '0-R9NH' THEN 'Default Organization'"
@@ -1961,7 +1961,7 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname, const QString& 
 "   AND T18.ROW_ID     = T10.CST_OU_ID "
 "   AND T19.ROW_ID     = T10.ROW_ID"
 "   AND T20.ROW_ID (+) = T19.ATTRIB_07"
-" UNION ALL"
+" UNION ALL "
 "SELECT T10.SR_NUM                                                        ID,"
 "       T20.LOGIN                                           QUEUE,"
 "       CASE"
@@ -2029,9 +2029,8 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname, const QString& 
 "   AND T21.ROW_ID (+)    = T19.ATTRIB_07"
 "   AND T20.ROW_ID (+) = T19.ATTRIB_07"
 "   AND T21.JOB_TITLE  = 'Pseudo User'"
-""
-" UNION ALL"
-"SELECT T20.SR_NUM                                               ID,"
+" UNION ALL "
+" SELECT T20.SR_NUM                                               ID,"
 "       NVL(T21.LOGIN,'null')                                    QUEUE,"
 "       CASE"
 "         WHEN T20.BU_ID = '0-R9NH' THEN 'Default Organization'"
