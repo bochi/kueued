@@ -134,11 +134,11 @@ void Database::insertSiebelItemIntoDB( SiebelItem item, const QString& dbname )
     query.prepare( "INSERT INTO QMON_SIEBEL( ID, QUEUE, GEO, HOURS, STATUS, SEVERITY, SOURCE, RESPOND_VIA, "
                    "                         CREATED, LAST_UPDATE, INQUEUE, SLA, SUPPORT_PROGRAM, SUPPORT_PROGRAM_LONG, "
                    "                         ROUTING_PRODUCT, SUPPORT_GROUP_ROUTING, INT_TYPE, SUBTYPE, SERVICE_LEVEL, "
-                   "                         BRIEF_DESC, CRITSIT, HIGH_VALUE, DETAILED_DESC, CATEGORY, CREATOR, ROW_ID ) "
+                   "                         BRIEF_DESC, CRITSIT, HIGH_VALUE, DETAILED_DESC, CATEGORY, CREATOR, ROW_ID, SUBOWNER ) "
                    " VALUES "
                    "( :id, :queue, :geo, :hours, :status, :severity, :source, :respond_via, :created, :last_update, :inqueue, "
                    "  :sla, :support_program, :support_program_long, :routing_product, :support_group_routing, :int_type, :subtype, "
-                   "  :service_level, :brief_desc, :critsit, :high_value,  :detailed_desc, :category, :creator, :row_id )" );
+                   "  :service_level, :brief_desc, :critsit, :high_value,  :detailed_desc, :category, :creator, :row_id, :subowner )" );
 
     query.bindValue( ":id", item.id );
     query.bindValue( ":queue", item.queue );
@@ -166,6 +166,7 @@ void Database::insertSiebelItemIntoDB( SiebelItem item, const QString& dbname )
     query.bindValue( ":category", item.category );
     query.bindValue( ":creator", item.creator );
     query.bindValue( ":row_id", item.row_id );
+    query.bindValue( ":subowner", item.subowner );
     
     if ( !query.exec() ) qDebug() << query.lastError().text();
     
@@ -482,7 +483,7 @@ void Database::updateSiebelItem( SiebelItem item, const QString& dbname, const Q
                    "                       SUPPORT_GROUP_ROUTING = :support_group_routing, INT_TYPE = :int_type,"
                    "                       SUBTYPE = :subtype, SERVICE_LEVEL = :service_level, BRIEF_DESC = :brief_desc,"
                    "                       CRITSIT = :critsit, HIGH_VALUE = :high_value, DETAILED_DESC = :detailed_desc, "
-                   "                       CATEGORY = :category, CREATOR = :creator, ROW_ID = :row_id WHERE ID = :id" );
+                   "                       CATEGORY = :category, CREATOR = :creator, ROW_ID = :row_id, SUBOWNER = :subowner WHERE ID = :id" );
     
     query.bindValue( ":geo", item.geo );
     query.bindValue( ":hours", item.hours );
@@ -512,6 +513,7 @@ void Database::updateSiebelItem( SiebelItem item, const QString& dbname, const Q
     }
     
     query.bindValue( ":row_id", item.row_id );
+    query.bindValue( ":subowner", item.subowner );
     query.bindValue( ":id", item.id );
 
     if ( !query.exec() ) qDebug() << query.lastError().text();
