@@ -165,6 +165,11 @@ QString XML::qmon( QList<SiebelItem> list )
             xml += "    <critsit>1</critsit>\n";
         }
         
+        if ( !si.subowner.isEmpty() )
+        {
+            xml += "    <subowner><![CDATA[" + si.subowner + "]]></subowner>\n";      
+        }
+        
         xml += "  </sr>\n";
     }
     

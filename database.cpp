@@ -1893,7 +1893,7 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname, const QString& 
     QList< SiebelItem > list;
     
     query.prepare( " SELECT T10.SR_NUM  ID, "
-                   "        T11.LOGIN   QUEUE, "
+                   "        T11.LOGIN                                                        QUEUE, "
                    " CASE "
                    "         WHEN T10.BU_ID = '0-R9NH' THEN 'Default Organization'"
                    "         WHEN T10.BU_ID = '1-AHT'  THEN 'EMEA'"
@@ -1963,7 +1963,7 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname, const QString& 
                    "   AND T20.ROW_ID (+) = T19.ATTRIB_07"
                    " UNION ALL "
                    "SELECT T10.SR_NUM                                                        ID,"
-                   "       T20.LOGIN                                           QUEUE,"
+                   "       T11.LOGIN                                                         QUEUE,"
                    "       CASE"
                    "         WHEN T10.BU_ID = '0-R9NH' THEN 'Default Organization'"
                    "         WHEN T10.BU_ID = '1-AHT'  THEN 'EMEA'"
@@ -2009,6 +2009,7 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname, const QString& 
                    "       T16.X_ORACLE_CUSTOMER_ID,"
                    "       T20.LOGIN                                                         SUBOWNER"
                    "  FROM SIEBEL.S_SRV_REQ   T10,"
+                   "       SIEBEL.S_USER      T11,"
                    "       SIEBEL.S_CONTACT   T13,"
                    "       SIEBEL.S_ENTLMNT   T14,"
                    "       SIEBEL.S_SCHED_CAL T15,"
@@ -2026,8 +2027,9 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname, const QString& 
                    "   AND T17.ROW_ID     = T10.X_PROD_FEATURE_ID"
                    "   AND T18.ROW_ID     = T10.CST_OU_ID "
                    "   AND T19.ROW_ID     = T10.ROW_ID"
-                   "   AND T21.ROW_ID (+)    = T19.ATTRIB_07"
+                   "   AND T21.ROW_ID (+) = T19.ATTRIB_07"
                    "   AND T20.ROW_ID (+) = T19.ATTRIB_07"
+                   "   AND T11.ROW_ID (+) = T10.OWNER_EMP_ID"
                    "   AND T21.JOB_TITLE  = 'Pseudo User'"
                    " UNION ALL "
                    " SELECT T20.SR_NUM                                               ID, "
@@ -2191,6 +2193,7 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname, const QString& 
         si.alt_contact = query.value( 34 ).toString();
         si.bugId = query.value( 35 ).toString();
         si.cstNum = query.value( 36 ).toString();
+	si.subowner = query.value( 37 ).toString();
         
         list.append( si );
     }

@@ -139,6 +139,7 @@ class SiebelItem
         QString bugId;
         QString cstNum;
         QString crsr;
+	QString subowner;
         bool isCr;
         bool isChat;
         bool critsit;
