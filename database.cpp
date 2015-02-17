@@ -1960,7 +1960,7 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname, const QString& 
                    "   AND T17.ROW_ID     = T10.X_PROD_FEATURE_ID"
                    "   AND T18.ROW_ID     = T10.CST_OU_ID "
                    "   AND T19.ROW_ID     = T10.ROW_ID"
-                   "   AND T20.ROW_ID {(+)} = T19.ATTRIB_07"
+                   "   AND T20.ROW_ID (+) = T19.ATTRIB_07"
                    " UNION ALL "
                    "SELECT T10.SR_NUM                                                        ID,"
                    "       T20.LOGIN                                           QUEUE,"
@@ -2026,8 +2026,8 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname, const QString& 
                    "   AND T17.ROW_ID     = T10.X_PROD_FEATURE_ID"
                    "   AND T18.ROW_ID     = T10.CST_OU_ID "
                    "   AND T19.ROW_ID     = T10.ROW_ID"
-                   "   AND T21.ROW_ID {(+)}    = T19.ATTRIB_07"
-                   "   AND T20.ROW_ID {(+)} = T19.ATTRIB_07"
+                   "   AND T21.ROW_ID (+)    = T19.ATTRIB_07"
+                   "   AND T20.ROW_ID (+) = T19.ATTRIB_07"
                    "   AND T21.JOB_TITLE  = 'Pseudo User'"
                    " UNION ALL "
                    " SELECT T20.SR_NUM                                               ID, "
@@ -2086,15 +2086,15 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname, const QString& 
                    "       SIEBEL.S_SRV_REQ_X T27,"
                    "       SIEBEL.S_USER      T28"
                    " WHERE (T20.OWNER_EMP_ID = '0-1' OR T20.OWNER_EMP_ID IS NULL)"
-                   "   AND T21.ROW_ID {(+)}    = T20.OWNER_EMP_ID "
+                   "   AND T21.ROW_ID (+)    = T20.OWNER_EMP_ID "
                    "   AND T20.SR_STAT_ID    = 'Open'"
                    "   AND T22.ROW_ID        = T20.AGREE_ID"
                    "   AND T23.ROW_ID        = T22.SVC_CALENDAR_ID"
                    "   AND T24.ROW_ID        = T20.CST_OU_ID"
                    "   AND T25.ROW_ID        = T20.X_PROD_FEATURE_ID"
                    "   AND T26.ROW_ID        = T24.ROW_ID"
-                   "   AND T28.ROW_ID {(+)}    = T27.ATTRIB_07"
-                   "   AND T28.ROW_ID        = T20.ROW_ID;" );
+                   "   AND T28.ROW_ID (+)    = T27.ATTRIB_07"
+                   "   AND T28.ROW_ID        = T20.ROW_ID" );
 
     if ( !query.exec() ) qDebug() << query.lastError().text();
     
