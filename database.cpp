@@ -1579,14 +1579,14 @@ QList< SiebelItem > Database::getSrsForQueue( const QString& queue, const QStrin
         query.prepare( "SELECT ID, QUEUE, GEO, HOURS, STATUS, SEVERITY, SOURCE, RESPOND_VIA, CREATED, LAST_UPDATE, "
                        "INQUEUE, SLA, SUPPORT_PROGRAM, SUPPORT_PROGRAM_LONG, ROUTING_PRODUCT, SUPPORT_GROUP_ROUTING, "
                        "INT_TYPE, SUBTYPE, SERVICE_LEVEL, BRIEF_DESC, CRITSIT, HIGH_VALUE, DETAILED_DESC, CATEGORY, "
-                       "CREATOR, ROW_ID from QMON_SIEBEL ORDER BY CREATED ASC" );
+                       "CREATOR, ROW_ID, SUBOWNER from QMON_SIEBEL ORDER BY CREATED ASC" );
     }
     else
     {
         query.prepare( "SELECT ID, QUEUE, GEO, HOURS, STATUS, SEVERITY, SOURCE, RESPOND_VIA, CREATED, LAST_UPDATE, "
                        "INQUEUE, SLA, SUPPORT_PROGRAM, SUPPORT_PROGRAM_LONG, ROUTING_PRODUCT, SUPPORT_GROUP_ROUTING, "
                        "INT_TYPE, SUBTYPE, SERVICE_LEVEL, BRIEF_DESC, CRITSIT, HIGH_VALUE, DETAILED_DESC, CATEGORY, "
-                       "CREATOR, ROW_ID from QMON_SIEBEL WHERE ( QUEUE = :queue ) ORDER BY CREATED ASC" );
+                       "CREATOR, ROW_ID, SUBOWNER from QMON_SIEBEL WHERE ( QUEUE = :queue ) ORDER BY CREATED ASC" );
         
         query.bindValue( ":queue", queue );
     }
@@ -1624,6 +1624,7 @@ QList< SiebelItem > Database::getSrsForQueue( const QString& queue, const QStrin
         si.detailed_desc = query.value( 22 ).toString().replace( "]]>", "]]&gt;" );
         si.category = query.value( 23 ).toString();
         si.row_id = query.value( 25 ).toString();
+	si.subowner = query.value( 26 ).toString();
         
         if ( getBomgarQueue( query.value( 0 ).toString(), dbname ) == "NOCHAT" )
         {
