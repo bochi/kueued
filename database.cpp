@@ -1640,6 +1640,7 @@ QList< SiebelItem > Database::getSrsForQueue( const QString& queue, const QStrin
         {
             si.isCr = true;
             si.creator = query.value( 24 ).toString();
+            si.crsr = getSrForCr( si.id, mysqlname );
         }
         else
         {
