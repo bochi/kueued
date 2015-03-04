@@ -170,6 +170,7 @@ void ServerThread::run()
             if ( cmd.startsWith( "/qmon" ) )
             {
                 Database::openMysqlDB( mMysqlDB );
+                Database::openReportDB( mReportDB );
                 
                 QString x = XML::qmon( Database::getSrsForQueue( "NONE", mMysqlDB ) );
 
@@ -345,7 +346,7 @@ void ServerThread::run()
                 Database::openSiebelDB( mSiebelDB );
                 Database::openQmonDB( mQmonDB );
                 Database::openReportDB( mReportDB );
-                
+
                 int btime;
                 QTime timer;
                 timer.start();

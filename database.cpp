@@ -241,7 +241,7 @@ QString Database::getSrForCr( const QString& cr, const QString& mysqlname, const
         
         if ( !r.isOpen() ) 
         {
-            //openReportDB( reportname );
+            openReportDB( reportname );
         }
         
         sr = getSrForCrReport( cr, mysqlname, reportname );
