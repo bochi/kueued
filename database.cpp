@@ -1877,7 +1877,7 @@ QString Database::convertTime( const QString& dt )
     return ( d.toString("yyyy-MM-dd hh:mm:ss") );
 }
 
-QList< SiebelItem > Database::getQmonSrs( const QString& dbname, const QString& mysqlname )
+QList< SiebelItem > Database::getQmonSrs( const QString& dbname, const QString& mysqlname, const QString& reportname )
 {
     QSqlDatabase db;
     
