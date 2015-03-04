@@ -2421,7 +2421,7 @@ bool Database::openMysqlDB( const QString& name )
     }
     else
     {
-        Debug::print( "database", "DB already open in this thread " + name );
+        Debug::print( "database", "MySQL DB already open in this thread " + name );
         return true;
     }
 }
