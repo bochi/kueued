@@ -237,7 +237,13 @@ QString Database::getSrForCr( const QString& cr, const QString& mysqlname, const
     
     if ( sr == QString::Null() )
     {
-        openReportDB( reportname );
+        QSqlDatabase r = QSqlDatabase::database( reportname );
+        
+        if ( !r.isOpen() ) 
+        {
+            openReportDB( reportname );
+        }
+        
         sr = getSrForCrReport( cr, mysqlname, reportname );
     }
         
