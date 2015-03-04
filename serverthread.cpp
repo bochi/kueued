@@ -344,6 +344,7 @@ void ServerThread::run()
                 Database::openMysqlDB( mMysqlDB );
                 Database::openSiebelDB( mSiebelDB );
                 Database::openQmonDB( mQmonDB );
+                Database::openReportDB( mReportDB );
                 
                 int btime;
                 QTime timer;
@@ -404,7 +405,7 @@ void ServerThread::run()
 
                 out << "Bomgar update took " +  QString::number( btime ) + " sec\n";
                 
-                QList<SiebelItem> ql = Database::getQmonSrs( mSiebelDB, mMysqlDB );
+                QList<SiebelItem> ql = Database::getQmonSrs( mSiebelDB, mMysqlDB, mReportDB );
                 QStringList newList;
                     
                 for ( int i = 0; i < ql.size(); ++i ) 
