@@ -2133,6 +2133,7 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname, const QString& 
         {
             si.isCr = true;
             si.creator = getCreator( si.id, dbname );
+            si.crsr = getSrForCr( si.id, mysqlname, reportname );
         }
         else
         {
