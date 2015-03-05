@@ -1118,6 +1118,7 @@ void Database::updatePseudoQueues( const QString& qDb, const QString& mDb )
     
     while ( query.next() )
     {
+        qDebug() << query.value(0).toString();
           inQuery.prepare( "INSERT INTO PSEUDOQ( QUEUENAME ) VALUES ( :queuename )" );
           inQuery.bindValue( ":queuename", query.value(0).toString() );
           inQuery.exec();
