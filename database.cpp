@@ -824,7 +824,7 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
             i.high_value = false;
         }
         
-        i.detailed_desc =  query.value( 24 ).toString();
+        i.detailed_desc =  query.value( 24 ).toString().replace( "]]>", "]]&gt;" );
         i.alt_contact = query.value( 25 ).toString();
         i.bugId = query.value( 26 ).toString();
         i.cstNum = query.value( 27 ).toString();
