@@ -237,7 +237,13 @@ QString Database::getSrForCr( const QString& cr, const QString& mysqlname, const
     
     if ( sr == QString::Null() )
     {
-        openReportDB( reportname );
+        QSqlDatabase r = QSqlDatabase::database( reportname );
+        
+        if ( !r.isOpen() ) 
+        {
+            openReportDB( reportname );
+        }
+        
         sr = getSrForCrReport( cr, mysqlname, reportname );
     }
         
@@ -1112,6 +1118,7 @@ void Database::updatePseudoQueues( const QString& qDb, const QString& mDb )
     
     while ( query.next() )
     {
+        qDebug() << query.value(0).toString();
           inQuery.prepare( "INSERT INTO PSEUDOQ( QUEUENAME ) VALUES ( :queuename )" );
           inQuery.bindValue( ":queuename", query.value(0).toString() );
           inQuery.exec();
@@ -1640,6 +1647,7 @@ QList< SiebelItem > Database::getSrsForQueue( const QString& queue, const QStrin
         {
             si.isCr = true;
             si.creator = query.value( 24 ).toString();
+            si.crsr = getSrForCrMysql( si.id, dbname );
         }
         else
         {
@@ -1877,7 +1885,7 @@ QString Database::convertTime( const QString& dt )
     return ( d.toString("yyyy-MM-dd hh:mm:ss") );
 }
 
-QList< SiebelItem > Database::getQmonSrs( const QString& dbname, const QString& mysqlname )
+QList< SiebelItem > Database::getQmonSrs( const QString& dbname, const QString& mysqlname, const QString& reportname )
 {
     QSqlDatabase db;
     
@@ -2133,6 +2141,7 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname, const QString& 
         {
             si.isCr = true;
             si.creator = getCreator( si.id, dbname );
+            si.crsr = getSrForCr( si.id, mysqlname, reportname );
         }
         else
         {
@@ -2419,7 +2428,7 @@ bool Database::openMysqlDB( const QString& name )
     }
     else
     {
-        Debug::print( "database", "DB already open in this thread " + name );
+        Debug::print( "database", "MySQL DB already open in this thread " + name );
         return true;
     }
 }
