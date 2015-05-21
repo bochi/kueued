@@ -231,7 +231,7 @@ bool Database::checkLTSSbyId( const QString& id, const QString& dbname )
 }
 
 
-QString Database::getSrForCr( const QString& cr, const QString& mysqlname, const QString& reportname )
+QString Database::getSrForCr( const QString& cr, const QString& mysqlname, const QString& reportname, const QString& siebelname )
 {
     QString sr = getSrForCrMysql( cr, mysqlname );
     
@@ -284,7 +284,7 @@ QString Database::getSrForCrMysql( const QString& cr, const QString& dbname )
 }
 
 
-QString Database::getSrForCrReport( const QString& cr, const QString& dbname1, const QString& dbname )
+QString Database::getSrForCrReport( const QString& cr, const QString& dbname1, const QString& dbname, const QString& siebelname )
 {
     QSqlDatabase db;
     QSqlDatabase db1;
@@ -325,12 +325,19 @@ QString Database::getSrForCrReport( const QString& cr, const QString& dbname1, c
     if ( query.next() )
     {
         sr = query.value( 0 ).toString();
+	
+	QStringList info = srInfo( sr, siebelname );
         
+	QString desc = info.at( 0 );
+	QString cust = info.at( 3 );
+	
         QSqlQuery query1( db1 );
         
-        query1.prepare( "INSERT INTO CRSR( CR, SR ) VALUES ( :cr, :sr )" );
+        query1.prepare( "INSERT INTO CRSR( CR, SR, DESC, CUST ) VALUES ( :cr, :sr, :desc, :cust )" );
         query1.bindValue( ":cr", cr );
         query1.bindValue( ":sr", sr );
+	query1.bindValue( ":desc", desc );
+	query1.bindValue( ":cust", cust );
         
         if ( !query1.exec() ) qDebug() << query1.lastError().text();
         

@@ -55,9 +55,9 @@ class Database : public QObject
         static QString getQmonBdesc( const QString&, const QString& = QString::Null() );
         static QString getDetDesc( const QString&, const QString& = QString::Null() );
         static QString getCreator( const QString&, const QString& = QString::Null() );
-        static QString getSrForCr( const QString&, const QString& = QString::Null(), const QString& = QString::Null() );
+        static QString getSrForCr( const QString&, const QString& = QString::Null(), const QString& = QString::Null(), const QString& = QString::Null() );
         static QString getSrForCrMysql( const QString&, const QString& = QString::Null() );
-        static QString getSrForCrReport( const QString&, const QString& = QString::Null(), const QString& = QString::Null() );
+        static QString getSrForCrReport( const QString&, const QString& = QString::Null(), const QString& = QString::Null(), const QString& = QString::Null() );
         
         static void updateBomgarItemInDB( BomgarItem, const QString& = QString::Null() );
         static void deleteBomgarItemFromDB( const QString&, const QString& = QString::Null() );
@@ -139,6 +139,8 @@ class SiebelItem
         QString bugId;
         QString cstNum;
         QString crsr;
+        QString crsrcust;
+	QString crsrdesc;
 	QString subowner;
         bool isCr;
         bool isChat;
