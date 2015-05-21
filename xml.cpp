@@ -364,8 +364,8 @@ QString XML::sr( QueueItem qi )
         xml += "    <srtype>cr</srtype>\n";
         xml += "    <creator>" + qi.creator + "</creator>\n";
         xml += "    <crsr>" + qi.crsr + "</crsr>\n";
-	xml += "    <crsr_cust>" + qi.crsrcust + "</crsr_cust>\n";
-	xml += "    <crsr_desc>" + qi.crsrdesc + "</crsr_desc>\n";
+	xml += "    <crsr_cust><![CDATA[" + qi.crsrcust + "]]></crsr_cust>\n";
+	xml += "    <crsr_desc><![CDATA[" + qi.crsrdesc + "]]></crsr_desc>\n";
     }
     else
     {
