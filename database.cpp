@@ -231,11 +231,11 @@ bool Database::checkLTSSbyId( const QString& id, const QString& dbname )
 }
 
 
-QString Database::getSrForCr( const QString& cr, const QString& mysqlname, const QString& reportname, const QString& siebelname )
+QStringList Database::getSrForCr( const QString& cr, const QString& mysqlname, const QString& reportname, const QString& siebelname )
 {
-    QString sr = getSrForCrMysql( cr, mysqlname );
+    QStringList sr = getSrForCrMysql( cr, mysqlname );
     
-    if ( sr == QString::Null() )
+    if ( sr.isEmpty() )
     {
         QSqlDatabase r = QSqlDatabase::database( reportname );
         
@@ -244,17 +244,17 @@ QString Database::getSrForCr( const QString& cr, const QString& mysqlname, const
             openReportDB( reportname );
         }
         
-        sr = getSrForCrReport( cr, mysqlname, reportname );
+        sr = getSrForCrReport( cr, mysqlname, reportname, siebelname );
     }
         
     return sr;
 }
 
-QString Database::getSrForCrMysql( const QString& cr, const QString& dbname )
+QStringList Database::getSrForCrMysql( const QString& cr, const QString& dbname )
 {
     QSqlDatabase db;
-    QString sr;
-    
+    QStringList sr;
+        
     if ( dbname.isNull() ) 
     {
         db = QSqlDatabase::database( "mysqlDB" );
@@ -268,27 +268,27 @@ QString Database::getSrForCrMysql( const QString& cr, const QString& dbname )
     
     QSqlQuery query( db );
     
-    query.prepare( "SELECT SR FROM CRSR WHERE ( CR = :cr )" );
+    query.prepare( "SELECT SR, CUST, BDESC FROM CRSR WHERE ( CR = :cr )" );
     query.bindValue( ":cr", cr );
     
     if ( !query.exec() ) qDebug() << query.lastError().text();
     
     if ( query.next() )
     {
-        return query.value( 0 ).toString();
+        sr.append( query.value( 0 ).toString() );
+	sr.append( query.value( 1 ).toString() );
+	sr.append( query.value( 2 ).toString() );
     }
-    else
-    {
-        return QString::Null();
-    }
+
+    return sr;
 }
 
 
-QString Database::getSrForCrReport( const QString& cr, const QString& dbname1, const QString& dbname, const QString& siebelname )
+QStringList Database::getSrForCrReport( const QString& cr, const QString& dbname1, const QString& dbname, const QString& siebelname )
 {
     QSqlDatabase db;
     QSqlDatabase db1;
-    QString sr;
+    QStringList srinfo;
     
     if ( dbname.isNull() ) 
     {
@@ -338,18 +338,15 @@ QString Database::getSrForCrReport( const QString& cr, const QString& dbname1, c
         query1.bindValue( ":sr", sr );
 	query1.bindValue( ":cust", cust );
 	query1.bindValue( ":bdesc", desc );
-	
-        
+	        
         if ( !query1.exec() ) qDebug() << query1.lastError().text();
         
-        return sr;
-    }
-    else
-    {
-        sr = "ERROR";
+	srinfo.append( sr );
+	srinfo.append( cust );
+	srinfo.append( desc );
     }
     
-    return sr;
+    return srinfo;
 }
 
 QList< LTSScustomer > Database::getLTSScustomersExt( const QString& dbname )
@@ -764,7 +761,7 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
     while ( query.next() )
     {
         QueueItem i;
-        
+	
         i.id = query.value( 0 ).toString();
         i.geo = query.value( 1 ).toString();
         i.hours = query.value( 2 ).toString();
@@ -777,9 +774,15 @@ QList< QueueItem > Database::getUserQueue( const QString& engineer, const QStrin
         
         if ( query.value( 9 ).toString() == "Collaboration" )
         {
-            i.isCr = true;
+	    QStringList srcrinfo;
+            
+	    i.isCr = true;
             i.creator = getCreator( i.id, dbname );
-            i.crsr = getSrForCr( i.id, mysqlname, reportname );
+            srcrinfo = getSrForCr( i.id, mysqlname, reportname, dbname ); 
+	    
+	    i.crsr = srcrinfo.at( 0 );
+	    i.crsrcust = srcrinfo.at( 1 );
+	    i.crsrdesc = srcrinfo.at( 2 );
         }
         else
         {
@@ -1653,9 +1656,13 @@ QList< SiebelItem > Database::getSrsForQueue( const QString& queue, const QStrin
         
         if ( si.subtype == "Collaboration" )
         {
+	    QStringList nfo = getSrForCrMysql( si.id, dbname );
+	    
             si.isCr = true;
             si.creator = query.value( 24 ).toString();
-            si.crsr = getSrForCrMysql( si.id, dbname );
+            si.crsr = nfo.at( 0 );
+	    si.crsrcust = nfo.at( 1 );
+	    si.crsrdesc = nfo.at( 2 );
         }
         else
         {

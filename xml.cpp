@@ -204,6 +204,8 @@ QString XML::qmonDate( QList<SiebelItem> list )
             xml += "    <srtype>cr</srtype>\n";
             xml += "    <creator>" + si.creator + "</creator>\n";
             xml += "    <crsr>" + si.crsr + "</crsr>\n";
+	    xml += "    <crsr_cust>" + si.crsrcust + "</crsr_cust>\n";
+	    xml += "    <crsr_desc>" + si.crsrdesc + "</crsr_desc>\n";
             
         }
         else
