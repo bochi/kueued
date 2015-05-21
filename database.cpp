@@ -333,11 +333,12 @@ QString Database::getSrForCrReport( const QString& cr, const QString& dbname1, c
 	
         QSqlQuery query1( db1 );
         
-        query1.prepare( "INSERT INTO CRSR( CR, SR, DESC, CUST ) VALUES ( :cr, :sr, :desc, :cust )" );
+        query1.prepare( "INSERT INTO CRSR( CR, SR, CUST, BDESC ) VALUES ( :cr, :sr, :cust, :bdesc )" );
         query1.bindValue( ":cr", cr );
         query1.bindValue( ":sr", sr );
-	query1.bindValue( ":desc", desc );
 	query1.bindValue( ":cust", cust );
+	query1.bindValue( ":bdesc", desc );
+	
         
         if ( !query1.exec() ) qDebug() << query1.lastError().text();
         
