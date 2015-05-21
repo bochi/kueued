@@ -1658,7 +1658,7 @@ QList< SiebelItem > Database::getSrsForQueue( const QString& queue, const QStrin
         if ( si.subtype == "Collaboration" )
         {
 	    QStringList nfo = getSrForCrMysql( si.id, dbname );
-	    
+	    qDebug() << "NFO" << nfo;
             si.isCr = true;
             si.creator = query.value( 24 ).toString();
             si.crsr = nfo.at( 0 );
