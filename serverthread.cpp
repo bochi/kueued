@@ -224,7 +224,7 @@ void ServerThread::run()
                 else
                 {  
                     out << text();
-                    out << Database::getSrForCr( q, mMysqlDB, mReportDB, mSiebelDB );
+                    out << Database::getSrForCr( q, mMysqlDB, mReportDB, mSiebelDB ).at( 0 );
                 }
                 
                 out.flush();

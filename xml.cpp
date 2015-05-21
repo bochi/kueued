@@ -62,6 +62,8 @@ QString XML::qmon( QList<SiebelItem> list )
             xml += "    <srtype>cr</srtype>\n";
             xml += "    <creator>" + si.creator + "</creator>\n";
             xml += "    <crsr>" + si.crsr + "</crsr>\n";
+	    xml += "    <crsr_cust>" + si.crsrcust + "</crsr_cust>\n";
+	    xml += "    <crsr_desc>" + si.crsrdesc + "</crsr_desc>\n";
             
         }
         else
@@ -362,6 +364,8 @@ QString XML::sr( QueueItem qi )
         xml += "    <srtype>cr</srtype>\n";
         xml += "    <creator>" + qi.creator + "</creator>\n";
         xml += "    <crsr>" + qi.crsr + "</crsr>\n";
+	xml += "    <crsr_cust>" + qi.crsrcust + "</crsr_cust>\n";
+	xml += "    <crsr_desc>" + qi.crsrdesc + "</crsr_desc>\n";
     }
     else
     {

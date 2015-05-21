@@ -289,6 +289,7 @@ QStringList Database::getSrForCrReport( const QString& cr, const QString& dbname
     QSqlDatabase db;
     QSqlDatabase db1;
     QStringList srinfo;
+    QString sr;
     
     if ( dbname.isNull() ) 
     {
@@ -2154,9 +2155,12 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname, const QString& 
 
         if ( query.value( 16 ).toString() == "Collaboration" )
         {
+	    QStringList nfo = getSrForCr( si.id, mysqlname, reportname, dbname );
             si.isCr = true;
             si.creator = getCreator( si.id, dbname );
-            si.crsr = getSrForCr( si.id, mysqlname, reportname );
+            si.crsr = nfo.at( 0 );
+	    si.crsrcust = nfo.at( 1 );
+	    si.crsrdesc = nfo.at( 2 );
         }
         else
         {
