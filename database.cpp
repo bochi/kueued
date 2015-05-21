@@ -2162,9 +2162,12 @@ QList< SiebelItem > Database::getQmonSrs( const QString& dbname, const QString& 
 	    QStringList nfo = getSrForCr( si.id, mysqlname, reportname, dbname );
             si.isCr = true;
             si.creator = getCreator( si.id, dbname );
-            si.crsr = nfo.at( 0 );
-	    si.crsrcust = nfo.at( 1 );
-	    si.crsrdesc = nfo.at( 2 );
+	    
+	    if ( !nfo.isEmpty() ) {
+	      si.crsr = nfo.at( 0 );
+	      si.crsrcust = nfo.at( 1 );
+	      si.crsrdesc = nfo.at( 2 );
+	    }
         }
         else
         {
